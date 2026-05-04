@@ -15,10 +15,8 @@ const config: NextAuthConfig = {
       credentials: {},
 
       authorize: async (credentials) => {
-        // TODO: wrap with try catch block and use a universal error handler
         const user = await UserService.localLogin(credentials as z.infer<typeof loginUserSchema>);
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        return user as any;
+        return user;
       },
     }),
   ],

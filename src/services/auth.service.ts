@@ -7,8 +7,10 @@ import { createUserSchema, loginUserSchema } from '@/validationSchemas/auth';
 import z from 'zod';
 import bcrypt from 'bcrypt';
 import { AuthProvider, User } from '@prisma/client';
-import { signIn } from '@/auth';
+import { auth, signIn } from '@/auth';
 import { UserContract } from '@/contracts/user';
+import { CredentialsSignin } from 'next-auth';
+import { ForbiddenError, UnAuthorizedError } from '@/lib/errors';
 
 class AuthService {
   private static async createLocalAuthMethod(
@@ -60,11 +62,7 @@ class AuthService {
 
     const user = await findUserByEmail(email);
     if (!user) {
-      throw {
-        error: 'InvalidCredentials',
-        message: 'Invalid email or password',
-        status: 401,
-      };
+      throw new CredentialsSignin('Invalid email or password');
     }
 
     const localAuthMethod = user.authMethods.find(
@@ -72,11 +70,7 @@ class AuthService {
     );
 
     if (!localAuthMethod || !localAuthMethod.passwordHash) {
-      throw {
-        error: 'InvalidCredentials',
-        message: 'Invalid email or password',
-        status: 401,
-      };
+      throw new CredentialsSignin('Invalid email or password');
     }
 
     const isPasswordValid = await bcrypt.compare(
@@ -85,14 +79,8 @@ class AuthService {
     );
 
     if (!isPasswordValid) {
-      throw {
-        error: 'InvalidCredentials',
-        message: 'Invalid email or password',
-        status: 401,
-      };
+      throw new CredentialsSignin('Invalid email or password');
     }
-
-    await signIn('credentials', { email, password, redirect: false });
 
     return {
       id: user.id,
@@ -103,6 +91,18 @@ class AuthService {
       phone: user.phone,
     };
   }
+
+  static async authorizeUser(roles: User['role'][]): Promise<UserContract> {
+  const session = await auth();
+  if (!session) {
+    throw new UnAuthorizedError('Unauthorized');
+  }
+  if (!roles.includes(session.user.role)) {
+    throw new ForbiddenError('Forbidden');
+  }
+
+  return session.user;
+};
 }
 
 export default AuthService;
