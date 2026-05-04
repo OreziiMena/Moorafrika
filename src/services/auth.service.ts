@@ -92,12 +92,12 @@ class AuthService {
     };
   }
 
-  static async authorizeUser(roles: User['role'][]): Promise<UserContract> {
+  static async authorizeUser(roles?: User['role'][]): Promise<UserContract> {
   const session = await auth();
   if (!session) {
     throw new UnAuthorizedError('Unauthorized');
   }
-  if (!roles.includes(session.user.role)) {
+  if (roles && !roles.includes(session.user.role)) {
     throw new ForbiddenError('Forbidden');
   }
 
