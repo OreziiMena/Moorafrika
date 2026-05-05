@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/prisma";
-import { AuthProvider, User } from "@prisma/client";
+import { AuthProvider, Prisma, User } from "@prisma/client";
 
 interface CreateAuthMethodPayload {
   userId: User["id"];
@@ -19,6 +19,14 @@ export const findUserByEmail = async (email: string) => {
   });
 };
 
+export const findUserById = async (id: string) => {
+  return await prisma.user.findUnique({
+    where: {
+      id,
+    },
+  });
+};
+
 export const createUser = async (data: {
   email: string;
   name: string;
@@ -32,6 +40,13 @@ export const createUser = async (data: {
     },
   });
 };
+
+export const updateUser = async (id: string, data: Prisma.UserUpdateInput) => {
+  return await prisma.user.update({
+    where: { id },
+    data,
+  });
+}
 
 export const createAuthMethod = async (data: CreateAuthMethodPayload) => {
   return await prisma.authMethod.create({

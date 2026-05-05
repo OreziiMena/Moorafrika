@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import { Prisma } from '@prisma/client';
 import { ZodError } from 'zod';
 
-type tParams = Promise<{ id?: string; slug?: string; trackingId?: string }>;
+type tParams = Promise<{ id: string; slug: string; trackingId: string }>;
 
 export const errorHandler =
   (

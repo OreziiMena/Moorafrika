@@ -93,16 +93,16 @@ class AuthService {
   }
 
   static async authorizeUser(roles?: User['role'][]): Promise<UserContract> {
-  const session = await auth();
-  if (!session) {
-    throw new UnAuthorizedError('Unauthorized');
-  }
-  if (roles && !roles.includes(session.user.role)) {
-    throw new ForbiddenError('Forbidden');
-  }
+    const session = await auth();
+    if (!session) {
+      throw new UnAuthorizedError('Unauthorized');
+    }
+    if (roles && !roles.includes(session.user.role)) {
+      throw new ForbiddenError('Insufficient permission to perform action.');
+    }
 
-  return session.user;
-};
+    return session.user;
+  }
 }
 
 export default AuthService;

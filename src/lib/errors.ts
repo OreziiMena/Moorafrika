@@ -1,29 +1,32 @@
 export class UnAuthorizedError extends Error {
   status: number;
+  error: string;
 
   constructor(message: string) {
     super(message);
-    this.name = 'UnAuthorizedError';
+    this.error = 'UnAuthorizedError';
     this.status = 401;
   }
 }
 
 export class ForbiddenError extends Error {
   status: number;
+  error: string;
 
   constructor(message: string) {
     super(message);
-    this.name = 'ForbiddenError';
+    this.error = 'ForbiddenError';
     this.status = 403;
   }
 }
 
 export class NotFoundError extends Error {
   status: number;
+  error: string;
 
   constructor(message: string) {
     super(message);
-    this.name = 'NotFoundError';
+    this.error = 'NotFoundError';
     this.status = 404;
   }
 }
