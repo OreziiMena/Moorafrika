@@ -44,3 +44,36 @@ model AuthMethod {
 
   @@map("auth_methods")
 }
+
+model Category {
+  id   Int    @id @default(autoincrement())
+  name String @unique
+
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  products Product[]
+
+  @@map("categories")
+}
+
+model Product {
+  id          String @id @default(uuid())
+  name        String
+  slug        String @unique
+  description String
+  categoryId  Int
+  price       Float
+
+  imageKey      String
+  thumbnailKeys String[] @default([])
+
+  sizes String[] @default([])
+
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  Category Category @relation(fields: [categoryId], references: [id])
+
+  @@map("products")
+}
