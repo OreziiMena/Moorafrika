@@ -1,7 +1,7 @@
 import Credentials from 'next-auth/providers/credentials';
 import NextAuth from 'next-auth';
 import type { NextAuthConfig } from 'next-auth';
-import UserService from '@/services/auth.service';
+import AuthService from '@/services/auth.service';
 import z from 'zod';
 import { loginUserSchema } from '@/validationSchemas/auth';
 
@@ -15,7 +15,7 @@ const config: NextAuthConfig = {
       credentials: {},
 
       authorize: async (credentials) => {
-        const user = await UserService.localLogin(credentials as z.infer<typeof loginUserSchema>);
+        const user = await AuthService.localLogin(credentials as z.infer<typeof loginUserSchema>);
         return user;
       },
     }),
