@@ -1,3 +1,14 @@
+export class BadRequestError extends Error {
+  status: number;
+  error: string;
+
+  constructor(message: string) {
+    super(message);
+    this.error = 'BadRequestError';
+    this.status = 400;
+  }
+}
+
 export class UnAuthorizedError extends Error {
   status: number;
   error: string;

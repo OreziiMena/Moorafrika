@@ -70,10 +70,11 @@ model Product {
 
   sizes String[] @default([])
 
-  created_at DateTime @default(now())
-  updated_at DateTime @updatedAt
+  created_at DateTime  @default(now())
+  updated_at DateTime  @updatedAt
+  deleted_at DateTime?
 
-  Category Category @relation(fields: [categoryId], references: [id])
+  category Category @relation(fields: [categoryId], references: [id])
 
   @@map("products")
 }
