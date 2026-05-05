@@ -11,6 +11,7 @@ import { auth, signIn } from '@/auth';
 import { UserContract } from '@/contracts/user';
 import { CredentialsSignin } from 'next-auth';
 import { ForbiddenError, UnAuthorizedError } from '@/lib/errors';
+import { userMapper } from '@/mapper/user';
 
 class AuthService {
   private static async createLocalAuthMethod(
@@ -45,14 +46,7 @@ class AuthService {
 
     await signIn('credentials', { email, name, password, redirect: false });
 
-    return {
-      id: user.id,
-      email,
-      name,
-      role: user.role,
-      address: user.address,
-      phone: user.phone,
-    };
+    return userMapper(user);
   }
 
   static async localLogin(
@@ -82,14 +76,7 @@ class AuthService {
       throw new CredentialsSignin('Invalid email or password');
     }
 
-    return {
-      id: user.id,
-      email,
-      name: user.name,
-      role: user.role,
-      address: user.address,
-      phone: user.phone,
-    };
+    return userMapper(user);
   }
 
   static async authorizeUser(roles?: User['role'][]): Promise<UserContract> {
