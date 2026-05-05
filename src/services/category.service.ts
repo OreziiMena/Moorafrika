@@ -1,13 +1,14 @@
 import {
   createCategory,
   updateCategory as _updateCategory,
-  deleteCategory as _deleteCategory,
   getAllCategories,
+  findCategoryById,
 } from '@/repositories/category.repository';
 import { createCategorySchema } from '@/validationSchemas/category';
 import z from 'zod';
 import { CategoryContract } from '@/contracts/category';
 import AuthService from './auth.service';
+import { NotFoundError } from '@/lib/errors';
 
 class CategoryService {
   static async fetchAllCategories(): Promise<CategoryContract[]> {
@@ -40,6 +41,10 @@ class CategoryService {
     await AuthService.authorizeUser(['ADMIN']);
 
     const { name } = payload;
+    const existingCategory = await findCategoryById(id);
+    if (!existingCategory || existingCategory.deleted_at) {
+      throw new NotFoundError('Category not found');
+    }
 
     const category = await _updateCategory(id, { name });
 
@@ -52,7 +57,10 @@ class CategoryService {
   static async deleteCategory(id: number): Promise<void> {
     await AuthService.authorizeUser(['ADMIN']);
 
-    await _deleteCategory(id);
+    await _updateCategory(id, {
+      deleted_at: new Date(),
+      name: `Deleted Category ${id}`,
+    });
 
     return;
   }

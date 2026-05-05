@@ -17,12 +17,6 @@ export const updateCategory = async (
   });
 };
 
-export const deleteCategory = async (id: number) => {
-  return await prisma.category.delete({
-    where: { id },
-  });
-};
-
 export const findCategoryById = async (id: number) => {
   return await prisma.category.findUnique({
     where: {
@@ -33,6 +27,9 @@ export const findCategoryById = async (id: number) => {
 
 export const getAllCategories = async () => {
   return await prisma.category.findMany({
+    where: {
+      deleted_at: null,
+    },
     orderBy: {
       name: 'asc',
     },
