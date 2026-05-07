@@ -1,0 +1,102 @@
+/* =========================================
+   Theme Variables (Fallback)
+   ========================================= */
+:root {
+  --obsidian: #141414;
+  --ivory: #FDFBF7;
+  --burnt-umber: #8B3A2B;
+  --terracotta: #E2725B;
+  --antique-gold: #C5A059;
+  --sand-beige: #E6DFD3;
+  --font-editorial: 'Playfair Display', 'Times New Roman', Times, serif;
+  --font-clean: 'Helvetica Neue', Arial, sans-serif;
+}
+
+.featuresSection {
+  background-color: var(--ivory);
+  padding: 5rem 1.5rem;
+  font-family: var(--font-clean);
+  border-top: 1px solid var(--sand-beige);
+  border-bottom: 1px solid var(--sand-beige);
+}
+
+.container {
+  max-width: 80rem;
+  margin: 0 auto;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 3rem;
+  text-align: center;
+}
+
+@media (min-width: 768px) {
+  .grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2rem;
+  }
+}
+
+.featureItem {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+}
+
+/* Add dividers between items on desktop */
+@media (min-width: 768px) {
+  .featureItem:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    right: -1rem;
+    top: 10%;
+    height: 80%;
+    width: 1px;
+    background-color: var(--sand-beige);
+  }
+}
+
+.iconWrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 4rem;
+  height: 4rem;
+  border-radius: 50%;
+  background-color: rgba(197, 160, 89, 0.1); /* Very subtle gold background */
+  color: var(--burnt-umber); /* Umber icon */
+  margin-bottom: 1.5rem;
+  transition: all 0.3s ease;
+}
+
+.featureItem:hover .iconWrapper {
+  background-color: var(--burnt-umber);
+  color: var(--ivory);
+  transform: translateY(-5px);
+}
+
+.icon {
+  width: 1.75rem;
+  height: 1.75rem;
+}
+
+.title {
+  font-family: var(--font-clean);
+  font-size: 0.9rem;
+  font-weight: 600;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--obsidian);
+  margin-bottom: 0.75rem;
+}
+
+.description {
+  font-size: 0.85rem;
+  color: rgba(20, 20, 20, 0.6);
+  line-height: 1.6;
+  max-width: 16rem;
+  margin: 0 auto;
+}

@@ -1,0 +1,133 @@
+:root {
+  --obsidian: #141414;
+  --ivory: #FDFBF7;
+  --burnt-umber: #8B3A2B;
+  --terracotta: #E2725B;
+  --antique-gold: #C5A059;
+  --sand-beige: #E6DFD3;
+  --font-editorial: 'Playfair Display', 'Times New Roman', Times, serif;
+  --font-clean: 'Helvetica Neue', Arial, sans-serif;
+}
+.heroSection {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  overflow: hidden;
+  background-color: var(--obsidian);
+}
+.heroBackground {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+}
+.heroImage {
+  object-fit: cover;
+  object-position: center;
+}
+.heroOverlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(20, 20, 20, 0.6); 
+}
+.heroContent {
+  position: relative;
+  z-index: 10; 
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  width: 100%;
+  height: 100vh;
+  padding: 10px;
+}
+
+.heroTitle {
+  font-family: var(--font-editorial);
+  margin-top: 10%;
+  font-size: 80px; 
+  font-weight: 700;
+  line-height: 1.1;
+  color: var(--ivory);
+  margin-bottom: 1.5rem;
+  letter-spacing: -0.02em;
+}
+
+.heroDescription {
+  font-family: var(--font-clean);
+  font-size: 18px;
+  line-height: 1.6;
+  color: rgba(253, 251, 247, 0.85);
+  max-width: 38rem;
+  margin: 0 auto 3.5rem auto;
+  font-weight: 300;
+}
+
+.heroButtonContainer {
+  background-color:  none;
+  padding: 0.5rem;
+  position: relative;
+  box-shadow: 0 30px 60px rgba(20, 20, 20, 0.4);
+}
+
+.heroButton {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: none;
+  color: var(--ivory);
+  padding: 17px 48px;
+  font-family: var(--font-clean);
+  font-size: 15px;
+  letter-spacing: 5px;
+  text-transform: uppercase;
+  font-weight: 600;
+  overflow: hidden;
+  border: none;
+  cursor: pointer;
+}
+
+.heroButtonBg {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: none;
+  transform: translateX(-101%);
+  transition: transform 0.6s cubic-bezier(0.19, 1, 0.22, 1);
+  z-index: 0;
+}
+
+.heroButtonContainer:hover .heroButtonBg {
+  transform: translateX(0);
+}
+
+.heroButtonText {
+  position: relative;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+}
+
+.heroButtonIcon {
+  margin-left: 13px;
+  width: 16px;
+  height: 16px;
+  transition: transform 0.4s ease;
+  color: var(--ivory);
+}
+
+.heroButtonContainer:hover .heroButtonIcon {
+  transform: translateX(0.5rem);
+  color: var(--ivory);
+}
