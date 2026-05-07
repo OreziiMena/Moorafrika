@@ -1,0 +1,112 @@
+:root {
+  --obsidian: #141414;
+  --ivory: #FDFBF7;
+  --burnt-umber: #8B3A2B;
+  --terracotta: #E2725B;
+  --antique-gold: #C5A059;
+  --sand-beige: #E6DFD3;
+  --font-editorial: 'Playfair Display', 'Times New Roman', Times, serif;
+  --font-clean: 'Helvetica Neue', Arial, sans-serif;
+}
+.gallerySection {
+  background-color: var(--obsidian);
+  padding: 6rem 1.5rem;
+  font-family: var(--font-clean);
+}
+.container {
+  max-width: 80rem;
+  margin: 0 auto;
+}
+.header {
+  text-align: center;
+  margin-bottom: 20px;
+}
+.title {
+  font-family: var(--font-editorial);
+  font-size: 2.5rem;
+  color: var(--ivory);
+  font-weight: 400;
+  letter-spacing: -0.02em;
+}
+.subtitle {
+  color: var(--antique-gold);
+  text-transform: uppercase;
+  letter-spacing: 0.3em;
+  font-size: 0.75rem;
+  font-weight: 500;
+  display: block;
+  margin-bottom: 5px;
+}
+.grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  grid-auto-rows: 300px; 
+  gap: 1rem;
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 1.5rem;
+}
+.imageWrapper {
+  position: relative;
+  border-radius: 1rem;
+  overflow: hidden;
+  width: 100%;
+  height: 100%; 
+  background-color: var(--sand-beige, #E6DFD3); 
+}
+.image {
+  object-fit: cover;
+}
+.imageWrapper:nth-child(1) {
+  grid-column: span 2;
+  grid-row: span 2;
+}
+.imageWrapper:nth-child(4) {
+  grid-column: span 2;
+  grid-row: span 1;
+}
+.imageWrapper:nth-child(5) {
+  grid-column: span 1;
+  grid-row: span 2;
+}
+
+/* Tablet (Switch to 3 columns, adjust the pattern) */
+@media (max-width: 1024px) {
+  .grid {
+    grid-template-columns: repeat(3, 1fr);
+    grid-auto-rows: 250px;
+  }
+  
+  .imageWrapper:nth-child(1) {
+    grid-column: span 2;
+    grid-row: span 2;
+  }
+  
+  /* Make the wide banner span all 3 columns */
+  .imageWrapper:nth-child(4) {
+    grid-column: span 3; 
+  }
+}
+
+/* Mobile (Switch to 2 columns) */
+@media (max-width: 640px) {
+  .grid {
+    grid-template-columns: repeat(2, 1fr);
+    grid-auto-rows: 200px;
+    gap: 0.5rem;
+    padding: 0.5rem;
+  }
+  
+  /* Hero takes up the top square */
+  .imageWrapper:nth-child(1) {
+    grid-column: span 2;
+    grid-row: span 2;
+  }
+  
+  /* Portrait becomes a standard square on mobile */
+  .imageWrapper:nth-child(5) {
+    grid-column: span 1;
+    grid-row: span 1; 
+  }
+}
