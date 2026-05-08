@@ -4,7 +4,9 @@ import { useState } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
+import { useCartStore } from "../app/store/cartStore"; 
 import { Search, Heart, ShoppingCart, ChevronDown } from "lucide-react";
+import styles from "./Navbar.module.css";
 
 const MenuIcon = ({ className, strokeWidth = 1.5 }: { className?: string, strokeWidth?: number }) => (
   <svg className={className} strokeWidth={strokeWidth} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round">
@@ -20,11 +22,13 @@ const CloseIcon = ({ className, strokeWidth = 1.5 }: { className?: string, strok
     <line x1="6" y1="6" x2="18" y2="18"></line>
   </svg>
 );
-import styles from "./Navbar.module.css";
 
 export default function Navbar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isResourcesOpen, setIsResourcesOpen] = useState(false);
+  
+  // 1. Pull the items from the global store
+  const { items } = useCartStore();
 
   const toggleMobileMenu = () => setIsMobileMenuOpen(!isMobileMenuOpen);
   const toggleResources = () => setIsResourcesOpen(!isResourcesOpen);
@@ -94,10 +98,15 @@ export default function Navbar() {
             <button className={styles.iconBtn}>
               <Heart strokeWidth={1.5} className={styles.iconSize} />
             </button>
-            <button className={styles.iconBtn}>
+            
+            {/* Updated Cart Button */}
+            <Link href="/cart" className={styles.iconBtn} style={{ position: 'relative', display: 'flex' }}>
               <ShoppingCart strokeWidth={1.5} className={styles.iconSize} />
-              <span className={styles.cartBadge}>3</span>
-            </button>
+              {/* Only show the badge if there are items in the cart */}
+              {items.length > 0 && (
+                <span className={styles.cartBadge}>{items.length}</span>
+              )}
+            </Link>
 
             {/* Mobile Menu Button */}
             <div className={styles.mobileMenuBtnContainer}>
