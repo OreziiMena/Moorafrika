@@ -58,3 +58,15 @@ export const createAuthMethod = async (data: CreateAuthMethodPayload) => {
     },
   });
 };
+
+export const updateLocalAuthMethod = async (id: string, passwordHash: string) => {
+  return await prisma.authMethod.updateMany({
+    where: {
+      id,
+      provider: AuthProvider.LOCAL,
+    },
+    data: {
+      passwordHash,
+    },
+  });
+};

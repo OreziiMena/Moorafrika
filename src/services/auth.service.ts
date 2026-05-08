@@ -14,7 +14,7 @@ import { ForbiddenError, UnAuthorizedError } from '@/lib/errors';
 import { userMapper } from '@/mapper/user';
 
 class AuthService {
-  private static async createLocalAuthMethod(
+  static async createLocalAuthMethod(
     userId: User['id'],
     passwordHash: string,
   ) {
