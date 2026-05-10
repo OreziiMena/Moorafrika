@@ -76,7 +76,7 @@ model Product {
   deleted_at DateTime?
 
   category  Category   @relation(fields: [categoryId], references: [id])
-  discounts Discount?
+  discount Discount?
 
   @@map("products")
 }
