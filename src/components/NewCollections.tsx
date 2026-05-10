@@ -18,18 +18,18 @@ interface Product {
 const products: Product[] = [
   { id: "1", name: "Classic T-Shirt", currentPrice: "₦22,500", inStock: true, imageSrc: "/Assets/brand-image-1.jpeg" },
   { id: "2", name: "Premium Hoodie", currentPrice: "₦45,000", inStock: true, imageSrc: "/Assets/brand-image-7.jpeg" },
-  { id: "3", name: "Cargo Pants", currentPrice: "₦35,000", inStock: false, imageSrc: "/Assets/brand-image-11.jpeg" },
-  { id: "4", name: "Cargo Pants", currentPrice: "₦35,000", inStock: false, imageSrc: "/Assets/brand-image-10.jpeg" }
+  { id: "3", name: "Cargo Pants", currentPrice: "₦35,000", inStock: true, imageSrc: "/Assets/brand-image-11.jpeg" },
+  { id: "4", name: "Cargo Pants", currentPrice: "₦35,000", inStock: true, imageSrc: "/Assets/brand-image-10.jpeg" }
 ];
 
 function ProductCard({ product }: { product: Product }) {
-  // 1. Hook into the Zustand global store
+  //Hooking into the Zustand global store
   const { items, addItem, removeItem } = useCartStore();
 
-  // 2. Check if this specific item is already inside the cart array
+  // Check if this specific item is already inside the cart array
   const isInCart = items.some((item) => item.id === product.id);
 
-  // 3. Handle the button click
+  //Handle the button click
   const handleCartClick = () => {
     if (isInCart) {
       removeItem(product.id);
@@ -60,7 +60,9 @@ function ProductCard({ product }: { product: Product }) {
         <h2 className={styles.productName}>{product.name}</h2>
       
         <div className={styles.statusWrapper}>
-          <span className={styles.currentPrice}>{product.currentPrice}</span>
+          <div className="{styles.firstStat}">
+            <span className={styles.currentPrice}>{product.currentPrice}</span>
+          </div>
           {product.inStock ? (
             <span className={styles.inStock}>In Stock</span>
           ) : (

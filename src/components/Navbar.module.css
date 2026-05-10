@@ -217,7 +217,7 @@
 }
 
 .mobileMenuBtn {
-  margin-left: 0.5rem;
+  margin-left: -0.5rem;
   background: none;
   border: none;
   color: var(--ivory);

@@ -51,6 +51,7 @@
   border: 1px solid rgba(230, 223, 211, 0.1); /* faded sand beige */
   transition: border-color 0.4s ease, transform 0.4s ease;
   position: relative;
+  border-radius: 1rem;
 }
 
 .card:hover {

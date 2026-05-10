@@ -61,18 +61,19 @@ export default function AboutPage() {
             </p>
 
              <p className={styles.paragraph}>
-              Mo’orafrika represents a generation that moves fluidly between worlds—rooted yet global, traditional yet progressive. It is for those who don’t perform culture, but embody it effortlessly.
-            </p>
+                The philosophy is clear:
+              </p>
 
-            <p className={styles.paragraph}>
-              The philosophy is clear:
-              <li>Intentional design over fast fashion</li>
-              <li>Cultural pride without cliché</li>
-              <li>Quiet luxury rooted in identity</li>
-              <li> Confidence that doesn’t seek validation</li>
+              <ul className={styles.paragraph}>
+                <li>Intentional design over fast fashion</li>
+                <li>Cultural pride without cliché</li>
+                <li>Quiet luxury rooted in identity</li>
+                <li>Confidence that doesn’t seek validation</li>
+              </ul>
 
-              This is not nostalgia. It is evolution.
-            </p>
+              <p className={styles.paragraph}>
+                This is not nostalgia. It is evolution.
+              </p>
       
             <div className={styles.quoteBlock}>
               <div className={styles.quoteLine}></div>

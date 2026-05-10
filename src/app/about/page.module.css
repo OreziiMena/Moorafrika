@@ -24,18 +24,21 @@
   width: 100%;
   height: 60vh; 
   overflow: hidden;
-  margin: 10%;
-  padding: 15px;
-}
-.image {
-  object-fit: cover;
+  margin-top: 1.9rem;
+  margin-bottom: 2rem; 
+  margin-left: 0; 
+  margin-right: 0;
+  padding: 0; 
 }
 
 .textContent {
   display: flex;
   flex-direction: column;
-  padding: 64px;
-  margin: 20px;
+  padding: 2rem 1.5rem; 
+  margin: 0; 
+}
+.image {
+  object-fit: cover;
 }
 
 .subtitle {
@@ -67,6 +70,7 @@
 .paragraph li {
   margin-left: 1.5rem;
   margin-bottom: 0.5rem;
+  list-style-type: disc;
 }
 .quoteBlock {
   display: flex;
@@ -87,10 +91,6 @@
   margin: 0;
 }
 
-
-/* =========================================
-   DESKTOP LAYOUT (The Split Effect)
-   ========================================= */
 @media (min-width: 1024px) {
   .splitLayout {
     flex-direction: row;
@@ -113,12 +113,8 @@
   }
 }
 
-/* =========================================
-   THE STICKY IMAGE
-   ========================================= */
-   @media (min-width: 1024px) {
+@media (min-width: 1024px) {
   .stickyImageWrapper {
-    /* This is the magic! It locks the image to the screen height as you scroll */
     position: sticky;
     top: 0;
     height: 100vh; 
