@@ -50,7 +50,7 @@ class CloudflareR2StorageServer {
     });
   }
 
-  private generatePublicUrl = (key: string) => `${this.publicUrl}/${key}`;
+  generatePublicUrl = (key: string) => `${this.publicUrl}/${key}`;
 
 
   generatePresignedUrl = async ({
