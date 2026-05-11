@@ -101,7 +101,7 @@ model Discount {
 
 model CartItem {
   id        String @id @default(uuid())
-  cartId    Int
+  cartId    String
   productId String
   quantity  Int
 
@@ -115,7 +115,7 @@ model CartItem {
 }
 
 model Cart {
-  id         Int        @id @default(autoincrement())
+  id         String     @id @default(uuid())
   user_id    String     @unique
   items      CartItem[]
   created_at DateTime   @default(now())
