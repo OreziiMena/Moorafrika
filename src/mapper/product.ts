@@ -1,6 +1,6 @@
 import { ProductContract } from "@/contracts/product";
-import { generateImageUrl } from "@/lib/mediaManager";
 import { Prisma } from "@prisma/client";
+import CloudflareStorageServer from "@/services/cloudflare/storage";
 
 export const productMapper = (product: Prisma.ProductGetPayload<{
   include: { category: true }
@@ -10,8 +10,8 @@ export const productMapper = (product: Prisma.ProductGetPayload<{
   slug: product.slug,
   description: product.description,
   price: product.price,
-  imageUrl: generateImageUrl(product.imageKey),
-  thumbnails: product.thumbnailKeys.map(generateImageUrl),
+  imageUrl: CloudflareStorageServer.generatePublicUrl(product.imageKey),
+  thumbnails: product.thumbnailKeys.map(CloudflareStorageServer.generatePublicUrl),
   sizes: product.sizes,
   category: product.category.name,
   createdAt: product.created_at,
