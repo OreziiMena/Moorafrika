@@ -66,6 +66,8 @@ model Product {
   description String
   categoryId  Int
   price       Float
+  stock_count Int
+  sales_count Int    @default(0)
 
   imageKey      String
   thumbnailKeys String[] @default([])
@@ -100,7 +102,7 @@ model Discount {
 }
 
 model CartItem {
-  id        String @id @default(uuid())
+  id        String  @id @default(uuid())
   cartId    String
   productId String
   quantity  Int
