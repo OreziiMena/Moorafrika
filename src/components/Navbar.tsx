@@ -5,7 +5,7 @@ import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
 import { useCartStore } from "../app/store/cartStore"; 
-import { Search, Heart, ShoppingCart, ChevronDown } from "lucide-react";
+import { Search, Heart, ShoppingCart, ChevronDown, User } from "lucide-react"; // Added User icon
 import styles from "./Navbar.module.css";
 
 const MenuIcon = ({ className, strokeWidth = 1.5 }: { className?: string, strokeWidth?: number }) => (
@@ -27,7 +27,6 @@ export default function Navbar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isResourcesOpen, setIsResourcesOpen] = useState(false);
   
-  // 1. Pull the items from the global store
   const { items } = useCartStore();
 
   const toggleMobileMenu = () => setIsMobileMenuOpen(!isMobileMenuOpen);
@@ -84,7 +83,7 @@ export default function Navbar() {
             </div>
           </div>
 
-          {/* Right Side: Icons */}
+          {/* Right Side: Icons & Auth */}
           <div className={styles.rightSide}>
             <div className={styles.desktopSearch}>
               <Search className={styles.searchIcon} />
@@ -95,14 +94,20 @@ export default function Navbar() {
               />
             </div>
 
+            {/*Desktop Login / Sign Up */}
+            <div className={styles.authLinks}>
+              <Link href="/login" className={styles.authLink}>Login</Link>
+              <span className={styles.authDivider}>/</span>
+              <Link href="/signup" className={styles.authLink}>Sign Up</Link>
+            </div>
+
             <button className={styles.iconBtn}>
               <Heart strokeWidth={1.5} className={styles.iconSize} />
             </button>
             
-            {/* Updated Cart Button */}
+            {/* Cart Button */}
             <Link href="/cart" className={styles.iconBtn} style={{ position: 'relative', display: 'flex' }}>
               <ShoppingCart strokeWidth={1.5} className={styles.iconSize} />
-              {/* Only show the badge if there are items in the cart */}
               {items.length > 0 && (
                 <span className={styles.cartBadge}>{items.length}</span>
               )}
@@ -165,6 +170,7 @@ export default function Navbar() {
                 </AnimatePresence>
               </div>
 
+
               <div className={styles.mobileSearchContainer}>
                 <Search className={styles.searchIcon} />
                 <input
@@ -172,6 +178,12 @@ export default function Navbar() {
                   placeholder="SEARCH..."
                   className={styles.mobileSearchInput}
                 />
+              </div>
+
+              {/* Mobile Login / Sign Up */}
+              <div className={styles.mobileAuthSection}>
+                 <Link href="/login" className={styles.mobileAuthBtn}>Log In</Link>
+                 <Link href="/signup" className={styles.mobileAuthBtnPrimary}>Sign Up</Link>
               </div>
             </div>
           </motion.div>

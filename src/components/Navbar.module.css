@@ -316,5 +316,73 @@
   .desktopNav, .desktopSearch { display: flex; }
   .mobileMenuBtnContainer, .mobileMenu { display: none !important; }
 }
+/* --- DESKTOP AUTH STYLES --- */
+.authLinks {
+  display: none; /* Hidden on mobile */
+  align-items: center;
+  gap: 0.5rem;
+  margin-right: 1rem; /* Space before the heart icon */
+}
 
-/* Dark mode overrides removed to maintain consistent white navbar */
+@media (min-width: 1024px) {
+  .authLinks {
+    display: flex;
+  }
+}
+
+.authLink {
+  font-family: var(--font-clean, sans-serif);
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--ivory, #FDFBF7);
+  text-decoration: none;
+  transition: opacity 0.2s ease;
+}
+
+.authLink:hover {
+  opacity: 0.7;
+}
+
+.authDivider {
+  color: rgba(253, 251, 247, 0.3);
+  font-size: 0.8rem;
+}
+
+/* --- MOBILE AUTH STYLES --- */
+.mobileAuthSection {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 1.5rem 0;
+  border-top: 1px solid rgba(253, 251, 247, 0.1);
+  border-bottom: 1px solid rgba(253, 251, 247, 0.1);
+  margin: 1rem 0;
+}
+
+.mobileAuthBtn {
+  display: block;
+  text-align: center;
+  font-family: var(--font-clean, sans-serif);
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--Obsidian, #141414);
+  text-decoration: none;
+  padding: 0.8rem;
+  border: 1px solid rgba(253, 251, 247, 0.3);
+}
+
+.mobileAuthBtnPrimary {
+  display: block;
+  text-align: center;
+  font-family: var(--font-clean, sans-serif);
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  background-color: var(--ivory, #FDFBF7);
+  color: var(--obsidian, #141414);
+  text-decoration: none;
+  padding: 0.8rem;
+}
+
