@@ -16,6 +16,14 @@ enum AuthProvider {
   GOOGLE
 }
 
+enum OrderStatus {
+  PENDING // Order has been placed but not yet paid
+  PROCESSING // Payment received, preparing for shipment
+  SHIPPED // Order has been shipped but not yet delivered
+  DELIVERED // Order has been delivered to the customer
+  CANCELLED // Order has been cancelled by the customer (before payment)
+}
+
 model User {
   id        String   @id @default(uuid())
   email     String   @unique
@@ -28,6 +36,7 @@ model User {
 
   authMethods AuthMethod[]
   cart        Cart?
+  orders      Order[]
 
   @@map("users")
 }
@@ -78,9 +87,10 @@ model Product {
   updated_at DateTime  @updatedAt
   deleted_at DateTime?
 
-  category  Category   @relation(fields: [categoryId], references: [id])
-  discount  Discount?
-  cartItems CartItem[]
+  category   Category    @relation(fields: [categoryId], references: [id])
+  discount   Discount?
+  cartItems  CartItem[]
+  orderItems OrderItem[]
 
   @@map("products")
 }
@@ -128,4 +138,47 @@ model Cart {
   user User @relation(fields: [user_id], references: [id])
 
   @@map("carts")
+}
+
+model OrderItem {
+  id        String  @id @default(uuid())
+  orderId   String
+  productId String
+  quantity  Int
+  size      String?
+  price_at_purchase Float
+
+  order   Order   @relation(fields: [orderId], references: [id])
+  product Product @relation(fields: [productId], references: [id])
+
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  @@map("order_items")
+}
+
+model Order {
+  id                String      @id @default(uuid())
+  userId            String
+  totalAmount       Float
+  payment_reference String
+  delivery_address  String
+  contact_name      String
+  contact_phone     String
+  contact_email     String
+  note              String?
+  admin_note        String?
+  status            OrderStatus @default(PENDING)
+  orderItems OrderItem[]
+
+  shipped_at   DateTime?
+  delivered_at DateTime?
+  cancelled_at DateTime?
+
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  user       User        @relation(fields: [userId], references: [id])
+
+  @@map("orders")
 }
