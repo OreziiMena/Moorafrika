@@ -1,24 +1,66 @@
 import { create } from 'zustand';
 
-
-// Define what a cart item looks like
-interface CartItem {
+export interface CartItem {
   id: string;
   name: string;
-  price: string;
-  imageSrc: string;
+  price: number;   
+  imageUrl: string; 
+  quantity: number; 
+  variant?: string;
 }
 
-// Define the rules for the store
+
 interface CartStore {
   items: CartItem[];
-  addItem: (item: CartItem) => void;
+  addItem: (item: Omit<CartItem, 'quantity'>) => void; 
   removeItem: (id: string) => void;
+  updateQuantity: (id: string, quantity: number) => void;
+  cartTotal: () => number;
 }
 
-// Create the actual store
-export const useCartStore = create<CartStore>((set) => ({
+// The Smart Store
+export const useCartStore = create<CartStore>((set, get) => ({
   items: [],
-  addItem: (item) => set((state) => ({ items: [...state.items, item] })),
-  removeItem: (id) => set((state) => ({ items: state.items.filter((i) => i.id !== id) })),
+  
+  addItem: (newItem) => {
+    set((state) => {
+      // Check if the item is already in the bag
+      const existingItem = state.items.find((item) => item.id === newItem.id);
+      
+      if (existingItem) {
+        // If it's already there, just bump the quantity by 1
+        return {
+          items: state.items.map((item) =>
+            item.id === newItem.id 
+              ? { ...item, quantity: item.quantity + 1 } 
+              : item
+          ),
+        };
+      }
+      
+      // If it's brand new, add it to the array with a starting quantity of 1
+      return { items: [...state.items, { ...newItem, quantity: 1 }] };
+    });
+  },
+
+  removeItem: (id) => {
+    set((state) => ({ 
+      items: state.items.filter((item) => item.id !== id) 
+    }));
+  },
+
+  updateQuantity: (id, quantity) => {
+    set((state) => ({
+      items: state.items.map((item) =>
+        item.id === id ? { ...item, quantity: Math.max(1, quantity) } : item //User can't set quantity below 1
+      ),
+    }));
+  },
+
+  cartTotal: () => {
+    // Look at all items and calculate the grand total
+    return get().items.reduce((total, item) => {
+      return total + (item.price * item.quantity);
+    }, 0);
+  },
 }));

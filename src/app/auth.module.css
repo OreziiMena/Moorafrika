@@ -1,0 +1,122 @@
+.pageWrapper {
+  background-color: var(--obsidian, #141414);
+  color: var(--ivory, #FDFBF7);
+  min-height: 100vh;
+}
+
+.authBox {
+  width: 100%;
+  justify-content: center;
+  padding: 2rem;
+  max-width: 440px; 
+  margin: 0 auto;
+}
+
+.header {
+  text-align: center;
+  margin-bottom: 3rem;
+}
+
+.title {
+  font-family: var(--font-editorial, serif);
+  font-size: 2.5rem;
+  font-weight: 400;
+  margin-bottom: 0.5rem;
+}
+
+.subtitle {
+  font-family: var(--font-clean, sans-serif);
+  font-size: 0.85rem;
+  opacity: 0.6;
+  letter-spacing: 0.05em;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.inputGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.label {
+  font-family: var(--font-clean, sans-serif);
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: rgba(253, 251, 247, 0.8);
+}
+
+.input {
+  background: transparent;
+  border: 1px solid rgba(253, 251, 247, 0.2);
+  color: var(--ivory, #FDFBF7);
+  padding: 1rem;
+  font-family: var(--font-clean, sans-serif);
+  font-size: 1rem;
+  outline: none;
+  border-radius: 2px; 
+  transition: border-color 0.3s ease;
+}
+
+.input:focus {
+  border-color: var(--ivory, #FDFBF7);
+}
+
+
+.submitBtn {
+  margin-top: 0.5rem;
+  background: var(--ivory, #FDFBF7);
+  color: var(--obsidian, #141414);
+  border: none;
+  padding: 1.2rem;
+  font-family: var(--font-clean, sans-serif);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-weight: 700;
+  cursor: pointer;
+  transition: opacity 0.3s ease;
+  border-radius: 2px;
+}
+
+.submitBtn:hover {
+  opacity: 0.8;
+}
+
+.footerLinks {
+  margin-top: 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  font-family: var(--font-clean, sans-serif);
+  font-size: 0.85rem;
+}
+
+.link {
+  color: var(--ivory, #FDFBF7);
+  text-decoration: none;
+  border-bottom: 1px solid rgba(253, 251, 247, 0.3);
+  padding-bottom: 2px;
+  transition: border-color 0.3s ease;
+}
+
+.link:hover {
+  border-color: var(--ivory, #FDFBF7);
+}
+
+.forgotPassword {
+  align-self: flex-end; 
+  font-size: 0.75rem;
+  margin-top: 0.5rem;
+  border-bottom: none;
+  opacity: 0.6;
+}
+
+.forgotPassword:hover {
+  opacity: 1;
+}

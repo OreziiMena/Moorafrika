@@ -1,0 +1,372 @@
+.pageWrapper,
+.emptyCart {
+  color: var(--ivory, #FDFBF7);
+  min-height: 100vh;
+  max-width: 1400px;
+  margin: 0 auto;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  background-image: linear-gradient(rgba(20, 20, 20, 0.85), rgba(20, 20, 20, 0.85)), url('/Assets/brand-image-9.jpeg');
+}
+
+.empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 12rem 2rem 5rem 2rem;
+  text-align: center;
+}
+
+.header {
+  text-align: center;
+  margin-bottom: 2rem;
+  padding-top: 8rem;
+}
+
+.title {
+  font-family: var(--font-editorial, serif);
+  font-size: 2.5rem;
+  color: var(--ivory, #FDFBF7);
+  font-weight: 400;
+  letter-spacing: -0.02em;
+  margin-bottom: 2.5rem;
+}
+
+.continueBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.2rem 2.5rem;
+  background-color: var(--ivory, #FDFBF7);
+  color: var(--obsidian, #141414);
+  border: 1px solid var(--ivory, #FDFBF7);
+  border-radius: 1rem;
+  font-family: var(--font-clean, sans-serif);
+  font-size: 1rem;
+  font-weight: 800;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  width: 100%;
+  max-width: 320px;
+}
+
+.continueBtn:hover {
+  background-color: transparent;
+  color: var(--ivory, #FDFBF7);
+}
+
+.layout {
+  padding: 2rem 1.5rem 4rem 1.5rem;
+  display: grid;
+  grid-template-columns: 1fr 380px;
+  gap: 3rem;
+  align-items: start;
+}
+
+.tableContainer {
+  width: 100%;
+  border: 1px solid rgba(253, 251, 247, 0.1);
+  padding: 2rem;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.table th {
+  text-align: center;
+  font-family: var(--font-clean, sans-serif);
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid rgba(253, 251, 247, 0.1);
+}
+
+.table td {
+  padding: 2rem 0;
+  border-bottom: 1px solid rgba(253, 251, 247, 0.1);
+  font-family: var(--font-clean, sans-serif);
+  font-size: 0.95rem;
+}
+
+.thumbnailCell {
+  width: 100px;
+}
+
+.titleCell {
+  padding-right: 2rem;
+}
+
+.removeCell {
+  width: 80px;
+  text-align: center;
+}
+
+.imageWrapper {
+  position: relative;
+  width: 80px;
+  aspect-ratio: 3/4;
+  background-color: rgba(253, 251, 247, 0.05);
+}
+
+.image {
+  object-fit: cover;
+}
+
+.titleCell h2 {
+  font-family: var(--font-editorial, serif);
+  font-size: 1.1rem;
+  font-weight: 400;
+  text-align: center;
+  margin-bottom: 0.25rem;
+}
+
+.titleCell p {
+  font-family: var(--font-clean, sans-serif);
+  font-size: 0.75rem;
+  opacity: 0.5;
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-top: 0.4rem;
+}
+
+.qtySelector {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  text-align: center;
+}
+
+.qtyBtn {
+  background: transparent;
+  border: 1px solid rgba(253, 251, 247, 0.15);
+  color: var(--ivory, #FDFBF7);
+  width: 36px;
+  height: 36px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  font-weight: 300;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.qtyBtn:hover:not(:disabled) {
+  background: rgba(253, 251, 247, 0.1);
+}
+
+.qtyBtn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.qtyInput {
+  width: 50px;
+  height: 36px;
+  background: transparent;
+  border: 1px solid rgba(253, 251, 247, 0.15);
+  color: var(--ivory, #FDFBF7);
+  padding: 0;
+  text-align: center;
+  font-family: var(--font-clean, sans-serif);
+  font-size: 1rem;
+  border-radius: 6px;
+  outline: none;
+  -moz-appearance: textfield;
+}
+
+.qtyInput::-webkit-inner-spin-button,
+.qtyInput::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.totalCell {
+  font-weight: 500;
+}
+
+.removeBtn {
+  background: none;
+  border: none;
+  color: #D32F2F;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.5rem;
+  transition: opacity 0.2s;
+  margin: 0 auto;
+}
+
+.removeBtn:hover {
+  opacity: 0.7;
+}
+
+.summaryBox {
+  border: 1px solid rgba(253, 251, 247, 0.1);
+  padding: 2.5rem 2rem;
+  position: sticky;
+  top: 6rem;
+}
+
+.summaryTitle {
+  font-family: var(--font-editorial, serif);
+  font-size: 1.5rem;
+  font-weight: 400;
+  margin-bottom: 2rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid rgba(253, 251, 247, 0.1);
+}
+
+.summaryRow {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
+  font-family: var(--font-clean, sans-serif);
+  font-size: 0.95rem;
+  opacity: 0.8;
+}
+
+.summaryRowTotal {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 2rem;
+  margin-bottom: 2.5rem;
+  font-family: var(--font-clean, sans-serif);
+  font-size: 1.2rem;
+  font-weight: 600;
+  border-top: 1px solid rgba(253, 251, 247, 0.1);
+  padding-top: 1.5rem;
+}
+
+.checkoutBtn {
+  width: 100%;
+  background: var(--ivory, #FDFBF7);
+  color: var(--obsidian, #141414);
+  border: none;
+  padding: 1.2rem;
+  font-family: var(--font-clean, sans-serif);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-weight: 700;
+  cursor: pointer;
+  border-radius: 1rem;
+  transition: opacity 0.3s;
+}
+
+.checkoutBtn:hover {
+  opacity: 0.8;
+}
+
+@media (max-width: 1024px) {
+  .layout {
+    grid-template-columns: 1fr;
+  }
+  .summaryBox {
+    position: relative;
+    top: 0;
+  }
+}
+
+@media (max-width: 768px) {
+  .empty {
+    padding: 8rem 1.5rem 4rem 1.5rem;
+  }
+  .title {
+    font-size: 2rem;
+  }
+  .table thead {
+    display: none;
+  }
+  .table tr {
+    display: grid;
+    grid-template-columns: 80px 1fr auto;
+    grid-template-areas:
+      "thumb title   title"
+      "thumb price   price"
+      "qty   total   total"
+      "qty   remove  remove";
+    row-gap: 0;
+    column-gap: 0;
+    padding: 0.3rem;
+    border: 1px solid rgba(253, 251, 247, 0.15);
+    border-radius: 12px;
+    margin-bottom: 1rem;
+    background: rgba(253, 251, 247, 0.02);
+  }
+  .table td {
+    border: none;
+    padding: 0;
+  }
+  .thumbnailCell {
+    grid-area: thumb;
+    width: 100%;
+    padding-bottom: 1.25rem;
+  }
+  .titleCell {
+    grid-area: title;
+    align-self: end;
+    padding-left: 1rem;
+    padding-bottom: 0.1rem;
+  }
+  .titleCell h2 {
+    margin-bottom: 0;
+    font-size: 1.1rem;
+  }
+  .table td:nth-child(3) {
+    grid-area: price;
+    align-self: start;
+    padding-left: 1rem;
+    padding-bottom: 1.25rem;
+    opacity: 0.7;
+    font-size: 0.9rem;
+  }
+  .table td:nth-child(4) {
+    grid-area: qty;
+    border-top: 1px solid rgba(253, 251, 247, 0.15);
+    padding-top: 1.25rem;
+    display: flex;
+    align-items: center;
+  }
+  .totalCell {
+    grid-area: total;
+    border-top: 1px solid rgba(253, 251, 247, 0.15);
+    padding-top: 1.25rem;
+    padding-left: 1rem;
+    text-align: right;
+    font-weight: 700;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+  }
+  .removeCell {
+    grid-area: remove;
+    position: static;
+    display: flex;
+    justify-content: flex-end;
+    padding-top: 0.5rem;
+    padding-left: 1rem;
+    width: auto;
+  }
+  .removeBtn {
+    margin: 0;
+    padding: 0.2rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .title {
+    font-size: 1.75rem;
+  }
+  .empty {
+    padding: 8rem 1rem 4rem 1rem;
+  }
+}
