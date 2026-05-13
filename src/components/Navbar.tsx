@@ -7,6 +7,7 @@ import Image from "next/image";
 import { useCartStore } from "../app/store/cartStore"; 
 import { Search, Heart, ShoppingCart, ChevronDown, User } from "lucide-react"; // Added User icon
 import styles from "./Navbar.module.css";
+import { useSession } from "next-auth/react";
 
 const MenuIcon = ({ className, strokeWidth = 1.5 }: { className?: string, strokeWidth?: number }) => (
   <svg className={className} strokeWidth={strokeWidth} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round">
@@ -26,6 +27,8 @@ const CloseIcon = ({ className, strokeWidth = 1.5 }: { className?: string, strok
 export default function Navbar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isResourcesOpen, setIsResourcesOpen] = useState(false);
+  const { data: session } = useSession(); // Get session data to check if user is logged in
+  const user = session?.user; // Extract user info from session
   
   const { items } = useCartStore();
 
@@ -95,11 +98,17 @@ export default function Navbar() {
             </div>
 
             {/*Desktop Login / Sign Up */}
-            <div className={styles.authLinks}>
+            {
+              user ? (
+                <p>Welcome, {user.name}!</p>
+              ) : (
+                <div className={styles.authLinks}>
               <Link href="/login" className={styles.authLink}>Login</Link>
               <span className={styles.authDivider}>/</span>
               <Link href="/signup" className={styles.authLink}>Sign Up</Link>
             </div>
+              )
+            }
 
             <button className={styles.iconBtn}>
               <Heart strokeWidth={1.5} className={styles.iconSize} />

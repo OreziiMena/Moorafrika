@@ -1,40 +1,92 @@
-"use client";
+'use client';
 
-import Image from "next/image";
-import Link from "next/link";
-import { ShoppingCart, ArrowRight } from "lucide-react";
-import { useCartStore } from "../app/store/cartStore"; 
-import styles from "./NewCollections.module.css";
+import Image from 'next/image';
+import Link from 'next/link';
+import { ShoppingCart, ArrowRight } from 'lucide-react';
+import { useCartStore } from '../app/store/cartStore';
+import styles from './NewCollections.module.css';
 
 // 1. IMPORT THE BACKEND CONTRACT (Adjust this path to exactly where the file is)
-import { ProductContract } from "../contracts/product"; 
+import { ProductContract } from '../contracts/product';
+
+const addToCart = async (productId: string) => {
+  const payload = {
+    productId,
+    quantity: 1,
+    size: 'M',
+  };
+
+  const res = await fetch('/api/cart', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload),
+  });
+
+  console.log(await res.json())
+};
 
 //Format currency
 const formatNaira = (amount: number) => {
   return new Intl.NumberFormat('en-NG', {
     style: 'currency',
     currency: 'NGN',
-    maximumFractionDigits: 0, 
+    maximumFractionDigits: 0,
   }).format(amount);
 };
 
 const products: ProductContract[] = [
-  { 
-    id: "1", name: "Classic T-Shirt", slug: "classic-t-shirt", description: "",
-    price: 22500, imageUrl: "/Assets/brand-image-1.jpeg", thumbnails: [], sizes: ["S", "M", "L"], category: "Tops", createdAt: new Date(), updatedAt: new Date()
+  {
+    id: '369d8030-caea-4349-91a2-8d6f55ac14ea',
+    name: 'Classic T-Shirt',
+    slug: 'classic-t-shirt',
+    description: '',
+    price: 22500,
+    imageUrl: '/Assets/brand-image-1.jpeg',
+    thumbnails: [],
+    sizes: ['S', 'M', 'L'],
+    category: 'Tops',
+    createdAt: new Date(),
+    updatedAt: new Date(),
   },
-  { 
-    id: "2", name: "Premium Hoodie", slug: "premium-hoodie", description: "",
-    price: 45000, imageUrl: "/Assets/brand-image-7.jpeg", thumbnails: [], sizes: ["M", "L", "XL"], category: "Outerwear", createdAt: new Date(), updatedAt: new Date()
+  {
+    id: '2',
+    name: 'Premium Hoodie',
+    slug: 'premium-hoodie',
+    description: '',
+    price: 45000,
+    imageUrl: '/Assets/brand-image-7.jpeg',
+    thumbnails: [],
+    sizes: ['M', 'L', 'XL'],
+    category: 'Outerwear',
+    createdAt: new Date(),
+    updatedAt: new Date(),
   },
-  { 
-    id: "3", name: "Cargo Pants", slug: "cargo-pants-1", description: "",
-    price: 35000, imageUrl: "/Assets/brand-image-11.jpeg", thumbnails: [], sizes: ["30", "32", "34"], category: "Bottoms", createdAt: new Date(), updatedAt: new Date()
+  {
+    id: '3',
+    name: 'Cargo Pants',
+    slug: 'cargo-pants-1',
+    description: '',
+    price: 35000,
+    imageUrl: '/Assets/brand-image-11.jpeg',
+    thumbnails: [],
+    sizes: ['30', '32', '34'],
+    category: 'Bottoms',
+    createdAt: new Date(),
+    updatedAt: new Date(),
   },
-  { 
-    id: "4", name: "Cargo Pants", slug: "cargo-pants-2", description: "",
-    price: 35000, imageUrl: "/Assets/brand-image-10.jpeg", thumbnails: [], sizes: ["32", "34", "36"], category: "Bottoms", createdAt: new Date(), updatedAt: new Date()
-  }
+  {
+    id: '4',
+    name: 'Cargo Pants',
+    slug: 'cargo-pants-2',
+    description: '',
+    price: 35000,
+    imageUrl: '/Assets/brand-image-10.jpeg',
+    thumbnails: [],
+    sizes: ['32', '34', '36'],
+    category: 'Bottoms',
+    createdAt: new Date(),
+    updatedAt: new Date(),
+  },
 ];
 
 function ProductCard({ product }: { product: ProductContract }) {
@@ -45,20 +97,22 @@ function ProductCard({ product }: { product: ProductContract }) {
   const isInCart = items.some((item) => item.id === product.id);
 
   // 'inStock' isn't in the backend contract yet, I'LL assume it's true for now!
-  const isAvailable = true; 
+  const isAvailable = true;
 
-  const handleCartClick = (e: React.MouseEvent<HTMLButtonElement>) => {
-    e.preventDefault();   
-    e.stopPropagation();  
+  const handleCartClick = async (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    // await addToCart(product.id)
 
     if (isInCart) {
       removeItem(product.id);
     } else {
-      addItem({ 
-        id: product.id, 
-        name: product.name, 
-        price: product.price, 
-        imageUrl: product.imageUrl 
+      addItem({
+        id: product.id,
+        name: product.name,
+        price: product.price,
+        imageUrl: product.imageUrl,
       });
     }
   };
@@ -78,12 +132,14 @@ function ProductCard({ product }: { product: ProductContract }) {
 
       <div className={styles.details}>
         <h2 className={styles.productName}>{product.name}</h2>
-      
+
         <div className={styles.statusWrapper}>
           <div className={styles.firstStat}>
-            <span className={styles.currentPrice}>{formatNaira(product.price)}</span>
+            <span className={styles.currentPrice}>
+              {formatNaira(product.price)}
+            </span>
           </div>
-          
+
           {isAvailable ? (
             <span className={styles.inStock}>In Stock</span>
           ) : (
@@ -91,18 +147,18 @@ function ProductCard({ product }: { product: ProductContract }) {
           )}
         </div>
 
-        <button 
+        <button
           type="button"
           onClick={handleCartClick}
           disabled={!isAvailable}
           className={isInCart ? styles.removeBtn : styles.cartBtn}
         >
-          <ShoppingCart className={styles.icon} /> 
-          {!isAvailable 
-            ? "Unavailable" 
-            : isInCart 
-              ? "Remove from Cart" 
-              : "Add to Cart"}
+          <ShoppingCart className={styles.icon} />
+          {!isAvailable
+            ? 'Unavailable'
+            : isInCart
+              ? 'Remove from Cart'
+              : 'Add to Cart'}
         </button>
       </div>
     </article>
@@ -113,7 +169,7 @@ export default function CollectionsPage() {
   return (
     <main className={styles.pageWrapper}>
       {/* <Navbar /> */}
-      
+
       <h1 className={styles.pageTitle}>New Collections</h1>
       <p className={styles.pageSubtitle}>Discover Our Latest Arrivals</p>
 
