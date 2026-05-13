@@ -4,7 +4,6 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
-import { useAuthStore } from "../store/authStore"; 
 import styles from "../auth.module.css";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
@@ -12,8 +11,6 @@ import Footer from "@/components/Footer";
 
 export default function SignupPage() {
   const router = useRouter();
-  const login = useAuthStore((state) => state.login);
-
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -27,7 +24,6 @@ export default function SignupPage() {
     setErrorMsg("");
 
     try {
-      // THE REAL API CALL
       const response = await fetch("/api/auth/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -39,7 +35,6 @@ export default function SignupPage() {
       if (!response.ok) {
         throw new Error(data.message || "Failed to create account");
       }
-
       // Redirect to the homepage
       router.push("/");
 
@@ -59,7 +54,7 @@ export default function SignupPage() {
         </Link>
 
         <header className={styles.header}>
-          <h1 className={styles.title}>Join Mo'orafrika</h1>
+          <h1 className={styles.title}>Join Mo&apos;orafrika</h1>
           <p className={styles.subtitle}>Create an account for exclusive access.</p>
         </header>
 
