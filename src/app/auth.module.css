@@ -1,5 +1,9 @@
 .pageWrapper {
-  background-color: var(--obsidian, #141414);
+   background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  background-image: linear-gradient(rgba(20, 20, 20, 0.85), rgba(20, 20, 20, 0.85)), url('/Assets/brand-image-9.jpeg');
   color: var(--ivory, #FDFBF7);
   min-height: 100vh;
 }

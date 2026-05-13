@@ -28,7 +28,7 @@ export default function SignupPage() {
 
     try {
       // THE REAL API CALL
-      const response = await fetch("YOUR_BACKEND_URL/auth/register", {
+      const response = await fetch("/api/auth/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name, email, password }),
@@ -39,10 +39,6 @@ export default function SignupPage() {
       if (!response.ok) {
         throw new Error(data.message || "Failed to create account");
       }
-
-      
-      // Adjust 'data.user' if you are sending the user object differently 
-      login(data.user || data);
 
       // Redirect to the homepage
       router.push("/");

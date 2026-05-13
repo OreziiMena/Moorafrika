@@ -54,8 +54,6 @@ export default function Navbar() {
               <Link href="/" className={styles.navLink}>Home</Link>
               <Link href="/about" className={styles.navLink}>About</Link>
               <Link href="/collection" className={styles.navLink}>Collection</Link>
-              <Link href="/blog" className={styles.navLink}>Blogs</Link>
-
               {/* Resources Dropdown */}
               <div
                 className={styles.dropdownContainer}
