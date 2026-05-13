@@ -24,7 +24,7 @@ export interface UserOrderContract {
   contactName: string;
   contactPhone: string;
   contactEmail: string;
-  paymentReference: string;
+  paymentReference: string | null;
   note: string | null;
   adminNote: string | null;
   status: OrderStatus;

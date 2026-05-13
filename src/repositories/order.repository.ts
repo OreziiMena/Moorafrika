@@ -43,6 +43,12 @@ export const createOrder = async (data: Prisma.OrderCreateInput) => {
   });
 };
 
+export const createOrderItems = async (data: Prisma.OrderItemCreateManyInput[]) => {
+  return prisma.orderItem.createMany({
+    data
+  })
+}
+
 export const updateOrderStatus = async (
   orderId: string,
   status: OrderStatus,

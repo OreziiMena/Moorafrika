@@ -9,7 +9,7 @@ type UserOrderWithItems = Prisma.OrderGetPayload<{
   };
 }>;
 
-type AdminOrderWithUserAndItems = Prisma.OrderGetPayload<{
+export type AdminOrderWithUserAndItems = Prisma.OrderGetPayload<{
   include: {
     user: true;
     orderItems: { include: { product: { include: { category: true } } } };
