@@ -12,7 +12,7 @@ import {
   updateCartItemSchema,
 } from '@/validationSchemas/cart';
 import z from 'zod';
-import { NotFoundError } from '@/lib/errors';
+import { BadRequestError, NotFoundError } from '@/lib/errors';
 
 class CartService {
   static async getUserCart(): Promise<CartContract> {
@@ -28,6 +28,10 @@ class CartService {
 
     const { productId, quantity, size } = createCartItemSchema.parse(data);
     const cart = await findCartByUserId(user.id);
+
+    if (cart.items.some((item) => item.productId === productId)) {
+      throw new BadRequestError('Product already in cart. Use update to change quantity.');
+    }
 
     const cartItem = await createCartItem(cart.id, productId, {
       quantity,
