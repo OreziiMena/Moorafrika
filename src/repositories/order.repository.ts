@@ -31,6 +31,13 @@ export const findOrders = async (isAdmin: boolean, where: Prisma.OrderWhereInput
   });
 };
 
+export const findUniqueOrder = async (where: Prisma.OrderWhereUniqueInput, isAdmin: boolean) => {
+  return await prisma.order.findUnique({
+    where,
+    include: isAdmin ? AdminOrderInclude : OrderInclude,
+  });
+};
+
 export const countOrders = async (where: Prisma.OrderWhereInput) => {
   return await prisma.order.count({
     where,
