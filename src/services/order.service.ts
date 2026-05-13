@@ -21,7 +21,7 @@ import { createOrderSchema } from '@/validationSchemas/order';
 import CartService from './cart.service';
 import { NotFoundError } from '@/lib/errors';
 import ProductService from './product.service';
-import { paystackCheckout } from '@/paystack/checkout';
+import { paystackCheckout } from '@/services/paystack/checkout';
 
 interface GetOrdersParams {
   page?: number;
