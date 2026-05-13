@@ -161,7 +161,7 @@ model Order {
   id                String      @id @default(uuid())
   userId            String
   totalAmount       Float
-  payment_reference String
+  payment_reference String?
   delivery_address  String
   contact_name      String
   contact_phone     String
@@ -181,4 +181,13 @@ model Order {
   user       User        @relation(fields: [userId], references: [id])
 
   @@map("orders")
+}
+
+model PaystackEvent {
+  event_id    String   @id
+  event_type  String
+  payload     Json
+  received_at DateTime @default(now())
+
+  @@map("paystack_event")
 }

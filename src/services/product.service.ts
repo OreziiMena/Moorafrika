@@ -121,6 +121,17 @@ class ProductService {
 
     return;
   }
+
+  static async updateProductStock(
+    slug: string,
+    quantityChange: number,
+  ): Promise<void> {
+    await _updateProduct(slug, {
+      stock_count: { increment: quantityChange },
+    });
+
+    return;
+  }
 }
 
 export default ProductService;

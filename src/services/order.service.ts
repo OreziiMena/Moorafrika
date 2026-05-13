@@ -3,6 +3,8 @@ import {
   createOrder,
   createOrderItems,
   findOrders,
+  findUniqueOrder,
+  updateOrderStatus,
 } from '@/repositories/order.repository';
 import AuthService from './auth.service';
 import { PagedResponse } from '@/contracts/response';
@@ -18,6 +20,8 @@ import z from 'zod';
 import { createOrderSchema } from '@/validationSchemas/order';
 import CartService from './cart.service';
 import { NotFoundError } from '@/lib/errors';
+import ProductService from './product.service';
+import { paystackCheckout } from '@/paystack/checkout';
 
 interface GetOrdersParams {
   page?: number;
@@ -108,6 +112,7 @@ class OrderService {
     if (cart.items.length === 0) {
       throw new Error('Cart is empty');
     }
+    const totalAmount = cart.items.reduce((sum, item) => sum + item.quantity * item.product.price, 0);
 
     const orderPayload = {
       delivery_address: deliveryAddress,
@@ -115,6 +120,7 @@ class OrderService {
       contact_name: contactName,
       contact_phone: contactPhone,
       note,
+      totalAmount,
 
       user: { connect: { id: user.id } },
     } as Prisma.OrderCreateInput;
@@ -133,6 +139,30 @@ class OrderService {
     );
 
     await createOrderItems(orderItems);
+    const url = await paystackCheckout({ orderId: order.id, email: contactEmail, totalAmount });
+    if (!url) {
+      throw new Error('Failed to initialize payment');
+    }
+
+    return url;
+  }
+
+  static async processPaidOrder(orderId: string) {
+    const order = await findUniqueOrder({ id: orderId }, false);
+    if (!order) {
+      throw {
+        message: 'Order not found for order ID: ' + orderId,
+        status: 404,
+      };
+    }
+
+    await updateOrderStatus(order.id, 'PROCESSING');
+    for (const item of order.orderItems) {
+      await ProductService.updateProductStock(
+        item.product.slug,
+        -item.quantity,
+      );
+    }
   }
 }
 
