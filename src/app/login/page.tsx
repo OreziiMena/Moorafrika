@@ -25,11 +25,10 @@ export default function LoginPage() {
 
     try {
 
-        await signIn('credentials', { email, password, redirect: false })
-      // Save the returned UserContract to browser memory
-    //   login(data.user || data);
-
-
+        const res = await signIn('credentials', { email, password, redirect: false })
+        if (!res || res.error) {
+            throw new Error(res?.error || "Login failed");
+        }
       
       router.push("/");
 
