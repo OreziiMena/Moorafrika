@@ -5,5 +5,5 @@ export const checkoutSchema = z.object({
   contactName: z.string().min(1, "Contact name is required"),
   contactPhone: z.string().min(1, "Contact phone is required"),
   contactEmail: z.email("Invalid email address").min(1, "Contact email is required"),
-  note: z.string().nullable(),
+  note: z.string().optional(),
 });

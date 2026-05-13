@@ -5,5 +5,5 @@ export const createOrderSchema = z.object({
   contactName: z.string(),
   contactPhone: z.string(),
   contactEmail: z.string(),
-  note: z.string().max(500).nullable(),
+  note: z.string().max(500).optional(),
 })
