@@ -112,7 +112,10 @@ class OrderService {
     if (cart.items.length === 0) {
       throw new Error('Cart is empty');
     }
-    const totalAmount = cart.items.reduce((sum, item) => sum + item.quantity * item.product.price, 0);
+    const totalAmount = cart.items.reduce(
+      (sum, item) => sum + item.quantity * item.product.price,
+      0,
+    );
 
     const orderPayload = {
       delivery_address: deliveryAddress,
@@ -139,7 +142,11 @@ class OrderService {
     );
 
     await createOrderItems(orderItems);
-    const url = await paystackCheckout({ orderId: order.id, email: contactEmail, totalAmount });
+    const url = await paystackCheckout({
+      orderId: order.id,
+      email: contactEmail,
+      totalAmount,
+    });
     if (!url) {
       throw new Error('Failed to initialize payment');
     }
@@ -150,10 +157,7 @@ class OrderService {
   static async processPaidOrder(orderId: string) {
     const order = await findUniqueOrder({ id: orderId }, false);
     if (!order) {
-      throw {
-        message: 'Order not found for order ID: ' + orderId,
-        status: 404,
-      };
+      throw new NotFoundError('Order not found');
     }
 
     await updateOrderStatus(order.id, 'PROCESSING');
@@ -163,6 +167,39 @@ class OrderService {
         -item.quantity,
       );
     }
+  }
+
+  static async initializePaymentForOrder(orderId: string) {
+    const user = await AuthService.authorizeUser();
+    const order = await findUniqueOrder(
+      {
+        id: orderId,
+      },
+      false,
+    );
+
+    if (!order || order.userId !== user.id) {
+      throw new NotFoundError('Order not found');
+    }
+
+    if (order.status !== 'PENDING') {
+      throw new Error('Payment can only be initialized for pending orders');
+    }
+
+    const totalAmount = order.orderItems.reduce(
+      (sum, item) => sum + item.quantity * item.price_at_purchase,
+      0,
+    );
+    const url = await paystackCheckout({
+      orderId: order.id,
+      email: order.contact_email,
+      totalAmount,
+    });
+    if (!url) {
+      throw new Error('Failed to initialize payment');
+    }
+
+    return url;
   }
 }
 
