@@ -68,6 +68,13 @@ class CartService {
     await deleteCartItem(cartItem.id);
     return;
   }
+
+  static async clearCartItems(items: CartItemContract[]): Promise<void> {
+    const deletePromises = items.map((item) =>
+      deleteCartItem(item.id),
+    );
+    await Promise.all(deletePromises);
+  }
 }
 
 export default CartService;

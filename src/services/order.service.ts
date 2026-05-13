@@ -2,6 +2,7 @@ import {
   countOrders,
   createOrder,
   createOrderItems,
+  deleteOrder,
   findOrders,
   findUniqueOrder,
   updateOrderStatus,
@@ -148,8 +149,11 @@ class OrderService {
       totalAmount,
     });
     if (!url) {
+      await deleteOrder(order.id);
       throw new Error('Failed to initialize payment');
     }
+
+    await CartService.clearCartItems(cart.items);
 
     return url;
   }

@@ -75,3 +75,9 @@ export const updateOrderAdminNote = async (
     data: { admin_note: adminNote },
   });
 };
+
+export const deleteOrder = async (orderId: string) => {
+  return await prisma.order.delete({
+    where: { id: orderId },
+  });
+};
