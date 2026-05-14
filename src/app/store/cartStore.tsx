@@ -1,66 +1,95 @@
+import { CartContract, CartItemContract } from '@/contracts/cart';
 import { create } from 'zustand';
 
-export interface CartItem {
-  id: string;
-  name: string;
-  price: number;   
-  imageUrl: string; 
-  quantity: number; 
-  variant?: string;
+interface CartRequest {
+  productId: string;
+  quantity: number;
+  size?: string;
 }
 
-
 interface CartStore {
-  items: CartItem[];
-  addItem: (item: Omit<CartItem, 'quantity'>) => void; 
-  removeItem: (id: string) => void;
-  updateQuantity: (id: string, quantity: number) => void;
+  items: CartItemContract[];
+  loadCart: () => Promise<void>;
+  addItem: (item: CartRequest) => Promise<void>;
+  removeItem: (id: string) => Promise<void>;
+  updateQuantity: (id: string, quantity: number) => Promise<void>;
   cartTotal: () => number;
 }
 
-// The Smart Store
+// The Smart Store (uses API routes)
 export const useCartStore = create<CartStore>((set, get) => ({
   items: [],
-  
-  addItem: (newItem) => {
-    set((state) => {
-      // Check if the item is already in the bag
-      const existingItem = state.items.find((item) => item.id === newItem.id);
-      
-      if (existingItem) {
-        // If it's already there, just bump the quantity by 1
-        return {
-          items: state.items.map((item) =>
-            item.id === newItem.id 
-              ? { ...item, quantity: item.quantity + 1 } 
-              : item
-          ),
-        };
-      }
-      
-      // If it's brand new, add it to the array with a starting quantity of 1
-      return { items: [...state.items, { ...newItem, quantity: 1 }] };
-    });
+
+  // Load the cart from the server
+  loadCart: async () => {
+    try {
+      const res = await fetch('/api/cart');
+      if (!res.ok) throw new Error('Failed to load cart');
+      const data: CartContract = await res.json();
+      set({ items: data.items });
+    } catch (err) {
+      console.error('loadCart error', err);
+    }
   },
 
-  removeItem: (id) => {
-    set((state) => ({ 
-      items: state.items.filter((item) => item.id !== id) 
-    }));
+  addItem: async (newItem) => {
+    try {
+      const res = await fetch('/api/cart', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(newItem),
+      });
+
+      if (!res.ok) throw new Error('Failed to add item to cart');
+
+      // Sync full cart from server to keep local state authoritative
+      await get().loadCart();
+    } catch (err) {
+      console.error('addItem error', err);
+    }
   },
 
-  updateQuantity: (id, quantity) => {
-    set((state) => ({
-      items: state.items.map((item) =>
-        item.id === id ? { ...item, quantity: Math.max(1, quantity) } : item //User can't set quantity below 1
-      ),
-    }));
+  removeItem: async (id) => {
+    try {
+      const res = await fetch(`/api/cart/${encodeURIComponent(id)}`, {
+        method: 'DELETE',
+      });
+
+      if (!res.ok) throw new Error('Failed to remove item from cart');
+
+      await get().loadCart();
+    } catch (err) {
+      console.error('removeItem error', err);
+    }
+  },
+
+  updateQuantity: async (id, quantity) => {
+    try {
+      const res = await fetch(`/api/cart/${encodeURIComponent(id)}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ quantity: Math.max(1, quantity) }),
+      });
+
+      if (!res.ok) throw new Error('Failed to update cart item quantity');
+
+      await get().loadCart();
+    } catch (err) {
+      console.error('updateQuantity error', err);
+    }
   },
 
   cartTotal: () => {
-    // Look at all items and calculate the grand total
-    return get().items.reduce((total, item) => {
-      return total + (item.price * item.quantity);
-    }, 0);
+    return get().items.reduce((total, item) => total + item.product.price * item.quantity, 0);
   },
 }));
+
+// Kick off an initial load in the background (best-effort)
+setTimeout(() => {
+  try {
+    const store = useCartStore.getState();
+    void store.loadCart();
+  } catch (err) {
+    // ignore
+  }
+}, 0);

@@ -25,7 +25,8 @@ function ProductCard({ product }: { product: ProductContract }) {
   const addItem = useCartStore((state) => state.addItem);
   const removeItem = useCartStore((state) => state.removeItem);
 
-  const isInCart = items.some((item) => item.id === product.id);
+  const isInCart = items.some((item) => item.product.id === product.id);
+  console.log('Cart items in ProductCard:', items); // Debugging line to check cart items
 
   // 'inStock' isn't in the backend contract yet, I'LL assume it's true for now!
   const isAvailable = product.stock_count > 0; 
@@ -37,12 +38,7 @@ function ProductCard({ product }: { product: ProductContract }) {
     if (isInCart) {
       removeItem(product.id);
     } else {
-      addItem({ 
-        id: product.id, 
-        name: product.name, 
-        price: product.price, 
-        imageUrl: product.imageUrl 
-      });
+      addItem({productId: product.id, quantity: 1});
     }
   };
 
