@@ -8,6 +8,8 @@ import styles from "./NewCollections.module.css";
 
 // 1. IMPORT THE BACKEND CONTRACT (Adjust this path to exactly where the file is)
 import { ProductContract } from "../contracts/product"; 
+import React from "react";
+import { PagedResponse } from "@/contracts/response";
 
 //Format currency
 const formatNaira = (amount: number) => {
@@ -18,25 +20,6 @@ const formatNaira = (amount: number) => {
   }).format(amount);
 };
 
-const products: ProductContract[] = [
-  { 
-    id: "1", name: "Classic T-Shirt", slug: "classic-t-shirt", description: "",
-    price: 22500, imageUrl: "/Assets/brand-image-1.jpeg", thumbnails: [], sizes: ["S", "M", "L"], category: "Tops", createdAt: new Date(), updatedAt: new Date()
-  },
-  { 
-    id: "2", name: "Premium Hoodie", slug: "premium-hoodie", description: "",
-    price: 45000, imageUrl: "/Assets/brand-image-7.jpeg", thumbnails: [], sizes: ["M", "L", "XL"], category: "Outerwear", createdAt: new Date(), updatedAt: new Date()
-  },
-  { 
-    id: "3", name: "Cargo Pants", slug: "cargo-pants-1", description: "",
-    price: 35000, imageUrl: "/Assets/brand-image-11.jpeg", thumbnails: [], sizes: ["30", "32", "34"], category: "Bottoms", createdAt: new Date(), updatedAt: new Date()
-  },
-  { 
-    id: "4", name: "Cargo Pants", slug: "cargo-pants-2", description: "",
-    price: 35000, imageUrl: "/Assets/brand-image-10.jpeg", thumbnails: [], sizes: ["32", "34", "36"], category: "Bottoms", createdAt: new Date(), updatedAt: new Date()
-  }
-];
-
 function ProductCard({ product }: { product: ProductContract }) {
   const items = useCartStore((state) => state.items);
   const addItem = useCartStore((state) => state.addItem);
@@ -45,7 +28,7 @@ function ProductCard({ product }: { product: ProductContract }) {
   const isInCart = items.some((item) => item.id === product.id);
 
   // 'inStock' isn't in the backend contract yet, I'LL assume it's true for now!
-  const isAvailable = true; 
+  const isAvailable = product.stock_count > 0; 
 
   const handleCartClick = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();   
@@ -110,6 +93,22 @@ function ProductCard({ product }: { product: ProductContract }) {
 }
 
 export default function CollectionsPage() {
+  const [products, setProducts] = React.useState<ProductContract[]>([]);
+
+  React.useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const response = await fetch("/api/products?limit=4");
+        const data = await response.json() as PagedResponse<ProductContract>;
+        setProducts(data.data);
+      } catch (error) {
+        console.error("Error fetching products:", error);
+      }
+    };
+
+    fetchProducts();
+  }, []);
+
   return (
     <main className={styles.pageWrapper}>
       {/* <Navbar /> */}
