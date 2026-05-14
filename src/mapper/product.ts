@@ -10,6 +10,8 @@ export const productMapper = (product: Prisma.ProductGetPayload<{
   slug: product.slug,
   description: product.description,
   price: product.price,
+  stock_count: product.stock_count,
+  sales_count: product.sales_count,
   imageUrl: CloudflareStorageServer.generatePublicUrl(product.imageKey),
   thumbnails: product.thumbnailKeys.map(CloudflareStorageServer.generatePublicUrl),
   sizes: product.sizes,

@@ -4,6 +4,8 @@ export interface ProductContract {
   slug: string;
   description: string;
   price: number;
+  stock_count: number;
+  sales_count: number;
   imageUrl: string;
   thumbnails: string[];
   sizes: string[];

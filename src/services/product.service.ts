@@ -15,6 +15,7 @@ import z from 'zod';
 import slugify from 'slugify';
 import AuthService from './auth.service';
 import { v4 as uuidv4 } from 'uuid';
+import { pageResponseMapper } from '@/mapper/pagedResponse';
 
 interface GetProductParams {
   page?: number;
@@ -48,21 +49,12 @@ class ProductService {
       countProducts(where),
     ]);
 
-    const totalPages = Math.ceil(total / limit);
-    const hasNextPage = page < totalPages;
-    const hasPreviousPage = page > 1;
-
-    return {
+    return pageResponseMapper({
       data: products.map(productMapper),
-      pagination: {
-        page,
-        limit,
-        total,
-        totalPages,
-        hasNextPage,
-        hasPreviousPage,
-      },
-    };
+      page,
+      limit,
+      total,
+    });
   }
 
   static async getProductBySlug(slug: string): Promise<ProductContract> {
@@ -125,6 +117,17 @@ class ProductService {
     await _updateProduct(slug, {
       deleted_at: new Date(),
       slug: uuidv4(), // Change slug to a random value to prevent conflicts with future products
+    });
+
+    return;
+  }
+
+  static async updateProductStock(
+    slug: string,
+    quantityChange: number,
+  ): Promise<void> {
+    await _updateProduct(slug, {
+      stock_count: { increment: quantityChange },
     });
 
     return;

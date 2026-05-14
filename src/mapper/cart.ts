@@ -19,9 +19,7 @@ export const mapCartItem = (cartItem: CartItemWithProduct): CartItemContract => 
   updatedAt: cartItem.updated_at,
 });
 
-export const cartMapper = (cart: Prisma.CartGetPayload<{
-  include: { items: { include: { product: { include: { category: true } } } } }
-}>): CartContract => ({
+export const cartMapper = (cart: CartWithItems): CartContract => ({
   id: cart.id,
   userId: cart.user_id,
   items: cart.items.map(mapCartItem),

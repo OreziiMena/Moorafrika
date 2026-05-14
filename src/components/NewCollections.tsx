@@ -7,23 +7,9 @@ import { useCartStore } from '../app/store/cartStore';
 import styles from './NewCollections.module.css';
 
 // 1. IMPORT THE BACKEND CONTRACT (Adjust this path to exactly where the file is)
-import { ProductContract } from '../contracts/product';
-
-const addToCart = async (productId: string) => {
-  const payload = {
-    productId,
-    quantity: 1,
-    size: 'M',
-  };
-
-  const res = await fetch('/api/cart', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(payload),
-  });
-
-  console.log(await res.json())
-};
+import { ProductContract } from "../contracts/product"; 
+import React from "react";
+import { PagedResponse } from "@/contracts/response";
 
 //Format currency
 const formatNaira = (amount: number) => {
@@ -34,70 +20,18 @@ const formatNaira = (amount: number) => {
   }).format(amount);
 };
 
-const products: ProductContract[] = [
-  {
-    id: '369d8030-caea-4349-91a2-8d6f55ac14ea',
-    name: 'Classic T-Shirt',
-    slug: 'classic-t-shirt',
-    description: '',
-    price: 22500,
-    imageUrl: '/Assets/brand-image-1.jpeg',
-    thumbnails: [],
-    sizes: ['S', 'M', 'L'],
-    category: 'Tops',
-    createdAt: new Date(),
-    updatedAt: new Date(),
-  },
-  {
-    id: '2',
-    name: 'Premium Hoodie',
-    slug: 'premium-hoodie',
-    description: '',
-    price: 45000,
-    imageUrl: '/Assets/brand-image-7.jpeg',
-    thumbnails: [],
-    sizes: ['M', 'L', 'XL'],
-    category: 'Outerwear',
-    createdAt: new Date(),
-    updatedAt: new Date(),
-  },
-  {
-    id: '3',
-    name: 'Cargo Pants',
-    slug: 'cargo-pants-1',
-    description: '',
-    price: 35000,
-    imageUrl: '/Assets/brand-image-11.jpeg',
-    thumbnails: [],
-    sizes: ['30', '32', '34'],
-    category: 'Bottoms',
-    createdAt: new Date(),
-    updatedAt: new Date(),
-  },
-  {
-    id: '4',
-    name: 'Cargo Pants',
-    slug: 'cargo-pants-2',
-    description: '',
-    price: 35000,
-    imageUrl: '/Assets/brand-image-10.jpeg',
-    thumbnails: [],
-    sizes: ['32', '34', '36'],
-    category: 'Bottoms',
-    createdAt: new Date(),
-    updatedAt: new Date(),
-  },
-];
+
 
 function ProductCard({ product }: { product: ProductContract }) {
   const items = useCartStore((state) => state.items);
   const addItem = useCartStore((state) => state.addItem);
   const removeItem = useCartStore((state) => state.removeItem);
 
-  const isInCart = items.some((item) => item.id === product.id);
+  const isInCart = items.some((item) => item.product.id === product.id);
+  console.log('Cart items in ProductCard:', items); // Debugging line to check cart items
 
   // 'inStock' isn't in the backend contract yet, I'LL assume it's true for now!
-  const isAvailable = true;
+  const isAvailable = product.stock_count > 0; 
 
   const handleCartClick = async (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
@@ -108,12 +42,7 @@ function ProductCard({ product }: { product: ProductContract }) {
     if (isInCart) {
       removeItem(product.id);
     } else {
-      addItem({
-        id: product.id,
-        name: product.name,
-        price: product.price,
-        imageUrl: product.imageUrl,
-      });
+      addItem({productId: product.id, quantity: 1});
     }
   };
 
@@ -166,6 +95,22 @@ function ProductCard({ product }: { product: ProductContract }) {
 }
 
 export default function CollectionsPage() {
+  const [products, setProducts] = React.useState<ProductContract[]>([]);
+
+  React.useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const response = await fetch("/api/products?limit=4");
+        const data = await response.json() as PagedResponse<ProductContract>;
+        setProducts(data.data);
+      } catch (error) {
+        console.error("Error fetching products:", error);
+      }
+    };
+
+    fetchProducts();
+  }, []);
+
   return (
     <main className={styles.pageWrapper}>
       {/* <Navbar /> */}
