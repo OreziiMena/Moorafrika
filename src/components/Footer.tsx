@@ -38,6 +38,13 @@ export const WhatsappIcon = ({ className }: { className?: string }) => (
   </svg>
 );
 
+const LocationIcon = ({ className }: { className?: string }) => (
+  <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+    <circle cx="12" cy="10" r="3"></circle>
+  </svg>
+);
+
 export default function Footer() {
   return (
     <footer className={styles.footer}>
@@ -80,7 +87,7 @@ export default function Footer() {
               <li><Link href="/about" className={styles.linkItem}>About Us</Link></li>
               <li><Link href="/collection" className={styles.linkItem}>Explore Products</Link></li>
               <li><Link href="/policies" className={styles.linkItem}>Brand Policy/ Terms of Service</Link></li>
-              <li><Link href="/careers" className={styles.linkItem}>Careers</Link></li>
+              <li><Link href="/careers" className={styles.linkItem}>Privacy Policy</Link></li>
             </ul>
           </div>
 
@@ -107,8 +114,10 @@ export default function Footer() {
               </a>
             </div>
 
-            <div className={styles.legalLinks}>
-              <Link href="/privacy-policy" className={styles.legalLink}>Privacy Policy</Link>
+            <div className={styles.socialLinks}>
+               <a href="#" className={styles.emailLink}>
+                <LocationIcon className={styles.emailIcon} /> Nigeria
+              </a>
             </div>
           </div>
         </div>

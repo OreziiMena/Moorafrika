@@ -1,10 +1,10 @@
-"use client";
+'use client';
 
-import Image from "next/image";
-import Link from "next/link";
-import { ShoppingCart, ArrowRight } from "lucide-react";
-import { useCartStore } from "../app/store/cartStore"; 
-import styles from "./NewCollections.module.css";
+import Image from 'next/image';
+import Link from 'next/link';
+import { ShoppingCart, ArrowRight } from 'lucide-react';
+import { useCartStore } from '../app/store/cartStore';
+import styles from './NewCollections.module.css';
 
 // 1. IMPORT THE BACKEND CONTRACT (Adjust this path to exactly where the file is)
 import { ProductContract } from "../contracts/product"; 
@@ -16,9 +16,11 @@ const formatNaira = (amount: number) => {
   return new Intl.NumberFormat('en-NG', {
     style: 'currency',
     currency: 'NGN',
-    maximumFractionDigits: 0, 
+    maximumFractionDigits: 0,
   }).format(amount);
 };
+
+
 
 function ProductCard({ product }: { product: ProductContract }) {
   const items = useCartStore((state) => state.items);
@@ -31,9 +33,11 @@ function ProductCard({ product }: { product: ProductContract }) {
   // 'inStock' isn't in the backend contract yet, I'LL assume it's true for now!
   const isAvailable = product.stock_count > 0; 
 
-  const handleCartClick = (e: React.MouseEvent<HTMLButtonElement>) => {
-    e.preventDefault();   
-    e.stopPropagation();  
+  const handleCartClick = async (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    // await addToCart(product.id)
 
     if (isInCart) {
       removeItem(product.id);
@@ -57,12 +61,14 @@ function ProductCard({ product }: { product: ProductContract }) {
 
       <div className={styles.details}>
         <h2 className={styles.productName}>{product.name}</h2>
-      
+
         <div className={styles.statusWrapper}>
           <div className={styles.firstStat}>
-            <span className={styles.currentPrice}>{formatNaira(product.price)}</span>
+            <span className={styles.currentPrice}>
+              {formatNaira(product.price)}
+            </span>
           </div>
-          
+
           {isAvailable ? (
             <span className={styles.inStock}>In Stock</span>
           ) : (
@@ -70,18 +76,18 @@ function ProductCard({ product }: { product: ProductContract }) {
           )}
         </div>
 
-        <button 
+        <button
           type="button"
           onClick={handleCartClick}
           disabled={!isAvailable}
           className={isInCart ? styles.removeBtn : styles.cartBtn}
         >
-          <ShoppingCart className={styles.icon} /> 
-          {!isAvailable 
-            ? "Unavailable" 
-            : isInCart 
-              ? "Remove from Cart" 
-              : "Add to Cart"}
+          <ShoppingCart className={styles.icon} />
+          {!isAvailable
+            ? 'Unavailable'
+            : isInCart
+              ? 'Remove from Cart'
+              : 'Add to Cart'}
         </button>
       </div>
     </article>
@@ -108,7 +114,7 @@ export default function CollectionsPage() {
   return (
     <main className={styles.pageWrapper}>
       {/* <Navbar /> */}
-      
+
       <h1 className={styles.pageTitle}>New Collections</h1>
       <p className={styles.pageSubtitle}>Discover Our Latest Arrivals</p>
 

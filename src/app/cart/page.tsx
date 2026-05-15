@@ -1,25 +1,37 @@
-"use client";
+'use client';
 
-import Image from "next/image";
-import Link from "next/link";
-import { Trash2 } from "lucide-react"; // Changed to Trash2 to match your high-end design
-import { useCartStore } from "../store/cartStore";
-import styles from "./page.module.css";
-import Navbar from "../../components/Navbar"; 
-import Footer from "@/components/Footer";
+import Image from 'next/image';
+import Link from 'next/link';
+import { Trash2 } from 'lucide-react'; // Changed to Trash2 to match your high-end design
+import { useCartStore } from '../store/cartStore';
+import styles from './page.module.css';
+import Navbar from '../../components/Navbar';
+import Footer from '@/components/Footer';
+import { useEffect } from 'react';
 
 export default function CartPage() {
   const { items, removeItem, updateQuantity, cartTotal } = useCartStore();
 
+  useEffect(() => {
+    const loadCart = async () => {
+      const res = await fetch('/api/cart');
+      const data = await res.json();
+
+      console.log(data)
+    };
+
+    loadCart()
+  }, []);
+
   if (items.length === 0) {
     return (
       <main className={styles.emptyCart}>
-         <Navbar />
+        <Navbar />
         <div className={styles.empty}>
-        <h1 className={styles.title}>Your collection is empty</h1>
-        <Link href="/collections" className={styles.continueBtn}>
-          DISCOVER PIECES
-        </Link>
+          <h1 className={styles.title}>Your collection is empty</h1>
+          <Link href="/collections" className={styles.continueBtn}>
+            DISCOVER PIECES
+          </Link>
         </div>
         <Footer />
       </main>
@@ -27,11 +39,11 @@ export default function CartPage() {
   }
 
   return (
-<main className={styles.pageWrapper}>
-<Navbar />
-<header className={styles.header}>
-<h1 className={styles.title}>Your Shopping Cart</h1>
-</header>
+    <main className={styles.pageWrapper}>
+      <Navbar />
+      <header className={styles.header}>
+        <h1 className={styles.title}>Your Shopping Cart</h1>
+      </header>
 
 <div className={styles.layout}>
 {/* LEFT COLUMN: The Table */}
@@ -119,28 +131,26 @@ export default function CartPage() {
     </table>
 </div>
 
-{/* RIGHT COLUMN: Cart Summary */}
-<aside className={styles.summaryContainer}>
-    <div className={styles.summaryBox}>
-    <h2 className={styles.summaryTitle}>Cart Summary</h2>
-    
-    <div className={styles.summaryRow}>
-        <span>Subtotal</span>
-        <span>₦{cartTotal().toLocaleString()}</span>
-    </div>
-    
-    <div className={styles.summaryRowTotal}>
-        <span>Total</span>
-        <span>₦{cartTotal().toLocaleString()}</span>
-    </div>
+        {/* RIGHT COLUMN: Cart Summary */}
+        <aside className={styles.summaryContainer}>
+          <div className={styles.summaryBox}>
+            <h2 className={styles.summaryTitle}>Cart Summary</h2>
 
-    <button className={styles.checkoutBtn}>
-        PROCEED TO CHECKOUT
-    </button>
-    </div>
-</aside>
-</div>
-<Footer />
-</main>
-);
+            <div className={styles.summaryRow}>
+              <span>Subtotal</span>
+              <span>₦{cartTotal().toLocaleString()}</span>
+            </div>
+
+            <div className={styles.summaryRowTotal}>
+              <span>Total</span>
+              <span>₦{cartTotal().toLocaleString()}</span>
+            </div>
+
+            <button className={styles.checkoutBtn}>PROCEED TO CHECKOUT</button>
+          </div>
+        </aside>
+      </div>
+      <Footer />
+    </main>
+  );
 }

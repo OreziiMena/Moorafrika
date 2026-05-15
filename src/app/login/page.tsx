@@ -8,10 +8,10 @@ import { useAuthStore } from "../store/authStore";
 import styles from "../auth.module.css"; 
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import { signIn, useSession } from "next-auth/react";
 
 export default function LoginPage() {
   const router = useRouter();
-  const login = useAuthStore((state) => state.login);
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -24,26 +24,16 @@ export default function LoginPage() {
     setErrorMsg("");
 
     try {
-      // THE REAL API CALL
-      const response = await fetch("YOUR_BACKEND_URL/auth/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
-      });
-      
-      const data = await response.json();
-      
-      if (!response.ok) {
-        throw new Error(data.message || "Invalid credentials");
-      }
 
-      // Save the returned UserContract to browser memory
-      login(data.user || data);
+        const res = await signIn('credentials', { email, password, redirect: false })
+        if (!res || res.error) {
+            throw new Error(res?.error || "Login failed");
+        }
       
       router.push("/");
 
     } catch (error: any) {
-      setErrorMsg(error.message);
+      setErrorMsg("Invalid email or password");
     } finally {
       setIsLoading(false);
     }
