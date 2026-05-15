@@ -7,6 +7,8 @@ import { ArrowLeft } from "lucide-react";
 import styles from "../auth.module.css";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import axios from "axios";
+import { handleClientError } from "@/lib/clientErrorHandler";
     
 
 export default function SignupPage() {
@@ -24,22 +26,12 @@ export default function SignupPage() {
     setErrorMsg("");
 
     try {
-      const response = await fetch("/api/auth/register", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, email, password }),
-      });
-      
-      const data = await response.json();
-      
-      if (!response.ok) {
-        throw new Error(data.message || "Failed to create account");
-      }
+      await axios.post('/api/auth/register', { name, email, password });
       // Redirect to the homepage
       router.push("/");
 
     } catch (error: any) {
-      setErrorMsg(error.message);
+      handleClientError(error, { setErrorMsg });
     } finally {
       setIsLoading(false);
     }
