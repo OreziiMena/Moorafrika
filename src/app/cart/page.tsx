@@ -7,21 +7,17 @@ import { useCartStore } from '../store/cartStore';
 import styles from './page.module.css';
 import Navbar from '../../components/Navbar';
 import Footer from '@/components/Footer';
-import { useEffect } from 'react';
+import { useState } from 'react';
 
 export default function CartPage() {
   const { items, removeItem, updateQuantity, cartTotal } = useCartStore();
-
-  useEffect(() => {
-    const loadCart = async () => {
-      const res = await fetch('/api/cart');
-      const data = await res.json();
-
-      console.log(data)
-    };
-
-    loadCart()
-  }, []);
+  const [loadingItemId, setLoadingItemId] = useState<string | null>(null);
+  
+  const handleUpdateQuantity = async (productId: string, newQuantity: number) => {
+    setLoadingItemId(productId);
+    await updateQuantity(productId, newQuantity);
+    setLoadingItemId(null);
+  }
 
   if (items.length === 0) {
     return (
@@ -90,8 +86,8 @@ export default function CartPage() {
                 <button 
                     type="button"
                     className={styles.qtyBtn}
-                    onClick={() => updateQuantity(item.product.id, item.quantity - 1)}
-                    disabled={item.quantity <= 1}
+                    onClick={() => handleUpdateQuantity(item.product.id, item.quantity - 1)}
+                    disabled={loadingItemId === item.product.id || item.quantity <= 1}
                 >
                     −
                 </button>
@@ -101,7 +97,7 @@ export default function CartPage() {
                     type="number" 
                     min="1" 
                     value={item.quantity} 
-                    onChange={(e) => updateQuantity(item.product.id, parseInt(e.target.value) || 1)}
+                    onChange={(e) => handleUpdateQuantity(item.product.id, parseInt(e.target.value) || 1)}
                     className={styles.qtyInput}
                 />
 
@@ -109,7 +105,8 @@ export default function CartPage() {
                 <button 
                     type="button"
                     className={styles.qtyBtn}
-                    onClick={() => updateQuantity(item.product.id, item.quantity + 1)}
+                    onClick={() => handleUpdateQuantity(item.product.id, item.quantity + 1)}
+                    disabled={loadingItemId === item.product.id || item.quantity >= item.product.stock_count}
                 >
                     +
                 </button>
@@ -120,8 +117,15 @@ export default function CartPage() {
                 ₦{rowTotal.toLocaleString()}
             </td>
             <td className={styles.removeCell}>
-                <button onClick={() => removeItem(item.product.id)} className={styles.removeBtn}>
-                <Trash2 size={18} strokeWidth={1.5} />
+                <button 
+                    onClick={() => {
+                        setLoadingItemId(item.product.id);
+                        removeItem(item.product.id).then(() => setLoadingItemId(null));
+                    }} 
+                    className={styles.removeBtn}
+                    disabled={loadingItemId === item.product.id}
+                >
+                    <Trash2 size={18} strokeWidth={1.5} />
                 </button>
             </td>
             </tr>

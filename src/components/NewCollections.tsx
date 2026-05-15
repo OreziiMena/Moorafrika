@@ -7,9 +7,11 @@ import { useCartStore } from '../app/store/cartStore';
 import styles from './NewCollections.module.css';
 
 // 1. IMPORT THE BACKEND CONTRACT (Adjust this path to exactly where the file is)
-import { ProductContract } from "../contracts/product"; 
-import React from "react";
-import { PagedResponse } from "@/contracts/response";
+import { ProductContract } from '../contracts/product';
+import React from 'react';
+import { PagedResponse } from '@/contracts/response';
+import axios from 'axios';
+import { handleClientError } from '@/lib/clientErrorHandler';
 
 //Format currency
 const formatNaira = (amount: number) => {
@@ -20,30 +22,28 @@ const formatNaira = (amount: number) => {
   }).format(amount);
 };
 
-
-
 function ProductCard({ product }: { product: ProductContract }) {
-  const items = useCartStore((state) => state.items);
-  const addItem = useCartStore((state) => state.addItem);
-  const removeItem = useCartStore((state) => state.removeItem);
+  const [isLoading, setIsLoading] = React.useState(false);
+  const { items, addItem, removeItem } = useCartStore();
 
   const isInCart = items.some((item) => item.product.id === product.id);
   console.log('Cart items in ProductCard:', items); // Debugging line to check cart items
 
   // 'inStock' isn't in the backend contract yet, I'LL assume it's true for now!
-  const isAvailable = product.stock_count > 0; 
+  const isAvailable = product.stock_count > 0;
 
   const handleCartClick = async (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     e.stopPropagation();
-
+    setIsLoading(true);
     // await addToCart(product.id)
 
     if (isInCart) {
-      removeItem(product.id);
+      await removeItem(product.id);
     } else {
-      addItem({productId: product.id, quantity: 1});
+      await addItem({ productId: product.id, quantity: 1 });
     }
+    setIsLoading(false);
   };
 
   return (
@@ -79,15 +79,19 @@ function ProductCard({ product }: { product: ProductContract }) {
         <button
           type="button"
           onClick={handleCartClick}
-          disabled={!isAvailable}
+          disabled={!isAvailable || isLoading}
           className={isInCart ? styles.removeBtn : styles.cartBtn}
         >
           <ShoppingCart className={styles.icon} />
-          {!isAvailable
-            ? 'Unavailable'
-            : isInCart
-              ? 'Remove from Cart'
-              : 'Add to Cart'}
+          {isLoading ? (
+            <span>{isInCart ? 'Removing...' : 'Adding...'}</span>
+          ) : !isAvailable ? (
+            'Unavailable'
+          ) : isInCart ? (
+            'Remove from Cart'
+          ) : (
+            'Add to Cart'
+          )}
         </button>
       </div>
     </article>
@@ -100,11 +104,13 @@ export default function CollectionsPage() {
   React.useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const response = await fetch("/api/products?limit=4");
-        const data = await response.json() as PagedResponse<ProductContract>;
+        const response = await axios.get<PagedResponse<ProductContract>>(
+          '/api/products?limit=4',
+        );
+        const data = response.data;
         setProducts(data.data);
       } catch (error) {
-        console.error("Error fetching products:", error);
+        handleClientError(error);
       }
     };
 

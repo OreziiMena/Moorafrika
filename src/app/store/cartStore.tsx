@@ -1,4 +1,6 @@
 import { CartContract, CartItemContract } from '@/contracts/cart';
+import { handleClientError } from '@/lib/clientErrorHandler';
+import axios from 'axios';
 import { create } from 'zustand';
 
 interface CartRequest {
@@ -16,6 +18,7 @@ interface CartStore {
   cartTotal: () => number;
 }
 
+
 // The Smart Store (uses API routes)
 export const useCartStore = create<CartStore>((set, get) => ({
   items: [],
@@ -23,59 +26,43 @@ export const useCartStore = create<CartStore>((set, get) => ({
   // Load the cart from the server
   loadCart: async () => {
     try {
-      const res = await fetch('/api/cart');
-      if (!res.ok) throw new Error('Failed to load cart');
-      const data: CartContract = await res.json();
-      set({ items: data.items });
+      const res = await axios.get<CartContract>('/api/cart');
+      set({ items: res.data.items });
     } catch (err) {
-      console.error('loadCart error', err);
+      handleClientError(err);
     }
   },
 
   addItem: async (newItem) => {
     try {
-      const res = await fetch('/api/cart', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(newItem),
-      });
-
-      if (!res.ok) throw new Error('Failed to add item to cart');
-
+      await axios.post('/api/cart', newItem);
+      
       // Sync full cart from server to keep local state authoritative
       await get().loadCart();
     } catch (err) {
-      console.error('addItem error', err);
+      handleClientError(err);
     }
   },
 
   removeItem: async (id) => {
     try {
-      const res = await fetch(`/api/cart/${encodeURIComponent(id)}`, {
-        method: 'DELETE',
-      });
-
-      if (!res.ok) throw new Error('Failed to remove item from cart');
+      await axios.delete(`/api/cart/${encodeURIComponent(id)}`);
 
       await get().loadCart();
     } catch (err) {
-      console.error('removeItem error', err);
+      handleClientError(err);
     }
   },
 
   updateQuantity: async (id, quantity) => {
     try {
-      const res = await fetch(`/api/cart/${encodeURIComponent(id)}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ quantity: Math.max(1, quantity) }),
+      await axios.put(`/api/cart/${encodeURIComponent(id)}`, {
+        quantity: Math.max(1, quantity)
       });
-
-      if (!res.ok) throw new Error('Failed to update cart item quantity');
 
       await get().loadCart();
     } catch (err) {
-      console.error('updateQuantity error', err);
+      handleClientError(err);
     }
   },
 
@@ -91,5 +78,6 @@ setTimeout(() => {
     void store.loadCart();
   } catch (err) {
     // ignore
+    handleClientError(err);
   }
 }, 0);
