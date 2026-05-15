@@ -30,7 +30,7 @@ export default function SignupPage() {
       // Redirect to the homepage
       router.push("/");
 
-    } catch (error: any) {
+    } catch (error) {
       handleClientError(error, { setErrorMsg });
     } finally {
       setIsLoading(false);

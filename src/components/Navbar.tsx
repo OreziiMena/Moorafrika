@@ -5,7 +5,7 @@ import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
 import { useCartStore } from "../app/store/cartStore"; 
-import { Search, Heart, ShoppingCart, ChevronDown, User } from "lucide-react"; // Added User icon
+import { Search, Heart, ShoppingCart, ChevronDown } from "lucide-react"; // Added User icon
 import styles from "./Navbar.module.css";
 import { useSession } from "next-auth/react";
 
@@ -50,7 +50,7 @@ export default function Navbar() {
                   className={styles.logoImage}
                 />
               </div>
-              <span className={styles.brandText}>Mo'orafrika</span>
+              <span className={styles.brandText}>Mo&apos;orafrika</span>
             </Link>
 
             <div className={styles.desktopNav}>

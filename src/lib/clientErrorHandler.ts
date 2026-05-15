@@ -36,12 +36,18 @@ const handelValidationError = (payload: {
 };
 
 export const handleClientError = (
-  error: AxiosError,
+  error: unknown,
   payload?: {
     setErrors?: SetErrors;
     setErrorMsg?: (x: string) => void;
   },
 ) => {
+  if (!(error instanceof AxiosError)) {
+    console.error('Unexpected error', error);
+    toast.error('An unexpected error occurred');
+    return;
+  }
+  
   const errorData = error.response?.data as ErrorData;
 
   if (errorData.error === 'ValidationError') {
