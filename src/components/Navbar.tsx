@@ -8,6 +8,7 @@ import { useCartStore } from "../app/store/cartStore";
 import { Search, Heart, ShoppingCart, ChevronDown } from "lucide-react"; // Added User icon
 import styles from "./Navbar.module.css";
 import { useSession } from "next-auth/react";
+import { useWishlistStore } from "@/app/store/wishliststore";
 
 const MenuIcon = ({ className, strokeWidth = 1.5 }: { className?: string, strokeWidth?: number }) => (
   <svg className={className} strokeWidth={strokeWidth} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round">
@@ -34,6 +35,7 @@ export default function Navbar() {
 
   const toggleMobileMenu = () => setIsMobileMenuOpen(!isMobileMenuOpen);
   const toggleResources = () => setIsResourcesOpen(!isResourcesOpen);
+  const wishlistCount = useWishlistStore((state) => state.items.length);
 
   return (
     <nav className={styles.navbar}>
@@ -47,6 +49,7 @@ export default function Navbar() {
                   src="/Assets/brandd-logo-white.png"
                   alt="Moorafrika Logo"
                   fill
+                  unoptimized
                   className={styles.logoImage}
                 />
               </div>
@@ -98,19 +101,50 @@ export default function Navbar() {
             {/*Desktop Login / Sign Up */}
             {
               user ? (
-                <p>Welcome, {user.name}!</p>
+                <Link href="/profile" className={styles.userProfileLink}>
+                  {/* Shows on Desktop */}
+                  <span className={styles.welcomeText}>Welcome, {user.name}!</span>
+                  
+                  {/* Shows on Mobile */}
+                  <div className={styles.userAvatar}>
+                    {user.name ? user.name.charAt(0).toUpperCase() : "U"}
+                  </div>
+                </Link>
               ) : (
                 <div className={styles.authLinks}>
-              <Link href="/login" className={styles.authLink}>Login</Link>
-              <span className={styles.authDivider}>/</span>
-              <Link href="/signup" className={styles.authLink}>Sign Up</Link>
-            </div>
+                  <Link href="/login" className={styles.authLink}>Login</Link>
+                  <span className={styles.authDivider}>/</span>
+                  <Link href="/signup" className={styles.authLink}>Sign Up</Link>
+                </div>
               )
             }
 
-            <button className={styles.iconBtn}>
+           {/* Wishlist Button */}
+            <Link href="/wishlist" className={styles.iconBtn} style={{ position: "relative", display: "inline-flex" }}>
               <Heart strokeWidth={1.5} className={styles.iconSize} />
-            </button>
+              
+              {/* The Smart Notification Badge */}
+              {wishlistCount > 0 && (
+                <span style={{
+                  position: "absolute",
+                  top: "-4px",
+                  right: "-4px", 
+                  backgroundColor: "#e11d48", 
+                  color: "#FDFBF7",
+                  fontSize: "0.65rem",
+                  fontWeight: "bold",
+                  borderRadius: "50%",
+                  minWidth: "16px", 
+                  height: "16px",
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  padding: "0 4px"
+                }}>
+                  {wishlistCount}
+                </span>
+              )}
+            </Link>
             
             {/* Cart Button */}
             <Link href="/cart" className={styles.iconBtn} style={{ position: 'relative', display: 'flex' }}>

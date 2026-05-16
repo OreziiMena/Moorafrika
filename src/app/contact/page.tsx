@@ -122,7 +122,7 @@ export default function ContactPage() {
             <div className={styles.socialBlock}>
               <h2 className={styles.infoTitle}>Follow Us</h2>
               <div className={styles.socialIcons}>
-                <a href="#" aria-label="Instagram" className={styles.socialIcon}><InstagramIcon className={styles.socialIconSvg} /></a>
+                <a href="https://www.instagram.com/moorafrika?igsh=bXZyOHRhOHEybTk0&utm_source=qr" aria-label="Instagram" className={styles.socialIcon}><InstagramIcon className={styles.socialIconSvg} /></a>
                 <a href="#" aria-label="Twitter" className={styles.socialIcon}><TwitterIcon className={styles.socialIconSvg} /></a>
                 <a href="#" aria-label="TikTok" className={styles.socialIcon}><TikTokIcon className={styles.socialIconSvg} /></a>
                 <a href="#" aria-label="Facebook" className={styles.socialIcon}><FacebookIcon className={styles.socialIconSvg} /></a>

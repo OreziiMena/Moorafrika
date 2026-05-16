@@ -66,7 +66,7 @@ export default function Footer() {
               More than fashion, More of Africa. Discover our latest collection blending contemporary design with timeless aesthetics. Crafted for those who dare to stand out.
             </p>
             <div className={styles.socialLinks}>
-              <a href="#" className={styles.socialLink}>
+              <a href="https://www.instagram.com/moorafrika?igsh=bXZyOHRhOHEybTk0&utm_source=qr" className={styles.socialLink}>
                 <InstagramIcon className={styles.socialIcon} />
               </a>
               <a href="#" className={styles.socialLink}>
@@ -87,7 +87,7 @@ export default function Footer() {
               <li><Link href="/about" className={styles.linkItem}>About Us</Link></li>
               <li><Link href="/collection" className={styles.linkItem}>Explore Products</Link></li>
               <li><Link href="/policies" className={styles.linkItem}>Brand Policy/ Terms of Service</Link></li>
-              <li><Link href="/careers" className={styles.linkItem}>Privacy Policy</Link></li>
+              <li><Link href="/policy" className={styles.linkItem}>Privacy Policy</Link></li>
             </ul>
           </div>
 
@@ -109,7 +109,7 @@ export default function Footer() {
             </a>
 
             <div className={styles.socialLinks}>
-              <a href="#" className={styles.emailLink}>
+              <a href="https://wa.me/message/WMJSYNTKNIYTE1" className={styles.emailLink}>
                 <WhatsappIcon className={styles.emailIcon} /> Chat with us
               </a>
             </div>

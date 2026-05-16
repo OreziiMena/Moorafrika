@@ -375,6 +375,30 @@
   width: 100%;
   color: var(--obsidian);
 }
+.welcomeText {
+  font-size: 0.9rem;
+  color: #FDFBF7; 
+  margin: 0;
+  white-space: nowrap; 
+  overflow: hidden; 
+  text-overflow: ellipsis; 
+  max-width: 200px; 
+}
+.userProfileLink {
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+}
+.userAvatar {
+  display: none; 
+  width: 32px;
+  height: 32px;
+  background-color: #FDFBF7; 
+  color: #121212; 
+  border-radius: 50%; 
+  font-weight: bold;
+  font-size: 1rem;
+}
 
 /* Mobile responsiveness */
 @media (min-width: 640px) { 
@@ -404,5 +428,16 @@
   /* Hide Mobile Elements completely */
   .mobileMenuBtnContainer, .mobileMenu { 
     display: none !important; 
+  }
+}
+@media (max-width: 768px) {
+  .welcomeText {
+    display: none;
+  }
+  .userAvatar {
+    display: flex; 
+    justify-content: center;
+    align-items: center;
+    margin-left: 1rem;
   }
 }

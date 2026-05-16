@@ -1,6 +1,6 @@
 "use client";
 
-import styles from "./page.module.css";
+import styles from "../policy.module.css";
 import Navbar from "../../components/Navbar"; 
 import Footer from "@/components/Footer";
 

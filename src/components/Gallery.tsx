@@ -101,6 +101,7 @@ export default function Gallery() {
                 src={img.src}
                 alt={img.alt}
                 fill
+                unoptimized
                 className={styles.image}
               />
             </motion.div>

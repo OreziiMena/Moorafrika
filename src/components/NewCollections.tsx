@@ -5,8 +5,6 @@ import Link from 'next/link';
 import { ShoppingCart, ArrowRight } from 'lucide-react';
 import { useCartStore } from '../app/store/cartStore';
 import styles from './NewCollections.module.css';
-
-// 1. IMPORT THE BACKEND CONTRACT (Adjust this path to exactly where the file is)
 import { ProductContract } from '../contracts/product';
 import React from 'react';
 import { PagedResponse } from '@/contracts/response';
@@ -54,6 +52,7 @@ function ProductCard({ product }: { product: ProductContract }) {
             src={product.imageUrl}
             alt={product.name}
             fill
+            sizes="(max-width: 768px) 100vw, 300px"
             className={styles.image}
           />
         </div>

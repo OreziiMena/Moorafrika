@@ -18,15 +18,19 @@ interface CartStore {
   cartTotal: () => number;
 }
 
-
-// The Smart Store (uses API routes)
 export const useCartStore = create<CartStore>((set, get) => ({
   items: [],
 
-  // Load the cart from the server
+  // Load the cart from the server (WITH CACHE BUSTING)
   loadCart: async () => {
     try {
-      const res = await axios.get<CartContract>('/api/cart');
+      const res = await axios.get<CartContract>('/api/cart', {
+        headers: {
+          'Cache-Control': 'no-cache',
+          'Pragma': 'no-cache',
+          'Expires': '0',
+        },
+      });
       set({ items: res.data.items });
     } catch (err) {
       handleClientError(err);
@@ -35,10 +39,26 @@ export const useCartStore = create<CartStore>((set, get) => ({
 
   addItem: async (newItem) => {
     try {
-      await axios.post('/api/cart', newItem);
-      
-      // Sync full cart from server to keep local state authoritative
+      // Check if the exact product AND size are already in the cart
+      const currentCart = get().items;
+      const existingItem = currentCart.find(
+        (item) => item.productId === newItem.productId && item.size === newItem.size
+      );
+
+      if (existingItem) {
+        //If it exists, (PUT)
+        // We add the newly selected quantity to whatever they already had in the cart
+        const newQuantity = existingItem.quantity + newItem.quantity;
+        
+        await axios.put(`/api/cart/${encodeURIComponent(existingItem.id)}`, {
+          quantity: newQuantity
+        });
+      } else {
+        //If it's a brand new item, (POST)
+        await axios.post('/api/cart', newItem);
+      }
       await get().loadCart();
+      
     } catch (err) {
       handleClientError(err);
     }
@@ -47,7 +67,6 @@ export const useCartStore = create<CartStore>((set, get) => ({
   removeItem: async (id) => {
     try {
       await axios.delete(`/api/cart/${encodeURIComponent(id)}`);
-
       await get().loadCart();
     } catch (err) {
       handleClientError(err);
@@ -59,7 +78,6 @@ export const useCartStore = create<CartStore>((set, get) => ({
       await axios.put(`/api/cart/${encodeURIComponent(id)}`, {
         quantity: Math.max(1, quantity)
       });
-
       await get().loadCart();
     } catch (err) {
       handleClientError(err);
@@ -71,13 +89,12 @@ export const useCartStore = create<CartStore>((set, get) => ({
   },
 }));
 
-// Kick off an initial load in the background (best-effort)
+// Kick off an initial load in the background
 setTimeout(() => {
   try {
     const store = useCartStore.getState();
     void store.loadCart();
   } catch (err) {
-    // ignore
     handleClientError(err);
   }
 }, 0);

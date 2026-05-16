@@ -150,7 +150,10 @@ export default function CartPage() {
               <span>₦{cartTotal().toLocaleString()}</span>
             </div>
 
-            <button className={styles.checkoutBtn}>PROCEED TO CHECKOUT</button>
+  
+            <Link href="/checkout" className={styles.checkoutBtn}>
+                PROCEED TO CHECKOUT
+            </Link>
           </div>
         </aside>
       </div>
