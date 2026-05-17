@@ -70,7 +70,7 @@ class ProductService {
   ): Promise<ProductContract> {
     await AuthService.authorizeUser(['ADMIN']);
 
-    const {categoryId, ...data} = createProductSchema.parse(payload);
+    const { categoryId, ...data } = createProductSchema.parse(payload);
     const slug = slugify(data.name, { lower: true, strict: true });
 
     const existingProduct = await findProductBySlug(slug);
@@ -93,7 +93,7 @@ class ProductService {
   ): Promise<ProductContract> {
     await AuthService.authorizeUser(['ADMIN']);
 
-    const data = createProductSchema.parse(payload);
+    const { categoryId, ...data } = createProductSchema.parse(payload);
     const newSlug = slugify(data.name, { lower: true, strict: true });
 
     const existingProduct = await findProductBySlug(slug);
@@ -105,7 +105,7 @@ class ProductService {
       ...data,
       slug: newSlug,
 
-      category: { connect: { id: data.categoryId } },
+      category: { connect: { id: categoryId } },
     });
 
     return productMapper(product);

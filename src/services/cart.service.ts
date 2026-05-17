@@ -29,8 +29,14 @@ class CartService {
     const { productId, quantity, size } = createCartItemSchema.parse(data);
     const cart = await findCartByUserId(user.id);
 
-    if (cart.items.some((item) => item.productId === productId)) {
-      throw new BadRequestError('Product already in cart. Use update to change quantity.');
+    if (
+      cart.items.some(
+        (item) => item.productId === productId && item.size === size,
+      )
+    ) {
+      throw new BadRequestError(
+        'Product variant already in cart. Use update to change quantity.',
+      );
     }
 
     const cartItem = await createCartItem(cart.id, productId, {
@@ -49,24 +55,37 @@ class CartService {
 
     const { quantity, size, productId } = updateCartItemSchema.parse(data);
     const cart = await findCartByUserId(user.id);
-    const cartItem = cart.items.find((item) => item.productId === productId);
+    const cartItem = cart.items.find(
+      (item) => item.productId === productId && item.size === size,
+    );
     if (!cartItem) {
-      throw new NotFoundError('Product not found in cart');
+      const cartItem = await createCartItem(cart.id, productId, {
+        quantity,
+        size,
+        cart: { connect: { id: cart.id } },
+        product: { connect: { id: productId } },
+      });
+      return mapCartItem(cartItem);
     }
 
     const updatedCartItem = await updateCartItemQuantity(cartItem.id, {
       quantity,
-      size,
     });
     return mapCartItem(updatedCartItem);
   }
 
-  static async removeItemFromCart(productId: string): Promise<void> {
+  static async removeItemFromCart(
+    productId: string,
+    size: string | null,
+  ): Promise<void> {
+    if (!size) throw new BadRequestError('Product size not in request');
     const user = await AuthService.authorizeUser();
     const cart = await findCartByUserId(user.id);
-    const cartItem = cart.items.find((item) => item.productId === productId);
+    const cartItem = cart.items.find(
+      (item) => item.productId === productId && item.size === size,
+    );
     if (!cartItem) {
-      throw new NotFoundError('Product not found in cart');
+      throw new NotFoundError('Product variant not found in cart');
     }
 
     await deleteCartItem(cartItem.id);
@@ -74,9 +93,7 @@ class CartService {
   }
 
   static async clearCartItems(items: CartItemContract[]): Promise<void> {
-    const deletePromises = items.map((item) =>
-      deleteCartItem(item.id),
-    );
+    const deletePromises = items.map((item) => deleteCartItem(item.id));
     await Promise.all(deletePromises);
   }
 }

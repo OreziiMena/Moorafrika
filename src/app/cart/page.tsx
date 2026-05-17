@@ -120,7 +120,7 @@ export default function CartPage() {
                 <button 
                     onClick={() => {
                         setLoadingItemId(item.product.id);
-                        removeItem(item.product.id).then(() => setLoadingItemId(null));
+                        removeItem(item.product.id, item.size).then(() => setLoadingItemId(null));
                     }} 
                     className={styles.removeBtn}
                     disabled={loadingItemId === item.product.id}

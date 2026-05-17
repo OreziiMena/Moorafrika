@@ -13,7 +13,7 @@ interface CartStore {
   items: CartItemContract[];
   loadCart: () => Promise<void>;
   addItem: (item: CartRequest) => Promise<void>;
-  removeItem: (id: string) => Promise<void>;
+  removeItem: (id: string, size: string) => Promise<void>;
   updateQuantity: (id: string, quantity: number) => Promise<void>;
   cartTotal: () => number;
 }
@@ -64,9 +64,9 @@ export const useCartStore = create<CartStore>((set, get) => ({
     }
   },
 
-  removeItem: async (id) => {
+  removeItem: async (id, size) => {
     try {
-      await axios.delete(`/api/cart/${encodeURIComponent(id)}`);
+      await axios.delete(`/api/cart/${encodeURIComponent(id)}?size=${encodeURIComponent(size)}`);
       await get().loadCart();
     } catch (err) {
       handleClientError(err);

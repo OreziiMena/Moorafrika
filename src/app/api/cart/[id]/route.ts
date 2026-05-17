@@ -10,9 +10,12 @@ export const PUT = errorHandler(async (request, { params }) => {
   return NextResponse.json(updatedCartItem);
 });
 
-export const DELETE = errorHandler(async (_, { params }) => {
+export const DELETE = errorHandler(async (req, { params }) => {
   const { id } = await params;
-  await CartService.removeItemFromCart(id);
+  const { searchParams } = new URL(req.url);
+  const size = searchParams.get('size');
+
+  await CartService.removeItemFromCart(id, size);
 
   return NextResponse.json({ message: 'Cart item removed successfully' });
 });

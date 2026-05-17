@@ -5,7 +5,7 @@ export interface CartItemContract {
   cartId: string;
   productId: string;
   quantity: number;
-  size: string | null;
+  size: string;
 
   product: ProductContract;
 

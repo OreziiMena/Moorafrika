@@ -37,7 +37,7 @@ function ProductCard({ product }: { product: ProductContract }) {
     // await addToCart(product.id)
 
     if (isInCart) {
-      await removeItem(product.id);
+      await removeItem(product.id, product.sizes[0]);
     } else {
       await addItem({ productId: product.id, quantity: 1 });
     }
