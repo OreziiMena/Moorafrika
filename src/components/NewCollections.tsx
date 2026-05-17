@@ -75,6 +75,17 @@ function ProductCard({ product }: { product: ProductContract }) {
           )}
         </div>
 
+        {product.sizes && product.sizes.length > 0 ? (
+
+        <Link 
+          href={`/product/${product.slug}`} 
+          className={styles.cartBtn} 
+        >
+          <span>ADD TO CART</span>
+        </Link>
+
+        ) : (
+
         <button
           type="button"
           onClick={handleCartClick}
@@ -92,6 +103,8 @@ function ProductCard({ product }: { product: ProductContract }) {
             'Add to Cart'
           )}
         </button>
+
+        )}
       </div>
     </article>
   );
