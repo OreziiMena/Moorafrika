@@ -8,14 +8,15 @@ import styles from './page.module.css';
 import Navbar from '../../components/Navbar';
 import Footer from '@/components/Footer';
 import { useState } from 'react';
+import { CartItemContract } from '@/contracts/cart';
 
 export default function CartPage() {
   const { items, removeItem, updateQuantity, cartTotal } = useCartStore();
   const [loadingItemId, setLoadingItemId] = useState<string | null>(null);
   
-  const handleUpdateQuantity = async (productId: string, newQuantity: number) => {
-    setLoadingItemId(productId);
-    await updateQuantity(productId, newQuantity);
+  const handleUpdateQuantity = async (item: CartItemContract) => {
+    setLoadingItemId(item.productId);
+    await updateQuantity(item);
     setLoadingItemId(null);
   }
 
@@ -86,7 +87,7 @@ export default function CartPage() {
                 <button 
                     type="button"
                     className={styles.qtyBtn}
-                    onClick={() => handleUpdateQuantity(item.product.id, item.quantity - 1)}
+                    onClick={() => handleUpdateQuantity({...item, quantity: item.quantity - 1})}
                     disabled={loadingItemId === item.product.id || item.quantity <= 1}
                 >
                     −
@@ -97,7 +98,7 @@ export default function CartPage() {
                     type="number" 
                     min="1" 
                     value={item.quantity} 
-                    onChange={(e) => handleUpdateQuantity(item.product.id, parseInt(e.target.value) || 1)}
+                    onChange={(e) => handleUpdateQuantity({...item, quantity: parseInt(e.target.value) || 1})}
                     className={styles.qtyInput}
                 />
 
@@ -105,7 +106,7 @@ export default function CartPage() {
                 <button 
                     type="button"
                     className={styles.qtyBtn}
-                    onClick={() => handleUpdateQuantity(item.product.id, item.quantity + 1)}
+                    onClick={() => handleUpdateQuantity({...item, quantity: item.quantity + 1})}
                     disabled={loadingItemId === item.product.id || item.quantity >= item.product.stock_count}
                 >
                     +

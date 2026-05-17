@@ -6,7 +6,7 @@ import { create } from 'zustand';
 interface CartRequest {
   productId: string;
   quantity: number;
-  size?: string;
+  size: string;
 }
 
 interface CartStore {
@@ -14,7 +14,7 @@ interface CartStore {
   loadCart: () => Promise<void>;
   addItem: (item: CartRequest) => Promise<void>;
   removeItem: (id: string, size: string) => Promise<void>;
-  updateQuantity: (id: string, quantity: number) => Promise<void>;
+  updateQuantity: (item: CartRequest) => Promise<void>;
   cartTotal: () => number;
 }
 
@@ -51,7 +51,8 @@ export const useCartStore = create<CartStore>((set, get) => ({
         const newQuantity = existingItem.quantity + newItem.quantity;
         
         await axios.put(`/api/cart/${encodeURIComponent(existingItem.id)}`, {
-          quantity: newQuantity
+          quantity: newQuantity,
+          size: newItem.size
         });
       } else {
         //If it's a brand new item, (POST)
@@ -73,10 +74,11 @@ export const useCartStore = create<CartStore>((set, get) => ({
     }
   },
 
-  updateQuantity: async (id, quantity) => {
+  updateQuantity: async (item) => {
     try {
-      await axios.put(`/api/cart/${encodeURIComponent(id)}`, {
-        quantity: Math.max(1, quantity)
+      await axios.put(`/api/cart/${encodeURIComponent(item.productId)}`, {
+        quantity: Math.max(1, item.quantity),
+        size: item.size
       });
       await get().loadCart();
     } catch (err) {
