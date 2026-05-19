@@ -1,4 +1,4 @@
-.pageWrapper{
+.pageWrapper {
   color: var(--ivory, #FDFBF7);
   min-height: 100vh;
   max-width: 1400px;
@@ -14,6 +14,8 @@
   width: 100%;
   padding: 2rem;
   margin-top: 5%;
+  box-sizing: border-box;
+  overflow-x: hidden;
 }
 
 .header {
@@ -38,15 +40,20 @@
 }
 
 .containerr {
-   display: flex;
+  display: flex;
   gap: 4rem;
-  align-items: flex-start; 
+  align-items: flex-start;
+  box-sizing: border-box;
+  width: 100%;
 }
 
 .formSection {
-  flex: 0 0 60%;
-  max-width: 60%;
+  flex: 0 0 calc(60% - 2rem);
+  max-width: calc(60% - 2rem);
+  box-sizing: border-box;
+  width: 100%;
 }
+
 .expressCheckout {
   display: flex;
   gap: 1rem;
@@ -57,13 +64,14 @@
   flex: 1;
   padding: 1rem;
   background: transparent;
-  border: 1px solid #27272a; 
+  border: 1px solid #27272a;
   color: #FDFBF7;
   font-size: 0.9rem;
   font-weight: 600;
   letter-spacing: 0.05em;
   cursor: pointer;
   transition: background-color 0.2s ease;
+  box-sizing: border-box;
 }
 
 .expressBtn:hover {
@@ -81,7 +89,7 @@
 }
 
 .inactiveStep {
-  color: #52525b; 
+  color: #52525b;
 }
 
 .formGroup {
@@ -117,6 +125,7 @@
   font-size: 1rem;
   outline: none;
   transition: border-color 0.2s ease;
+  box-sizing: border-box;
 }
 
 .inputWrapper input:focus,
@@ -127,12 +136,12 @@
 .inputWrapper select {
   cursor: pointer;
 }
+
 .inputWrapper select option {
-  background-color: #1c1c1c; 
-  color: #FDFBF7; 
+  background-color: #1c1c1c;
+  color: #FDFBF7;
 }
 
-/* --- Radio Buttons --- */
 .radioGroup {
   display: flex;
   flex-direction: column;
@@ -147,6 +156,7 @@
   border: 1px solid #27272a;
   cursor: pointer;
   transition: all 0.2s ease;
+  box-sizing: border-box;
 }
 
 .radioInfo {
@@ -160,27 +170,11 @@
   background-color: rgba(253, 251, 247, 0.03);
 }
 
-.submitBtn {
-  width: 100%;
-  padding: 1.25rem;
-  background-color: #FDFBF7;
-  color: #141414;
-  font-size: 1rem;
-  font-weight: 600;
-  letter-spacing: 0.05em;
-  border: none;
-  cursor: pointer;
-  margin-top: 2rem;
-  transition: opacity 0.2s ease;
-}
-
-.submitBtn:hover {
-  opacity: 0.9;
-}
-
 .summarySection {
-  flex: 0 0 calc(40% - 4rem);
-  max-width: calc(40% - 4rem);
+  flex: 0 0 calc(40% - 2rem);
+  max-width: calc(40% - 2rem);
+  box-sizing: border-box;
+  width: 100%;
 }
 
 .stickyContainer {
@@ -189,14 +183,18 @@
   padding: 2rem;
   background-color: rgba(39, 39, 42, 0.1);
   border: 1px solid #27272a;
+  box-sizing: border-box;
+  width: 100%;
 }
-.sectionTitle{
+
+.sectionTitle {
   text-align: center;
   margin-bottom: 0.5rem;
   padding: 0.5rem;
   font-family: var(--font-editorial);
   font-size: 1.7rem;
 }
+
 .cartItems {
   display: flex;
   flex-direction: column;
@@ -211,16 +209,25 @@
   gap: 1rem;
   border: 1px solid #363638;
   padding: 1rem;
+  box-sizing: border-box;
+  width: 100%;
 }
 
 .itemImage {
   flex-shrink: 0;
 }
 
+.itemDetails {
+  overflow: hidden;
+}
+
 .itemDetails h3 {
   font-size: 0.95rem;
   font-weight: 500;
   margin-bottom: 0.25rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .itemDetails p {
@@ -234,7 +241,6 @@
   font-weight: 500;
   margin-top: 0.5rem;
 }
-
 
 .calculations {
   display: flex;
@@ -258,11 +264,38 @@
   border-top: 1px solid #27272a;
 }
 
-/* --- Mobile Responsiveness --- */
+.submitBtn {
+  width: 100%;
+  padding: 1.25rem;
+  background-color: #FDFBF7;
+  color: #141414;
+  font-size: 1rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  border: none;
+  cursor: pointer;
+  margin-top: 2rem;
+  transition: opacity 0.2s ease;
+  box-sizing: border-box;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.submitBtn:hover {
+  opacity: 0.9;
+}
+
 @media (max-width: 1024px) {
   .containerr {
-    flex-direction: column-reverse;
+    flex-direction: column;
     gap: 3rem;
+  }
+
+  .summarySection {
+    order: -1;
   }
 
   .formSection,
@@ -284,12 +317,20 @@
 
 @media (max-width: 640px) {
   .container {
-    width: 1000%;
+    width: 100%;
     padding: 1rem;
     margin-top: 2rem;
+    overflow-x: hidden;
+  }
+
+  .containerr {
+    width: 100%;
+    gap: 2rem;
+    margin: 0;
   }
 
   .title {
+    margin-top: 3rem;
     font-size: 2.2rem;
   }
 
@@ -300,8 +341,23 @@
   .inputGrid {
     grid-template-columns: 1fr;
   }
-  
+
   .inputWrapper[style] {
     grid-column: 1 / -1 !important;
+  }
+  
+  .submitBtn {
+    padding: 1rem;
+    font-size: 0.95rem;
+    white-space: normal;
+    word-wrap: break-word;
+    height: auto;
+    min-height: 3.5rem;
+  }
+
+  .cartItem {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
   }
 }

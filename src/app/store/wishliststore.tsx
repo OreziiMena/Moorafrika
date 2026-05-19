@@ -2,9 +2,10 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
 interface WishlistStore {
-  items: string[]; // We will just store the Product IDs
+  items: string[]; // We will just store the Product IDs (Slugs)
   toggleWishlist: (productId: string) => void;
   isInWishlist: (productId: string) => boolean;
+  clearWishlist: () => void; 
 }
 
 export const useWishlistStore = create<WishlistStore>()(
@@ -23,6 +24,9 @@ export const useWishlistStore = create<WishlistStore>()(
       },
       
       isInWishlist: (productId) => get().items.includes(productId),
+
+      // FIX: This must live safely inside the main state object!
+      clearWishlist: () => set({ items: [] }), 
     }),
     {
       name: 'moorafrika-wishlist', // The name of the storage key in the browser

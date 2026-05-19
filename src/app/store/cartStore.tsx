@@ -21,7 +21,6 @@ interface CartStore {
 export const useCartStore = create<CartStore>((set, get) => ({
   items: [],
 
-  // Load the cart from the server (WITH CACHE BUSTING)
   loadCart: async () => {
     try {
       const res = await axios.get<CartContract>('/api/cart', {
@@ -39,23 +38,18 @@ export const useCartStore = create<CartStore>((set, get) => ({
 
   addItem: async (newItem) => {
     try {
-      // Check if the exact product AND size are already in the cart
       const currentCart = get().items;
       const existingItem = currentCart.find(
         (item) => item.productId === newItem.productId && item.size === newItem.size
       );
 
       if (existingItem) {
-        //If it exists, (PUT)
-        // We add the newly selected quantity to whatever they already had in the cart
         const newQuantity = existingItem.quantity + newItem.quantity;
-        
         await axios.put(`/api/cart/${encodeURIComponent(existingItem.id)}`, {
           quantity: newQuantity,
           size: newItem.size
         });
       } else {
-        //If it's a brand new item, (POST)
         await axios.post('/api/cart', newItem);
       }
       await get().loadCart();
@@ -91,12 +85,14 @@ export const useCartStore = create<CartStore>((set, get) => ({
   },
 }));
 
-// Kick off an initial load in the background
-setTimeout(() => {
-  try {
-    const store = useCartStore.getState();
-    void store.loadCart();
-  } catch (err) {
-    handleClientError(err);
-  }
-}, 0);
+// --- THE CRITICAL FIX: Guard the server-side initialization ---
+if (typeof window !== 'undefined') {
+  setTimeout(() => {
+    try {
+      const store = useCartStore.getState();
+      void store.loadCart();
+    } catch (err) {
+      handleClientError(err);
+    }
+  }, 0);
+}

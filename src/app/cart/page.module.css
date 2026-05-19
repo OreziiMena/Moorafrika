@@ -36,21 +36,23 @@
 }
 
 .continueBtn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 1.2rem 2.5rem;
-  background-color: var(--ivory, #FDFBF7);
-  color: var(--obsidian, #141414);
-  border: 1px solid var(--ivory, #FDFBF7);
-  border-radius: 1rem;
-  font-family: var(--font-clean, sans-serif);
-  font-size: 1rem;
-  font-weight: 800;
-  text-decoration: none;
-  transition: all 0.3s ease;
   width: 100%;
-  max-width: 320px;
+  padding: 1.25rem;
+  background-color: #FDFBF7;
+  color: #141414;
+  font-size: 1rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  border: none;
+  cursor: pointer;
+  margin-top: 2rem;
+  transition: opacity 0.2s ease;
+  box-sizing: border-box;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  white-space: nowrap;
 }
 
 .continueBtn:hover {
@@ -249,17 +251,22 @@
 
 .checkoutBtn {
   width: 100%;
-  background: var(--ivory, #FDFBF7);
-  color: var(--obsidian, #141414);
+  padding: 1.25rem;
+  background-color: #FDFBF7;
+  color: #141414;
+  font-size: 1rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
   border: none;
-  padding: 1.2rem;
-  font-family: var(--font-clean, sans-serif);
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  font-weight: 700;
   cursor: pointer;
-  border-radius: 1rem;
-  transition: opacity 0.3s;
+  margin-top: 2rem;
+  transition: opacity 0.2s ease;
+  box-sizing: border-box;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  white-space: nowrap;
 }
 
 .checkoutBtn:hover {
@@ -282,6 +289,15 @@
   }
   .title {
     font-size: 2rem;
+  }
+  .tableContainer{
+    width: 95vw;        
+    margin-left: -1rem;   
+    margin-right: -1rem; 
+    padding: 0 1rem;      
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    border: none;
   }
   .table thead {
     display: none;
@@ -359,6 +375,14 @@
   .removeBtn {
     margin: 0;
     padding: 0.2rem;
+  }
+  .checkoutBtn{
+    padding: 1rem;
+    font-size: 0.95rem;
+    white-space: normal;
+    word-wrap: break-word;
+    height: auto;
+    min-height: 3.5rem;
   }
 }
 

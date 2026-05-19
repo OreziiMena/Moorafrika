@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { ShoppingCart, AlertCircle, Heart, Ruler } from "lucide-react";
@@ -30,19 +30,19 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
   const [selectedSize, setSelectedSize] = useState<string>("");
   const [quantity, setQuantity] = useState<number>(1);
   const [isAdding, setIsAdding] = useState(false);
-  const { toggleWishlist, isInWishlist } = useWishlistStore();
   
-  // Check if THIS specific product is in the global wishlist
-  const isWishlisted = product ? isInWishlist(product.id) : false;
+  // Track current swipe index for mobile dot indicators
+  const [currentMobileIndex, setCurrentMobileIndex] = useState(0);
+  const carouselRef = useRef<HTMLDivElement>(null);
 
-  const { items, addItem } = useCartStore();
+  const { toggleWishlist, isInWishlist } = useWishlistStore();
+  const isWishlisted = product ? isInWishlist(product.slug) : false;
+  const { addItem } = useCartStore();
 
   useEffect(() => {
     const fetchProduct = async () => {
       try {
-        const response = await axios.get<ProductContract>(
-          `/api/products/${slug}`
-        );
+        const response = await axios.get<ProductContract>(`/api/products/${slug}`);
         const productData = response.data; 
         
         setProduct(productData);
@@ -56,6 +56,14 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
 
     fetchProduct();
   }, [slug]);
+
+  // Update dots tracking when a user swipes on mobile
+  const handleMobileScroll = () => {
+    if (!carouselRef.current) return;
+    const { scrollLeft, clientWidth } = carouselRef.current;
+    const newIndex = Math.round(scrollLeft / clientWidth);
+    setCurrentMobileIndex(newIndex);
+  };
 
   if (isLoading) {
     return (
@@ -76,36 +84,32 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
   }
 
   const isAvailable = product.stock_count > 0;
-  // Combines main image and thumbnails for the vertical grid
   const galleryImages = [product.imageUrl, ...(product.thumbnails || [])];
 
-const handleAddToCart = async () => {
+  const handleAddToCart = async () => {
     if (!selectedSize) {
       alert("Please select a size first!");
       return;
     }
-    
     setIsAdding(true);
-    
-    // Pass the exact quantity and size to the Zustand store
     await addItem({ 
       productId: product.id, 
       quantity: quantity, 
       size: selectedSize 
     });
-    
     setIsAdding(false);
   };
-
- 
 
   return (
     <main className={styles.pageWrapper}>
       <Navbar />
 
       <div className={styles.container}>
-        {/* LEFT COLUMN: Image Grid Layout */}
+        
+        {/* REWORKED GALLERY SECTION */}
         <div className={styles.gallerySection}>
+          
+          {/* Desktop Only Side Strip */}
           <div className={styles.thumbnailStrip}>
             {galleryImages.map((img, idx) => (
               <button 
@@ -124,6 +128,7 @@ const handleAddToCart = async () => {
             ))}
           </div>
           
+          {/* Desktop Main View Box */}
           <div className={styles.mainImageContainer}>
             <Image 
               src={activeImage} 
@@ -134,6 +139,37 @@ const handleAddToCart = async () => {
               className={styles.mainImg} 
             />
           </div>
+
+          {/* Mobile Swipe Carousel View */}
+          <div 
+            className={styles.mobileCarousel} 
+            ref={carouselRef}
+            onScroll={handleMobileScroll}
+          >
+            {galleryImages.map((img, idx) => (
+              <div key={idx} className={styles.mobileCarouselFrame}>
+                <Image 
+                  src={img} 
+                  alt={`${product.name} mobile swipe view ${idx + 1}`} 
+                  fill
+                  sizes="100vw"
+                  priority={idx === 0}
+                  className={styles.mainImg}
+                />
+              </div>
+            ))}
+          </div>
+
+          {/* Carousel Pagination Dots Indicators (Mobile Only) */}
+          <div className={styles.carouselDots}>
+            {galleryImages.map((_, idx) => (
+              <div 
+                key={idx} 
+                className={`${styles.dot} ${currentMobileIndex === idx ? styles.activeDot : ""}`}
+              />
+            ))}
+          </div>
+
         </div>
 
         {/* RIGHT COLUMN: Product Details */}
@@ -145,7 +181,7 @@ const handleAddToCart = async () => {
             <p>{product.description}</p>
           </div>
 
-          {/* Size Selector Layout (Matches Reference Image) */}
+          {/* Size Selector */}
           <div className={styles.selectorGroup}>
             <div className={styles.sizeHeader}>
               <span className={styles.label}>Size:</span>
@@ -182,18 +218,14 @@ const handleAddToCart = async () => {
             </div>
           </div>
 
-          {/* Action Buttons: Add to Cart & Wishlist */}
+          {/* Action Row */}
           <div className={styles.actionRow}>
             <button
               onClick={handleAddToCart}
               disabled={!isAvailable || isAdding}
               className={styles.addToCartBtn}
             >
-              {isAdding ? (
-                "Adding..."
-              ) : !isAvailable ? (
-                "Out of Stock"
-              ) : (
+              {isAdding ? "Adding..." : !isAvailable ? "Out of Stock" : (
                 <>
                   <ShoppingCart size={20} />
                   ADD TO CART
@@ -202,9 +234,9 @@ const handleAddToCart = async () => {
             </button>
             
             <button 
-              onClick={() => toggleWishlist(product.id)}
-              className={`${styles.wishlistBtn} ${isWishlisted ? styles.wishlistActive : ""}`}
-              aria-label="Save to wishlist"
+              onClick={() => toggleWishlist(product.slug)} 
+              className={`${styles.wishlistBtn} ${isWishlisted ? styles.wishlisted : ""}`}
+              aria-label="Add to Wishlist"
             >
               <Heart 
                 size={24} 

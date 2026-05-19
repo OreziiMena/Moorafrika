@@ -1,6 +1,3 @@
-/* =========================================
-   1. VARIABLES & BASE
-   ========================================= */
 :root {
   --obsidian: #141414;
   --ivory: #FDFBF7;
@@ -16,7 +13,7 @@
   position: fixed;
   width: 100%;
   z-index: 1000;
-  background-color:hsl(from color h s l);
+  background-color: hsl(from color h s l);
   backdrop-filter: blur(12px);
   box-shadow: 0 4px 30px rgba(0, 0, 0, 0.05);
   transition: background-color 0.4s ease, border-color 0.4s ease;
@@ -45,6 +42,7 @@
   align-items: center;
   gap: 0.75rem; 
 }
+
 .logoLink {
   flex-shrink: 0;
   display: flex;
@@ -99,7 +97,6 @@
   color: var(--terracotta);
 }
 
-/* Dropdown */
 .dropdownContainer {
   position: relative;
 }
@@ -144,7 +141,6 @@
   background-color: var(--ivory); 
 }
 
-/* Search */
 .desktopSearch {
   display: none; 
   align-items: center;
@@ -181,7 +177,6 @@
   width: 180px;
 }
 
-/* Desktop Auth Links */
 .authLinks {
   display: none; 
   align-items: center;
@@ -206,6 +201,46 @@
 .authDivider {
   color: rgba(253, 251, 247, 0.3);
   font-size: 0.8rem;
+}
+
+.desktopAuthSection {
+  display: none;
+  align-items: center;
+  gap: 1.5rem;
+  margin-right: 1rem;
+}
+
+.userProfileLink {
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+}
+
+.welcomeText {
+  font-family: var(--font-clean, sans-serif);
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #FDFBF7; 
+  margin: 0;
+  white-space: nowrap; 
+}
+
+.desktopLogoutBtn {
+  font-family: var(--font-clean, sans-serif);
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--terracotta);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  transition: opacity 0.2s ease;
+}
+
+.desktopLogoutBtn:hover {
+  opacity: 0.7;
 }
 
 .iconBtn {
@@ -332,19 +367,23 @@
 
 .mobileAuthBtn {
   display: block;
+  width: 100%;
   text-align: center;
   font-family: var(--font-clean, sans-serif);
   font-size: 0.9rem;
   text-transform: uppercase;
   letter-spacing: 0.1em;
   color: var(--obsidian, #141414); 
+  background: transparent;
   text-decoration: none;
   padding: 0.8rem;
   border: 1px solid rgba(20, 20, 20, 0.3); 
+  cursor: pointer;
 }
 
 .mobileAuthBtnPrimary {
   display: block;
+  width: 100%;
   text-align: center;
   font-family: var(--font-clean, sans-serif);
   font-size: 0.9rem;
@@ -354,6 +393,8 @@
   color: var(--ivory, #FDFBF7);
   text-decoration: none;
   padding: 0.8rem;
+  border: none;
+  cursor: pointer;
 }
 
 .mobileSearchContainer {
@@ -375,39 +416,23 @@
   width: 100%;
   color: var(--obsidian);
 }
-.welcomeText {
-  font-size: 0.9rem;
-  color: #FDFBF7; 
-  margin: 0;
-  white-space: nowrap; 
-  overflow: hidden; 
-  text-overflow: ellipsis; 
-  max-width: 200px; 
-}
-.userProfileLink {
-  text-decoration: none;
-  display: flex;
-  align-items: center;
-}
-.userAvatar {
-  display: none; 
-  width: 32px;
-  height: 32px;
-  background-color: #FDFBF7; 
-  color: #121212; 
-  border-radius: 50%; 
-  font-weight: bold;
-  font-size: 1rem;
+
+@media (max-width: 1023px) {
+  .brandText {
+    display: none;
+  }
+  
+  .logoWrapper {
+    margin-right: 0;
+  }
 }
 
-/* Mobile responsiveness */
 @media (min-width: 640px) { 
   .container { 
     padding: 0 1.5rem; 
   } 
 }
 
-/* DESKTOP STYLES: Add the generous spacing back in */
 @media (min-width: 1024px) { 
   .container { 
     padding: 0 2rem; 
@@ -421,23 +446,11 @@
     gap: 1.5rem; 
   }
 
-  .desktopNav, .desktopSearch, .authLinks { 
+  .desktopNav, .desktopSearch, .authLinks, .desktopAuthSection { 
     display: flex; 
   }
 
-  /* Hide Mobile Elements completely */
   .mobileMenuBtnContainer, .mobileMenu { 
     display: none !important; 
-  }
-}
-@media (max-width: 768px) {
-  .welcomeText {
-    display: none;
-  }
-  .userAvatar {
-    display: flex; 
-    justify-content: center;
-    align-items: center;
-    margin-left: 1rem;
   }
 }

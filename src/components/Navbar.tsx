@@ -5,9 +5,9 @@ import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
 import { useCartStore } from "../app/store/cartStore"; 
-import { Search, Heart, ShoppingCart, ChevronDown } from "lucide-react"; // Added User icon
+import { Search, Heart, ShoppingCart, ChevronDown } from "lucide-react";
 import styles from "./Navbar.module.css";
-import { useSession } from "next-auth/react";
+import { useSession, signOut } from "next-auth/react";
 import { useWishlistStore } from "@/app/store/wishliststore";
 
 const MenuIcon = ({ className, strokeWidth = 1.5 }: { className?: string, strokeWidth?: number }) => (
@@ -28,8 +28,8 @@ const CloseIcon = ({ className, strokeWidth = 1.5 }: { className?: string, strok
 export default function Navbar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isResourcesOpen, setIsResourcesOpen] = useState(false);
-  const { data: session } = useSession(); // Get session data to check if user is logged in
-  const user = session?.user; // Extract user info from session
+  const { data: session } = useSession();
+  const user = session?.user;
   
   const { items } = useCartStore();
 
@@ -41,7 +41,6 @@ export default function Navbar() {
     <nav className={styles.navbar}>
       <div className={styles.container}>
         <div className={styles.navInner}>
-          {/* Left Side: Logo and Navigation */}
           <div className={styles.leftSide}>
             <Link href="/" className={styles.logoLink}>
               <div className={styles.logoWrapper}>
@@ -60,7 +59,6 @@ export default function Navbar() {
               <Link href="/" className={styles.navLink}>Home</Link>
               <Link href="/about" className={styles.navLink}>About</Link>
               <Link href="/collection" className={styles.navLink}>Collection</Link>
-              {/* Resources Dropdown */}
               <div
                 className={styles.dropdownContainer}
                 onMouseEnter={() => setIsResourcesOpen(true)}
@@ -87,7 +85,6 @@ export default function Navbar() {
             </div>
           </div>
 
-          {/* Right Side: Icons & Auth */}
           <div className={styles.rightSide}>
             <div className={styles.desktopSearch}>
               <Search className={styles.searchIcon} />
@@ -98,32 +95,25 @@ export default function Navbar() {
               />
             </div>
 
-            {/*Desktop Login / Sign Up */}
-            {
-              user ? (
+            {user ? (
+              <div className={styles.desktopAuthSection}>
                 <Link href="/profile" className={styles.userProfileLink}>
-                  {/* Shows on Desktop */}
                   <span className={styles.welcomeText}>Welcome, {user.name}!</span>
-                  
-                  {/* Shows on Mobile */}
-                  <div className={styles.userAvatar}>
-                    {user.name ? user.name.charAt(0).toUpperCase() : "U"}
-                  </div>
                 </Link>
-              ) : (
-                <div className={styles.authLinks}>
-                  <Link href="/login" className={styles.authLink}>Login</Link>
-                  <span className={styles.authDivider}>/</span>
-                  <Link href="/signup" className={styles.authLink}>Sign Up</Link>
-                </div>
-              )
-            }
+                <button onClick={() => signOut()} className={styles.desktopLogoutBtn}>
+                  Logout
+                </button>
+              </div>
+            ) : (
+              <div className={styles.authLinks}>
+                <Link href="/login" className={styles.authLink}>Login</Link>
+                <span className={styles.authDivider}>/</span>
+                <Link href="/signup" className={styles.authLink}>Sign Up</Link>
+              </div>
+            )}
 
-           {/* Wishlist Button */}
             <Link href="/wishlist" className={styles.iconBtn} style={{ position: "relative", display: "inline-flex" }}>
               <Heart strokeWidth={1.5} className={styles.iconSize} />
-              
-              {/* The Smart Notification Badge */}
               {wishlistCount > 0 && (
                 <span style={{
                   position: "absolute",
@@ -146,7 +136,6 @@ export default function Navbar() {
               )}
             </Link>
             
-            {/* Cart Button */}
             <Link href="/cart" className={styles.iconBtn} style={{ position: 'relative', display: 'flex' }}>
               <ShoppingCart strokeWidth={1.5} className={styles.iconSize} />
               {items.length > 0 && (
@@ -154,7 +143,6 @@ export default function Navbar() {
               )}
             </Link>
 
-            {/* Mobile Menu Button */}
             <div className={styles.mobileMenuBtnContainer}>
               <button onClick={toggleMobileMenu} className={styles.mobileMenuBtn}>
                 {isMobileMenuOpen ? (
@@ -168,7 +156,6 @@ export default function Navbar() {
         </div>
       </div>
 
-      {/* Mobile Menu */}
       <AnimatePresence>
         {isMobileMenuOpen && (
           <motion.div
@@ -211,7 +198,6 @@ export default function Navbar() {
                 </AnimatePresence>
               </div>
 
-
               <div className={styles.mobileSearchContainer}>
                 <Search className={styles.searchIcon} />
                 <input
@@ -221,10 +207,20 @@ export default function Navbar() {
                 />
               </div>
 
-              {/* Mobile Login / Sign Up */}
               <div className={styles.mobileAuthSection}>
-                 <Link href="/login" className={styles.mobileAuthBtn}>Log In</Link>
-                 <Link href="/signup" className={styles.mobileAuthBtnPrimary}>Sign Up</Link>
+                {user ? (
+                  <>
+                    <Link href="/profile" className={styles.mobileAuthBtn}>My Profile</Link>
+                    <button onClick={() => signOut()} className={styles.mobileAuthBtnPrimary}>
+                      Log Out
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <Link href="/login" className={styles.mobileAuthBtn}>Log In</Link>
+                    <Link href="/signup" className={styles.mobileAuthBtnPrimary}>Sign Up</Link>
+                  </>
+                )}
               </div>
             </div>
           </motion.div>
