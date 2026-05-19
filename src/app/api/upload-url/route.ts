@@ -5,8 +5,8 @@ import StorageServerInstance from '@/services/cloudflare/storage';
 export const POST = errorHandler(async (request) => {
   const body = await request.json();
 
-  const { presignedUrl, key } = await StorageServerInstance.generatePresignedUrl(body);
-  return NextResponse.json({ presignedUrl, key });
+  const { presignedUrl, key, url } = await StorageServerInstance.generatePresignedUrl(body);
+  return NextResponse.json({ presignedUrl, key, url });
 });
 
 export const DELETE = errorHandler(async (request) => {

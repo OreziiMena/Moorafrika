@@ -4,6 +4,7 @@ import type { NextAuthConfig } from 'next-auth';
 import AuthService from '@/services/auth.service';
 import z from 'zod';
 import { loginUserSchema } from '@/validationSchemas/auth';
+import UserService from './services/user.service';
 
 const config: NextAuthConfig = {
   pages: {
@@ -22,7 +23,7 @@ const config: NextAuthConfig = {
   ],
 
   callbacks: {
-    jwt({ token, user }) {
+    async jwt({ token, user, trigger }) {
       if (user) {
         token.id = user.id!;
         token.email = user.email;
@@ -30,6 +31,18 @@ const config: NextAuthConfig = {
         token.role = user.role;
         token.address = user.address;
         token.phone = user.phone;
+      }
+
+      if (trigger && trigger === 'update') {
+        const user = await UserService.getProfile()
+        if (user) {
+          token.id = user.id!;
+          token.email = user.email;
+          token.name = user.name;
+          token.role = user.role;
+          token.address = user.address;
+          token.phone = user.phone;
+        }
       }
       return token;
     },

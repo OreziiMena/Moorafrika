@@ -18,7 +18,14 @@ import { AuthProvider } from '@prisma/client';
 
 class UserService {
   static async getProfile() {
-    return await AuthService.authorizeUser();
+    const { id } = await AuthService.authorizeUser();
+    const user = await findUserById(id);
+
+    if (!user) {
+      throw new NotFoundError('Profile not found');
+    }
+
+    return userMapper(user);
   }
 
   static async updateProfile(
@@ -52,10 +59,7 @@ class UserService {
     const newPasswordHash = await bcrypt.hash(data.newPassword, 10);
 
     if (!localAuthMethod) {
-      await AuthService.createLocalAuthMethod(
-        existingUser.id,
-        newPasswordHash,
-      );
+      await AuthService.createLocalAuthMethod(existingUser.id, newPasswordHash);
       return { message: 'Password set successfully' };
     }
 
