@@ -8,7 +8,7 @@ export interface OrderItemContract {
   productId: string;
   quantity: number;
   priceAtPurchase: number;
-  size: string | null;
+  size: string;
 
   product: ProductContract;
 
@@ -20,7 +20,11 @@ export interface UserOrderContract {
   id: string;
   userId: string;
   totalAmount: number;
-  deliveryAddress: string;
+  streetAddress: string;
+  city: string;
+  state: string;
+  zipCode: string | null;
+  country: string;
   contactName: string;
   contactPhone: string;
   contactEmail: string;

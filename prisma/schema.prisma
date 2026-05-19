@@ -145,7 +145,7 @@ model OrderItem {
   orderId   String
   productId String
   quantity  Int
-  size      String?
+  size      String
   price_at_purchase Float
 
   order   Order   @relation(fields: [orderId], references: [id])
@@ -162,7 +162,11 @@ model Order {
   userId            String
   totalAmount       Float
   payment_reference String?
-  delivery_address  String
+  street_address    String
+  city              String
+  state             String
+  zip_code          String?
+  country           String
   contact_name      String
   contact_phone     String
   contact_email     String

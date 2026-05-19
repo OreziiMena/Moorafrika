@@ -105,8 +105,17 @@ class OrderService {
   }
 
   static async createNewOrder(payload: z.infer<typeof createOrderSchema>) {
-    const { deliveryAddress, contactEmail, contactName, contactPhone, note } =
-      createOrderSchema.parse(payload);
+    const {
+      streetAddress,
+      city,
+      state,
+      zipCode,
+      country,
+      contactEmail,
+      contactName,
+      contactPhone,
+      note,
+    } = createOrderSchema.parse(payload);
 
     const user = await AuthService.authorizeUser();
     const cart = await CartService.getUserCart();
@@ -119,7 +128,11 @@ class OrderService {
     );
 
     const orderPayload = {
-      delivery_address: deliveryAddress,
+      street_address: streetAddress,
+      city: city,
+      state: state,
+      zip_code: zipCode,
+      country: country,
       contact_email: contactEmail,
       contact_name: contactName,
       contact_phone: contactPhone,
