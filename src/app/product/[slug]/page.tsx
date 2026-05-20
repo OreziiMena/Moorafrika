@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { ShoppingCart, AlertCircle, Heart, Ruler } from "lucide-react";
+import { ShoppingCart, AlertCircle, Heart, Ruler, Check } from "lucide-react";
 import { useCartStore } from "@/app/store/cartStore";
 import { useWishlistStore } from "@/app/store/wishliststore";
 import { ProductContract } from "@/contracts/product";
@@ -30,14 +30,21 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
   const [selectedSize, setSelectedSize] = useState<string>("");
   const [quantity, setQuantity] = useState<number>(1);
   const [isAdding, setIsAdding] = useState(false);
+  const [isSuccess, setIsSuccess] = useState(false);
   
-  // Track current swipe index for mobile dot indicators
   const [currentMobileIndex, setCurrentMobileIndex] = useState(0);
   const carouselRef = useRef<HTMLDivElement>(null);
 
   const { toggleWishlist, isInWishlist } = useWishlistStore();
   const isWishlisted = product ? isInWishlist(product.slug) : false;
-  const { addItem } = useCartStore();
+  
+  const { items, addItem, removeItem } = useCartStore();
+
+  const existingCartItem = selectedSize 
+    ? items.find((item) => item.productId === product?.id && item.size === selectedSize)
+    : items.find((item) => item.productId === product?.id);
+
+  const isInCart = !!existingCartItem;
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -57,7 +64,6 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
     fetchProduct();
   }, [slug]);
 
-  // Update dots tracking when a user swipes on mobile
   const handleMobileScroll = () => {
     if (!carouselRef.current) return;
     const { scrollLeft, clientWidth } = carouselRef.current;
@@ -86,18 +92,43 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
   const isAvailable = product.stock_count > 0;
   const galleryImages = [product.imageUrl, ...(product.thumbnails || [])];
 
-  const handleAddToCart = async () => {
-    if (!selectedSize) {
-      alert("Please select a size first!");
-      return;
+  const handleCartAction = async () => {
+    if (!product) return;
+
+    if (isInCart && existingCartItem) {
+      setIsAdding(true);
+      try {
+        await removeItem(product.id, existingCartItem.size);
+      } catch (error) {
+        console.error("Failed to remove item", error);
+      } finally {
+        setIsAdding(false);
+      }
+    } else {
+      if (!selectedSize) {
+        alert("Please select a size first!");
+        return;
+      }
+      
+      setIsAdding(true);
+      try {
+        await addItem({ 
+          productId: product.id, 
+          quantity: quantity, 
+          size: selectedSize 
+        });
+        
+        setIsSuccess(true);
+        setTimeout(() => {
+          setIsSuccess(false);
+        }, 2500);
+        
+      } catch (error) {
+        console.error("Failed to add item", error);
+      } finally {
+        setIsAdding(false);
+      }
     }
-    setIsAdding(true);
-    await addItem({ 
-      productId: product.id, 
-      quantity: quantity, 
-      size: selectedSize 
-    });
-    setIsAdding(false);
   };
 
   return (
@@ -106,10 +137,8 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
 
       <div className={styles.container}>
         
-        {/* REWORKED GALLERY SECTION */}
         <div className={styles.gallerySection}>
           
-          {/* Desktop Only Side Strip */}
           <div className={styles.thumbnailStrip}>
             {galleryImages.map((img, idx) => (
               <button 
@@ -128,7 +157,6 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
             ))}
           </div>
           
-          {/* Desktop Main View Box */}
           <div className={styles.mainImageContainer}>
             <Image 
               src={activeImage} 
@@ -140,7 +168,6 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
             />
           </div>
 
-          {/* Mobile Swipe Carousel View */}
           <div 
             className={styles.mobileCarousel} 
             ref={carouselRef}
@@ -160,7 +187,6 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
             ))}
           </div>
 
-          {/* Carousel Pagination Dots Indicators (Mobile Only) */}
           <div className={styles.carouselDots}>
             {galleryImages.map((_, idx) => (
               <div 
@@ -172,7 +198,6 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
 
         </div>
 
-        {/* RIGHT COLUMN: Product Details */}
         <div className={styles.detailsSection}>
           <h1 className={styles.title}>{product.name}</h1>
           <p className={styles.price}>{formatNaira(product.price)}</p>
@@ -181,7 +206,6 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
             <p>{product.description}</p>
           </div>
 
-          {/* Size Selector */}
           <div className={styles.selectorGroup}>
             <div className={styles.sizeHeader}>
               <span className={styles.label}>Size:</span>
@@ -202,7 +226,6 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
             </div>
           </div>
 
-          {/* Quantity Selector */}
           <div className={styles.selectorGroup}>
             <span className={styles.label}>Qty:</span>
             <div className={styles.quantityControls}>
@@ -218,14 +241,22 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
             </div>
           </div>
 
-          {/* Action Row */}
           <div className={styles.actionRow}>
             <button
-              onClick={handleAddToCart}
-              disabled={!isAvailable || isAdding}
+              onClick={handleCartAction}
+              disabled={!isAvailable || isAdding || isSuccess}
               className={styles.addToCartBtn}
+              style={{
+                backgroundColor:  isInCart ? "transparent" : "",
+                color: isSuccess ? "#141414" : isInCart ? " #ef4444" : "#141414",
+                border: isInCart ? "1px solid #ef4444" : "",
+              }}
             >
-              {isAdding ? "Adding..." : !isAvailable ? "Out of Stock" : (
+              {isInCart ? (
+                "REMOVE FROM CART"
+              ) : !isAvailable ? (
+                "OUT OF STOCK"
+              ) : (
                 <>
                   <ShoppingCart size={20} />
                   ADD TO CART

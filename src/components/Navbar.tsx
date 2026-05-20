@@ -28,6 +28,8 @@ const CloseIcon = ({ className, strokeWidth = 1.5 }: { className?: string, strok
 export default function Navbar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isResourcesOpen, setIsResourcesOpen] = useState(false);
+  const [isProfileOpen, setIsProfileOpen] = useState(false); // New state for profile dropdown
+
   const { data: session } = useSession();
   const user = session?.user;
   
@@ -97,12 +99,36 @@ export default function Navbar() {
 
             {user ? (
               <div className={styles.desktopAuthSection}>
-                <Link href="/profile" className={styles.userProfileLink}>
-                  <span className={styles.welcomeText}>Welcome, {user.name}!</span>
-                </Link>
-                <button onClick={() => signOut()} className={styles.desktopLogoutBtn}>
-                  Logout
-                </button>
+                <div
+                  className={styles.dropdownContainer}
+                  onMouseEnter={() => setIsProfileOpen(true)}
+                  onMouseLeave={() => setIsProfileOpen(false)}
+                >
+                  <button className={styles.dropdownBtn} style={{ textTransform: 'none' }}>
+                    <span className={styles.welcomeText}>Welcome, {user.name}!</span>
+                    <ChevronDown className={styles.chevronIcon} />
+                  </button>
+                  <AnimatePresence>
+                    {isProfileOpen && (
+                      <motion.div
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: 10 }}
+                        className={styles.dropdownMenu}
+                        style={{ right: 0, left: 'auto' }} // Align to the right side
+                      >
+                        <Link href="/profile" className={styles.dropdownItem}>My Profile</Link>
+                        <button 
+                          onClick={() => signOut()} 
+                          className={styles.dropdownItem}
+                          style={{ width: '100%', textAlign: 'left', background: 'none', border: 'none', cursor: 'pointer' }}
+                        >
+                          Logout
+                        </button>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
               </div>
             ) : (
               <div className={styles.authLinks}>
@@ -211,9 +237,6 @@ export default function Navbar() {
                 {user ? (
                   <>
                     <Link href="/profile" className={styles.mobileAuthBtn}>My Profile</Link>
-                    <button onClick={() => signOut()} className={styles.mobileAuthBtnPrimary}>
-                      Log Out
-                    </button>
                   </>
                 ) : (
                   <>

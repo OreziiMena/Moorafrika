@@ -36,7 +36,7 @@
 }
 
 .continueBtn {
-  width: 100%;
+  width: 50%;
   padding: 1.25rem;
   background-color: #FDFBF7;
   color: #141414;
@@ -56,8 +56,7 @@
 }
 
 .continueBtn:hover {
-  background-color: transparent;
-  color: var(--ivory, #FDFBF7);
+  opacity: 0.9;
 }
 
 .layout {

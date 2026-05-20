@@ -85,7 +85,6 @@ export const useCartStore = create<CartStore>((set, get) => ({
   },
 }));
 
-// --- THE CRITICAL FIX: Guard the server-side initialization ---
 if (typeof window !== 'undefined') {
   setTimeout(() => {
     try {
