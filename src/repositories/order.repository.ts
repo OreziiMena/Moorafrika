@@ -22,7 +22,12 @@ const AdminOrderInclude = {
   },
 };
 
-export const findOrders = async (isAdmin: boolean, where: Prisma.OrderWhereInput, skip: number, limit: number) => {
+export const findOrders = async (
+  isAdmin: boolean,
+  where: Prisma.OrderWhereInput,
+  skip: number,
+  limit: number,
+) => {
   return await prisma.order.findMany({
     where,
     include: isAdmin ? AdminOrderInclude : OrderInclude,
@@ -31,7 +36,10 @@ export const findOrders = async (isAdmin: boolean, where: Prisma.OrderWhereInput
   });
 };
 
-export const findUniqueOrder = async (where: Prisma.OrderWhereUniqueInput, isAdmin: boolean) => {
+export const findUniqueOrder = async (
+  where: Prisma.OrderWhereUniqueInput,
+  isAdmin: boolean,
+) => {
   return await prisma.order.findUnique({
     where,
     include: isAdmin ? AdminOrderInclude : OrderInclude,
@@ -50,19 +58,25 @@ export const createOrder = async (data: Prisma.OrderCreateInput) => {
   });
 };
 
-export const createOrderItems = async (data: Prisma.OrderItemCreateManyInput[]) => {
+export const createOrderItems = async (
+  data: Prisma.OrderItemCreateManyInput[],
+) => {
   return prisma.orderItem.createMany({
-    data
-  })
-}
+    data,
+  });
+};
 
 export const updateOrderStatus = async (
   orderId: string,
-  status: OrderStatus,
+  payload: { status: OrderStatus; note?: string; adminNote?: string },
 ) => {
   return await prisma.order.update({
     where: { id: orderId },
-    data: { status },
+    data: {
+      status: payload.status,
+      note: payload.note,
+      admin_note: payload.adminNote,
+    },
   });
 };
 

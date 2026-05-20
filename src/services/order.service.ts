@@ -18,9 +18,9 @@ import {
 import { OrderStatus, Prisma } from '@prisma/client';
 import { pageResponseMapper } from '@/mapper/pagedResponse';
 import z from 'zod';
-import { createOrderSchema } from '@/validationSchemas/order';
+import { adminUpdateOrder, createOrderSchema } from '@/validationSchemas/order';
 import CartService from './cart.service';
-import { NotFoundError } from '@/lib/errors';
+import { BadRequestError, NotFoundError } from '@/lib/errors';
 import ProductService from './product.service';
 import { paystackCheckout } from '@/services/paystack/checkout';
 
@@ -177,7 +177,7 @@ class OrderService {
       throw new NotFoundError('Order not found');
     }
 
-    await updateOrderStatus(order.id, 'PROCESSING');
+    await updateOrderStatus(order.id, { status: 'PROCESSING' });
     for (const item of order.orderItems) {
       await ProductService.updateProductStock(
         item.product.slug,
@@ -217,6 +217,49 @@ class OrderService {
     }
 
     return url;
+  }
+
+  static async cancelOrder(orderId: string, note?: string) {
+    const user = await AuthService.authorizeUser();
+    const order = await findUniqueOrder({ id: orderId }, false);
+
+    if (!order || order.userId !== user.id) {
+      throw new NotFoundError('Order not found');
+    }
+
+    if (order.status === 'CANCELLED') {
+      throw new BadRequestError('Order is already cancelled');
+    }
+
+    if (order.status !== 'PENDING') {
+      throw new BadRequestError('Only unpaid orders can be cancelled');
+    }
+
+    await updateOrderStatus(order.id, { status: 'CANCELLED', note });
+    return;
+  }
+
+  static async adminUpdateOrder(
+    orderId: string,
+    payload: z.infer<typeof adminUpdateOrder>,
+  ) {
+    await AuthService.authorizeUser(['ADMIN']);
+    const order = await findUniqueOrder({ id: orderId }, false);
+    if (!order) {
+      throw new NotFoundError('Order not found');
+    }
+
+    if (order.status === 'PENDING') {
+      throw new BadRequestError('Cannot update a pending order');
+    }
+
+    if (order.status === 'CANCELLED') {
+      throw new BadRequestError('Cannot update a cancelled order');
+    }
+    const { status, note } = adminUpdateOrder.parse(payload);
+    await updateOrderStatus(order.id, { status, adminNote: note });
+
+    return;
   }
 }
 

@@ -11,3 +11,8 @@ export const createOrderSchema = z.object({
   contactEmail: z.string(),
   note: z.string().max(500).optional(),
 })
+
+export const adminUpdateOrder = z.object({
+  status: z.enum(['SHIPPED', 'DELIVERED', 'CANCELLED']),
+  note: z.string().max(500).optional(),
+})
