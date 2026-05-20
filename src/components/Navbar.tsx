@@ -88,14 +88,6 @@ export default function Navbar() {
           </div>
 
           <div className={styles.rightSide}>
-            <div className={styles.desktopSearch}>
-              <Search className={styles.searchIcon} />
-              <input
-                type="text"
-                placeholder="Search..."
-                className={styles.searchInput}
-              />
-            </div>
 
             {user ? (
               <div className={styles.desktopAuthSection}>
@@ -224,14 +216,6 @@ export default function Navbar() {
                 </AnimatePresence>
               </div>
 
-              <div className={styles.mobileSearchContainer}>
-                <Search className={styles.searchIcon} />
-                <input
-                  type="text"
-                  placeholder="SEARCH..."
-                  className={styles.mobileSearchInput}
-                />
-              </div>
 
               <div className={styles.mobileAuthSection}>
                 {user ? (

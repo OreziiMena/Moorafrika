@@ -141,42 +141,6 @@
   background-color: var(--ivory); 
 }
 
-.desktopSearch {
-  display: none; 
-  align-items: center;
-  border-bottom: 1px solid var(--ivory); 
-  padding: 10px 0;
-  margin-right: 1rem;
-}
-
-.searchIcon {
-  width: 16px;
-  height: 16px;
-  color: var(--ivory);
-  margin-right: 8px;
-}
-
-.searchInput {
-  background: transparent;
-  border: none;
-  outline: none;
-  font-family: var(--font-clean);
-  font-size: 0.7rem;
-  letter-spacing: 0.15em;
-  text-transform: uppercase;
-  width: 6rem;
-  color: var(--ivory);
-  transition: width 0.4s ease;
-}
-
-.searchInput::placeholder {
-  color: var(--ivory);
-}
-
-.searchInput:focus {
-  width: 180px;
-}
-
 .authLinks {
   display: none; 
   align-items: center;
@@ -397,25 +361,6 @@
   cursor: pointer;
 }
 
-.mobileSearchContainer {
-  display: flex;
-  align-items: center;
-  border-bottom: 1px solid var(--obsidian);
-  padding: 0.75rem 0;
-  margin-top: 2rem;
-}
-
-.mobileSearchInput {
-  background: transparent;
-  border: none;
-  outline: none;
-  font-family: var(--font-clean);
-  font-size: 0.75rem;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  width: 100%;
-  color: var(--obsidian);
-}
 
 @media (max-width: 1023px) {
   .brandText {
