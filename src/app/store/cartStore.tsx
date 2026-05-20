@@ -31,8 +31,8 @@ export const useCartStore = create<CartStore>((set, get) => ({
         },
       });
       set({ items: res.data.items });
-    } catch (err) {
-      handleClientError(err);
+    } catch (e) {
+      set({ items: [] })
     }
   },
 

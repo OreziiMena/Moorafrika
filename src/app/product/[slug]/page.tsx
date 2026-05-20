@@ -64,6 +64,18 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
     fetchProduct();
   }, [slug]);
 
+  useEffect(() => {
+    const syncPageAndCartData = () => {
+      if (existingCartItem) {
+        setQuantity(existingCartItem.quantity);
+        setSelectedSize(existingCartItem.size)
+      } else {
+        setQuantity(1);
+      }
+    }
+    syncPageAndCartData()
+  }, [existingCartItem])
+
   const handleMobileScroll = () => {
     if (!carouselRef.current) return;
     const { scrollLeft, clientWidth } = carouselRef.current;
