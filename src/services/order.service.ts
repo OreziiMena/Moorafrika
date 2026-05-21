@@ -179,7 +179,7 @@ class OrderService {
 
     await updateOrderStatus(order.id, { status: 'PROCESSING' });
     for (const item of order.orderItems) {
-      await ProductService.updateProductStock(
+      await ProductService.updateSoldProduct(
         item.product.slug,
         -item.quantity,
       );

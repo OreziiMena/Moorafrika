@@ -22,13 +22,28 @@ interface GetProductParams {
   limit?: number;
   search?: string;
   categoryId?: number;
+  orderBy?: string;
 }
 
 class ProductService {
+  private static orderMapping: Record<string, Prisma.ProductOrderByWithRelationInput> = {
+    name: { name: 'asc' },
+    price_asc: { price: 'asc' },
+    price_desc: { price: 'desc' },
+    popularity: { sales_count: 'desc' },
+    createdAt: { created_at: 'asc' },
+  };
+
   static async getProducts(
     payload: GetProductParams,
   ): Promise<PagedResponse<ProductContract>> {
-    const { page = 1, limit = 10, search, categoryId } = payload;
+    const {
+      page = 1,
+      limit = 10,
+      search,
+      categoryId,
+      orderBy = 'createdAt',
+    } = payload;
 
     const skip = (page - 1) * limit;
 
@@ -44,8 +59,10 @@ class ProductService {
       deleted_at: null,
     };
 
+    const orderByClause = this.orderMapping[orderBy] || { created_at: 'asc' };
+
     const [products, total] = await Promise.all([
-      findProducts(where, skip, limit),
+      findProducts(where, skip, limit, orderByClause),
       countProducts(where),
     ]);
 
@@ -122,12 +139,13 @@ class ProductService {
     return;
   }
 
-  static async updateProductStock(
+  static async updateSoldProduct(
     slug: string,
     quantityChange: number,
   ): Promise<void> {
     await _updateProduct(slug, {
       stock_count: { increment: quantityChange },
+      sales_count: { increment: -quantityChange },
     });
 
     return;

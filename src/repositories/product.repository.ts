@@ -9,12 +9,14 @@ export const findProducts = async (
   where: Prisma.ProductWhereInput,
   skip: number,
   limit: number,
+  orderBy: Prisma.ProductOrderByWithRelationInput
 ) => {
   return await prisma.product.findMany({
     where,
     skip,
     take: limit,
     include,
+    orderBy,
   });
 };
 

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import axios from "axios";
@@ -9,6 +9,11 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import styles from "./collection.module.css";
 import { ProductContract } from "@/contracts/product";
+import { CategoryContract } from "@/contracts/category";
+import { PagedResponse } from "@/contracts/response";
+import { handleClientError } from "@/lib/clientErrorHandler";
+
+type PageItem = number | "...";
 
 const formatNaira = (amount: number) => {
   return new Intl.NumberFormat("en-NG", {
@@ -20,77 +25,117 @@ const formatNaira = (amount: number) => {
 
 export default function CollectionPage() {
   const [products, setProducts] = useState<ProductContract[]>([]);
+  const [categories, setCategories] = useState<CategoryContract[]>([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
   const [isLoading, setIsLoading] = useState(true);
 
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState("All Categories");
-  const [sortOption, setSortOption] = useState("Featured");
+  const [debouncedSearchQuery, setDebouncedSearchQuery] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState(-1);
+  const [sortOption, setSortOption] = useState("popularity");
+
+  const lastAppliedSearchRef = useRef("");
+  const lastAppliedCategoryRef = useRef(-1);
 
   useEffect(() => {
-    const fetchProducts = async () => {
+    const timeoutId = window.setTimeout(() => {
+      setDebouncedSearchQuery(searchQuery.trim());
+    }, 300);
+
+    return () => window.clearTimeout(timeoutId);
+  }, [searchQuery]);
+
+  useEffect(() => {
+    const fetchCategories = async () => {
       try {
-        const response = await axios.get("/api/products");
-        const fetchedData = response.data;
-        let actualArray: ProductContract[] = [];
+        const categoriesResponse = await axios.get<CategoryContract[]>("/api/categories");
+        const fetchedCategories = categoriesResponse.data;
 
-        if (Array.isArray(fetchedData)) {
-          actualArray = fetchedData;
-        } else if (fetchedData && Array.isArray(fetchedData.data)) {
-          actualArray = fetchedData.data;
-        } else if (fetchedData && Array.isArray(fetchedData.products)) {
-          actualArray = fetchedData.products;
-        }
+        setCategories(fetchedCategories);
 
-        setProducts(actualArray);
       } catch (error) {
-        setProducts([]);
+        handleClientError(error);
+      }
+    };
+
+    fetchCategories();
+  }, []);
+
+  useEffect(() => {
+    const filtersChanged =
+      lastAppliedSearchRef.current !== debouncedSearchQuery ||
+      lastAppliedCategoryRef.current !== selectedCategory;
+
+    if (filtersChanged && currentPage !== 1) {
+      setCurrentPage(1);
+      return;
+    }
+
+    const fetchFilteredProducts = async () => {
+      const urlParams = new URLSearchParams();
+
+      urlParams.append("page", currentPage.toString());
+      if (debouncedSearchQuery !== "") {
+        urlParams.append("search", debouncedSearchQuery);
+      }
+      if (selectedCategory !== -1) {
+        urlParams.append("categoryId", selectedCategory.toString());
+      }
+      urlParams.append("orderBy", sortOption);
+
+      const url = `/api/products?${urlParams.toString()}`;
+
+      try {
+        const response = await axios.get<PagedResponse<ProductContract>>(url);
+        if (filtersChanged) {
+          lastAppliedSearchRef.current = debouncedSearchQuery;
+          lastAppliedCategoryRef.current = selectedCategory;
+        }
+        setProducts(response.data.data);
+        setTotalPages(response.data.pagination.totalPages);
+      } catch (error) {
+        handleClientError(error);
       } finally {
         setIsLoading(false);
       }
     };
 
-    fetchProducts();
-  }, []);
+    fetchFilteredProducts();
+  }, [debouncedSearchQuery, selectedCategory, currentPage, sortOption]);
 
-  const filteredAndSortedProducts = React.useMemo(() => {
-    if (!Array.isArray(products)) return [];
-
-    let result = [...products];
-
-    if (searchQuery.trim() !== "") {
-      const query = searchQuery.toLowerCase();
-      result = result.filter(
-        (product) =>
-          product?.name?.toLowerCase().includes(query) ||
-          product?.description?.toLowerCase().includes(query)
-      );
+  const visiblePages = (): PageItem[] => {
+    if (totalPages <= 7) {
+      return Array.from({ length: totalPages }, (_, index) => index + 1);
     }
 
-    if (selectedCategory !== "All Categories") {
-      result = result.filter(
-        (product) => product?.category?.toLowerCase() === selectedCategory.toLowerCase()
-      );
+    const pages: PageItem[] = [1];
+    const startPage = Math.max(2, currentPage - 1);
+    const endPage = Math.min(totalPages - 1, currentPage + 1);
+
+    if (startPage > 2) {
+      pages.push("...");
     }
 
-    switch (sortOption) {
-      case "Price: Low to High":
-        result.sort((a, b) => (a.price || 0) - (b.price || 0));
-        break;
-      case "Price: High to Low":
-        result.sort((a, b) => (b.price || 0) - (a.price || 0));
-        break;
-      case "Newest":
-        result.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
-        break;
-      case "Most Popular":
-        result.sort((a, b) => (b.sales_count || 0) - (a.sales_count || 0));
-        break;
-      default:
-        break;
+    for (let page = startPage; page <= endPage; page += 1) {
+      pages.push(page);
     }
 
-    return result;
-  }, [products, searchQuery, selectedCategory, sortOption]);
+    if (endPage < totalPages - 1) {
+      pages.push("...");
+    }
+
+    pages.push(totalPages);
+
+    return pages;
+  };
+
+  const handleClearFilters = () => {
+    setSearchQuery("");
+    setDebouncedSearchQuery("");
+    setSelectedCategory(-1);
+    setCurrentPage(1);
+  };
 
   return (
     <main className={styles.pageWrapper}>
@@ -118,11 +163,14 @@ export default function CollectionPage() {
             <select
               className={styles.selectInput}
               value={selectedCategory}
-              onChange={(e) => setSelectedCategory(e.target.value)}
+              onChange={(e) => setSelectedCategory(Number(e.target.value))}
             >
-              <option value="All Categories">All Categories</option>
-              <option value="Men">Men</option>
-              <option value="Women">Women</option>
+              <option value="-1">All Categories</option>
+              {categories.map((category) => (
+                <option key={category.id} value={category.id}>
+                  {category.name}
+                </option>
+              ))}
             </select>
 
             <select
@@ -130,66 +178,111 @@ export default function CollectionPage() {
               value={sortOption}
               onChange={(e) => setSortOption(e.target.value)}
             >
-              <option value="Featured">Featured</option>
-              <option value="Price: Low to High">Price: Low to High</option>
-              <option value="Price: High to Low">Price: High to Low</option>
-              <option value="Newest">Newest</option>
-              <option value="Most Popular">Most Popular</option>
+              <option value="popularity">Most Popular</option>
+              <option value="createdAt">Latest</option>
+              <option value="price_asc">Price: Low to High</option>
+              <option value="price_desc">Price: High to Low</option>
             </select>
           </div>
         </div>
 
         {isLoading ? (
           <div className={styles.loadingState}>Loading collection...</div>
-        ) : filteredAndSortedProducts.length === 0 ? (
+        ) : products.length === 0 ? (
           <div className={styles.emptyState}>
             <p>No products found matching your criteria.</p>
             <button 
               className={styles.clearBtn}
-              onClick={() => {
-                setSearchQuery("");
-                setSelectedCategory("All Categories");
-              }}
+              onClick={handleClearFilters}
             >
               Clear Filters
             </button>
           </div>
         ) : (
-          <div className={styles.productGrid}>
-            {filteredAndSortedProducts.map((product) => (
-              <Link href={`/product/${product.slug}`} key={product.id} className={styles.productCard}>
-                
-                <div className={styles.imageContainer}>
-                  <Image
-                    src={product.imageUrl}
-                    alt={product.name}
-                    fill
-                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                    className={styles.productImage}
-                  />
+          <>
+            <div className={styles.productGrid}>
+              {products.map((product) => (
+                <Link href={`/product/${product.slug}`} key={product.id} className={styles.productCard}>
+                  
+                  <div className={styles.imageContainer}>
+                    <Image
+                      src={product.imageUrl}
+                      alt={product.name}
+                      fill
+                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                      className={styles.productImage}
+                    />
+                  </div>
+
+                  <div className={styles.productDetails}>
+                    <div className={styles.cardHeader}>
+                      <h3 className={styles.productName}>{product.name}</h3>
+                      {product.stock_count > 0 ? (
+                        <span className={styles.inStockBadge}>In Stock</span>
+                      ) : (
+                        <span className={styles.outOfStockBadge}>Sold Out</span>
+                      )}
+                    </div>
+                    
+                    <p className={styles.productPrice}>{formatNaira(product.price)}</p>
+                    
+                    <div className={styles.gridCartBtn}>
+                      ADD TO CART
+                    </div>
+                  </div>
+
+                </Link>
+              ))}
+            </div>
+
+            {totalPages > 1 && (
+              <nav className={styles.pagination} aria-label="Collection pages">
+                <button
+                  type="button"
+                  className={styles.paginationButton}
+                  onClick={() => setCurrentPage((page) => Math.max(1, page - 1))}
+                  disabled={currentPage === 1}
+                >
+                  Previous
+                </button>
+
+                <div className={styles.paginationNumbers}>
+                  {visiblePages().map((page, index) => {
+                    if (page === "...") {
+                      return (
+                        <span key={`ellipsis-${index}`} className={styles.paginationEllipsis}>
+                          ...
+                        </span>
+                      );
+                    }
+
+                    const pageNumber = page;
+
+                    return (
+                      <button
+                        key={pageNumber}
+                        type="button"
+                        className={pageNumber === currentPage ? styles.paginationButtonActive : styles.paginationButton}
+                        onClick={() => setCurrentPage(pageNumber)}
+                        aria-current={pageNumber === currentPage ? "page" : undefined}
+                      >
+                        {pageNumber}
+                      </button>
+                    );
+                  })}
                 </div>
 
-                <div className={styles.productDetails}>
-                  <div className={styles.cardHeader}>
-                    <h3 className={styles.productName}>{product.name}</h3>
-                    {product.stock_count > 0 ? (
-                      <span className={styles.inStockBadge}>In Stock</span>
-                    ) : (
-                      <span className={styles.outOfStockBadge}>Sold Out</span>
-                    )}
-                  </div>
-                  
-                  <p className={styles.productPrice}>{formatNaira(product.price)}</p>
-                  
-                  {/* Using a div instead of a button to prevent invalid HTML (button inside an anchor tag) */}
-                  <div className={styles.gridCartBtn}>
-                    ADD TO CART
-                  </div>
-                </div>
-
-              </Link>
-            ))}
-          </div>
+                <button
+                  type="button"
+                  className={styles.paginationButton}
+                  onClick={() => setCurrentPage((page) => Math.min(totalPages, page + 1))}
+                  disabled={currentPage === totalPages}
+                >
+                  Next
+                </button>
+              </nav>
+            )}
+          </>
         )}
       </div>
 

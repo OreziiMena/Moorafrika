@@ -12,6 +12,7 @@ export const GET = errorHandler(async (req: Request) => {
     categoryId: searchParams.get('categoryId')
       ? Number(searchParams.get('categoryId'))
       : undefined,
+    orderBy: searchParams.get('orderBy') || 'createdAt',
   });
 
   return NextResponse.json(res, { status: 200 });

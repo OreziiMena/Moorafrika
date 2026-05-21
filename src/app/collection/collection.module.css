@@ -229,6 +229,61 @@
   opacity: 0.85;
 }
 
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  margin-top: 3rem;
+  flex-wrap: wrap;
+}
+
+.paginationNumbers {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.paginationButton,
+.paginationButtonActive {
+  min-width: 2.75rem;
+  height: 2.75rem;
+  padding: 0 1rem;
+  border-radius: 999px;
+  border: 1px solid #4a4a4d;
+  background: transparent;
+  color: var(--ivory, #FDFBF7);
+  font-family: var(--font-clean, sans-serif);
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.2s ease, border-color 0.2s ease, background-color 0.2s ease;
+}
+
+.paginationButton:hover:not(:disabled) {
+  transform: translateY(-1px);
+  border-color: var(--ivory, #FDFBF7);
+}
+
+.paginationButton:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.paginationButtonActive {
+  background-color: var(--ivory, #FDFBF7);
+  color: var(--obsidian, #141414);
+  border-color: var(--ivory, #FDFBF7);
+}
+
+.paginationEllipsis {
+  color: #a1a1aa;
+  font-size: 0.95rem;
+  padding: 0 0.25rem;
+}
+
 /* States */
 .loadingState, .emptyState {
   text-align: center;
@@ -304,6 +359,19 @@
   .gridCartBtn {
     padding: 0.75rem;
     font-size: 0.75rem;
+  }
+
+  .pagination {
+    gap: 0.5rem;
+    margin-top: 2rem;
+  }
+
+  .paginationButton,
+  .paginationButtonActive {
+    min-width: 2.4rem;
+    height: 2.4rem;
+    padding: 0 0.75rem;
+    font-size: 0.78rem;
   }
 }
 
