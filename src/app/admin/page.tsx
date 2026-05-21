@@ -7,27 +7,14 @@ import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { 
   ShoppingCart, Package, Users, TrendingUp, 
-  Plus, BarChart2, Settings, FileText, Eye, Tag
+  Plus, BarChart2, Settings, FileText, Eye, Tag,
+  DollarSign
 } from "lucide-react";
 import styles from "./admin.module.css";
-
-// The interfaces based on expected backend data
-interface OrderData {
-  id: string;
-  customerName: string;
-  itemsCount: number;
-  totalAmount: number;
-  status: "pending" | "processing" | "completed" | "cancelled";
-}
-
-interface AdminStats {
-  totalOrders: number;
-  ordersTrend: number;
-  totalProducts: number;
-  activeProducts: number;
-  totalCustomers: number;
-  newCustomers: number;
-}
+import { DashboardStatsContract } from "@/contracts/stats";
+import { PagedResponse } from "@/contracts/response";
+import { AdminOrderContract } from "@/contracts/order";
+import { handleClientError } from "@/lib/clientErrorHandler";
 
 const formatNaira = (amount: number) => {
   return new Intl.NumberFormat("en-NG", {
@@ -44,8 +31,8 @@ export default function AdminDashboard() {
   const [activeTab, setActiveTab] = useState("overview");
   
   // Real Backend States
-  const [orders, setOrders] = useState<OrderData[]>([]);
-  const [stats, setStats] = useState<AdminStats | null>(null);
+  const [orders, setOrders] = useState<AdminOrderContract[]>([]);
+  const [stats, setStats] = useState<DashboardStatsContract | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   // Security Check
@@ -67,28 +54,17 @@ export default function AdminDashboard() {
     const fetchAdminData = async () => {
       try {
         // Fetch KPI Stats
-        try {
-          const statsRes = await axios.get("/api/admin/stats");
-          setStats(statsRes.data);
-        } catch (e) {
-          console.warn("Stats API not ready yet.");
-        }
+        const statsRes = await axios.get<DashboardStatsContract>("/api/stats");
+        setStats(statsRes.data);
 
         // Fetch Recent Orders
-        const ordersRes = await axios.get("/api/orders?limit=5");
+        const ordersRes = await axios.get<PagedResponse<AdminOrderContract>>("/api/orders/admin?limit=5");
         const fetchedOrders = ordersRes.data;
-        
-        // Safety check depending on how the backend wraps the response
-        if (Array.isArray(fetchedOrders)) {
-          setOrders(fetchedOrders);
-        } else if (fetchedOrders && Array.isArray(fetchedOrders.data)) {
-          setOrders(fetchedOrders.data);
-        } else if (fetchedOrders && Array.isArray(fetchedOrders.orders)) {
-          setOrders(fetchedOrders.orders);
-        }
+        setOrders(fetchedOrders.data)
 
       } catch (error) {
         console.error("Failed to fetch admin dashboard data:", error);
+        handleClientError(error);
       } finally {
         setIsLoading(false);
       }
@@ -117,6 +93,19 @@ export default function AdminDashboard() {
         <div className={styles.kpiGrid}>
           <div className={styles.kpiCard}>
             <div className={styles.kpiHeader}>
+              <span className={styles.kpiLabel}>Total Revenue</span>
+              <div className={styles.iconWrapper} style={{ backgroundColor: 'rgba(59, 130, 246, 0.1)', color: '#3b82f6' }}>
+                <DollarSign size={20} />
+              </div>
+            </div>
+            <h2 className={styles.kpiValue}>₦{stats?.totalRevenue || 0}</h2>
+            <p className={styles.kpiTrend}>
+              <TrendingUp size={14} /> +{stats?.revenueGrowth || 0}% from last month
+            </p>
+          </div>
+
+          <div className={styles.kpiCard}>
+            <div className={styles.kpiHeader}>
               <span className={styles.kpiLabel}>Total Orders</span>
               <div className={styles.iconWrapper} style={{ backgroundColor: 'rgba(59, 130, 246, 0.1)', color: '#3b82f6' }}>
                 <ShoppingCart size={20} />
@@ -124,7 +113,7 @@ export default function AdminDashboard() {
             </div>
             <h2 className={styles.kpiValue}>{stats?.totalOrders || 0}</h2>
             <p className={styles.kpiTrend}>
-              <TrendingUp size={14} /> +{stats?.ordersTrend || 0}% from last month
+              <TrendingUp size={14} /> +{stats?.orderGrowth || 0}% from last month
             </p>
           </div>
 
@@ -136,7 +125,7 @@ export default function AdminDashboard() {
               </div>
             </div>
             <h2 className={styles.kpiValue}>{stats?.totalProducts || 0}</h2>
-            <p className={styles.kpiSubtext}>{stats?.activeProducts || 0} active</p>
+            <p className={styles.kpiSubtext}>{stats?.totalProductsSold || 0} sold</p>
           </div>
 
           <div className={styles.kpiCard}>
@@ -147,7 +136,7 @@ export default function AdminDashboard() {
               </div>
             </div>
             <h2 className={styles.kpiValue}>{stats?.totalCustomers || 0}</h2>
-            <p className={styles.kpiSubtext}>+{stats?.newCustomers || 0} new this month</p>
+            <p className={styles.kpiSubtext}>+{stats?.currentMonthCustomers || 0} new this month</p>
           </div>
         </div>
 
@@ -187,7 +176,7 @@ export default function AdminDashboard() {
                   <div key={order.id} className={styles.orderCard}>
                     <div className={styles.orderInfo}>
                       <p className={styles.orderId}>#{String(order.id).slice(-8).toUpperCase()}</p>
-                      <p className={styles.orderCustomer}>{order.customerName || "Guest"} • {order.itemsCount} items</p>
+                      <p className={styles.orderCustomer}>{order.user.name} • {order.orderItems.length} items</p>
                     </div>
                     
                     <div className={styles.orderMeta}>
