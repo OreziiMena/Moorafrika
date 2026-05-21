@@ -144,9 +144,6 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
   };
 
   return (
-    <main className={styles.pageWrapper}>
-      <Navbar />
-
       <div className={styles.container}>
         
         <div className={styles.gallerySection}>
@@ -296,8 +293,5 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
           )}
         </div>
       </div>
-      
-      <Footer />
-    </main>
   );
 }

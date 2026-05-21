@@ -1,15 +1,11 @@
 "use client";
 
-import Navbar from "../../components/Navbar"; 
-import Footer from "@/components/Footer";
 import Link from "next/link"; 
 import styles from "../policy.module.css";
 
 export default function PoliciesPage() {
   return (
-    <main className={styles.pageWrapper}>
-       <Navbar /> 
-
+    <div>
        <div className={styles.header}>
           <h1 className={styles.pageTitle}>Mo&apos;orafrika Privacy Policy</h1>
           <p className={styles.pageSubtitle}>Last Updated: May 15, 2026</p>
@@ -113,7 +109,6 @@ export default function PoliciesPage() {
         </section>
 
       </div>
-      <Footer />
-    </main>
+    </div>
   );
 }

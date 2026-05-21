@@ -5,8 +5,6 @@ import Link from "next/link";
 import Image from "next/image";
 import axios from "axios";
 import { Search } from "lucide-react";
-import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";
 import styles from "./collection.module.css";
 import { ProductContract } from "@/contracts/product";
 import { CategoryContract } from "@/contracts/category";
@@ -138,9 +136,6 @@ export default function CollectionPage() {
   };
 
   return (
-    <main className={styles.pageWrapper}>
-      <Navbar />
-
       <div className={styles.container}>
         <header className={styles.header}>
           <h1 className={styles.title}>OUR COLLECTION</h1>
@@ -285,8 +280,5 @@ export default function CollectionPage() {
           </>
         )}
       </div>
-
-      <Footer />
-    </main>
   );
 }

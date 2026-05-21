@@ -4,11 +4,8 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
-import { useAuthStore } from "../store/authStore";
 import styles from "../auth.module.css"; 
-import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";
-import { signIn, useSession } from "next-auth/react";
+import { signIn } from "next-auth/react";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -32,7 +29,8 @@ export default function LoginPage() {
       
       router.push("/");
 
-    } catch (error: any) {
+    } catch (error) {
+      console.error("Login error:", error);
       setErrorMsg("Invalid email or password");
     } finally {
       setIsLoading(false);
@@ -40,8 +38,6 @@ export default function LoginPage() {
   };
 
   return (
-    <main className={styles.pageWrapper}>
-        <Navbar />
       <div className={styles.authBox}>
         <Link href="/" style={{ display: 'inline-flex', marginBottom: '2rem', color: 'rgba(253, 251, 247, 0.5)' }}>
           <ArrowLeft size={20} />
@@ -89,12 +85,10 @@ export default function LoginPage() {
 
         <div className={styles.footerLinks}>
           <p>
-            <span style={{ opacity: 0.6 }}>Don't have an account? </span>
+            <span style={{ opacity: 0.6 }}>Don&apos;t have an account? </span>
             <Link href="/signup" className={styles.link}>Create Account</Link>
           </p>
         </div>
       </div>
-        <Footer />
-    </main>
   );
 }

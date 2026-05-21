@@ -16,6 +16,6 @@ export const GET = errorHandler(async (req: Request) => {
 
 export const POST = errorHandler(async (req: Request) => {
   const body = await req.json();
-  const res = await OrderService.createNewOrder(body);
-  return NextResponse.json(res, { status: 201 });
+  const url = await OrderService.createNewOrder(body);
+  return NextResponse.json({ url }, { status: 201 });
 });

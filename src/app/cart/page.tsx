@@ -5,12 +5,15 @@ import Link from 'next/link';
 import { Trash2 } from 'lucide-react'; // Changed to Trash2 to match your high-end design
 import { useCartStore } from '../store/cartStore';
 import styles from './page.module.css';
-import Navbar from '../../components/Navbar';
-import Footer from '@/components/Footer';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { CartItemContract } from '@/contracts/cart';
+import { useRouter } from 'next/navigation';
+import { useSession } from 'next-auth/react';
+import { toast } from 'sonner';
 
 export default function CartPage() {
+  const router = useRouter();
+  const { status } = useSession();
   const { items, removeItem, updateQuantity, cartTotal } = useCartStore();
   const [loadingItemId, setLoadingItemId] = useState<string | null>(null);
   
@@ -20,24 +23,26 @@ export default function CartPage() {
     setLoadingItemId(null);
   }
 
+  useEffect(() => {
+    if (status === "unauthenticated") {
+      toast.info('Please log in to view your cart');
+      router.push("/login");
+    }
+  }, [status, router]);
+
   if (items.length === 0) {
     return (
-      <main className={styles.emptyCart}>
-        <Navbar />
-        <div className={styles.empty}>
-          <h1 className={styles.title}>Your collection is empty</h1>
-          <Link href="/collections" className={styles.continueBtn}>
-            DISCOVER PIECES
-          </Link>
-        </div>
-        <Footer />
-      </main>
+      <div className={styles.empty}>
+        <h1 className={styles.title}>Your collection is empty</h1>
+        <Link href="/collections" className={styles.continueBtn}>
+          DISCOVER PIECES
+        </Link>
+      </div>
     );
   }
 
   return (
-    <main className={styles.pageWrapper}>
-      <Navbar />
+    <div>
       <header className={styles.header}>
         <h1 className={styles.title}>Your Shopping Cart</h1>
       </header>
@@ -158,7 +163,6 @@ export default function CartPage() {
           </div>
         </aside>
       </div>
-      <Footer />
-    </main>
+    </div>
   );
 }

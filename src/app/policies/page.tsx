@@ -1,14 +1,10 @@
 "use client";
 
 import styles from "../policy.module.css";
-import Navbar from "../../components/Navbar"; 
-import Footer from "@/components/Footer";
 
 export default function PoliciesPage() {
   return (
-    <main className={styles.pageWrapper}>
-       <Navbar /> 
-
+    <div>
        <div className={styles.header}>
           <h1 className={styles.pageTitle}>Mo’orafrika Policies</h1>
           <p className={styles.pageSubtitle}>Effective Date: May 2026</p>
@@ -96,7 +92,6 @@ export default function PoliciesPage() {
         </section>
 
       </div>
-      <Footer />
-    </main>
+    </div>
   );
 }

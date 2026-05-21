@@ -5,8 +5,6 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
 import styles from "../auth.module.css";
-import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";
 import axios from "axios";
 import { handleClientError } from "@/lib/clientErrorHandler";
     
@@ -38,8 +36,6 @@ export default function SignupPage() {
   };
 
   return (
-    <main className={styles.pageWrapper}>
-      <Navbar />
       <div className={styles.authBox}>
         <Link href="/" style={{ display: 'inline-flex', marginBottom: '2rem', color: 'rgba(253, 251, 247, 0.5)' }}>
           <ArrowLeft size={20} />
@@ -100,7 +96,5 @@ export default function SignupPage() {
           </p>
         </div>
       </div>
-      <Footer />
-    </main>
   );
 }

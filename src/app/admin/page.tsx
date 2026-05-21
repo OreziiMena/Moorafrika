@@ -9,8 +9,6 @@ import {
   ShoppingCart, Package, Users, TrendingUp, 
   Plus, BarChart2, Settings, FileText, Eye, Tag
 } from "lucide-react";
-import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";
 import styles from "./admin.module.css";
 
 // The interfaces based on expected backend data
@@ -101,19 +99,13 @@ export default function AdminDashboard() {
 
   if (status === "loading" || isLoading) {
     return (
-      <main className={styles.pageWrapper}>
-        <Navbar />
-        <div className={styles.container} style={{ textAlign: 'center', paddingTop: '10rem' }}>
-          <p style={{ color: '#a1a1aa' }}>Loading Admin Dashboard...</p>
-        </div>
-      </main>
+      <div className={styles.container} style={{ textAlign: 'center', paddingTop: '10rem' }}>
+        <p style={{ color: '#a1a1aa' }}>Loading Admin Dashboard...</p>
+      </div>
     );
   }
 
   return (
-    <main className={styles.pageWrapper}>
-      <Navbar />
-
       <div className={styles.container}>
         <header className={styles.header}>
           <div>
@@ -243,7 +235,5 @@ export default function AdminDashboard() {
 
         </div>
       </div>
-      <Footer />
-    </main>
   );
 }

@@ -6,8 +6,9 @@ import { useRouter } from "next/navigation";
 import axios from "axios";
 import styles from "./checkout.module.css";
 import { useCartStore } from "@/app/store/cartStore";
-import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";
+import { useSession } from "next-auth/react";
+import { toast } from "sonner";
+import { handleClientError } from "@/lib/clientErrorHandler";
 
 const formatNaira = (amount: number) => {
   return new Intl.NumberFormat("en-NG", {
@@ -27,18 +28,20 @@ const NIGERIAN_STATES = [
 
 export default function CheckoutPage() {
   const router = useRouter();
+  const { status, data } = useSession();
+  const user = data?.user;
   const { items } = useCartStore();
 
   const [formData, setFormData] = useState({
-    firstName: "",
-    lastName: "",
-    address: "",
+    firstName: user?.name ? user.name.split(" ")[0] : "",
+    lastName: user?.name ? user.name.split(" ")[1] : "",
+    address: user?.address || "",
     city: "",
     postalCode: "",
     state: "Lagos",
     country: "NG",
-    email: "",
-    phone: ""
+    email: user?.email || "",
+    phone: user?.phone || ""
   });
 
   const [shippingMethod, setShippingMethod] = useState("standard");
@@ -49,6 +52,19 @@ export default function CheckoutPage() {
   const subtotal = items.reduce((acc, item) => acc + (item.product.price * item.quantity), 0);
   const tax = subtotal * 0.075;
   const total = subtotal + shippingCost + tax;
+
+  useEffect(() => {
+    if (status === "unauthenticated") {
+      toast.info('Please log in to proceed to checkout');
+      router.push("/login");
+    }
+  }, [status, router]);
+
+  useEffect(() => {
+    if (items.length === 0) {
+      router.push("/collection");
+    }
+  }, [items, router]);
 
   useEffect(() => {
     const fetchShippingRate = async () => {
@@ -94,28 +110,25 @@ export default function CheckoutPage() {
 
     try {
       const response = await axios.post("/api/orders", {
-        customer: formData,
-        cartItems: items,
-        totalAmount: total,
-        shippingCost: shippingCost,
-        shippingMethod: shippingMethod
+        streetAddress: formData.address,
+        country: formData.country,
+        state: formData.state,
+        city: formData.city,
+        zipCode: formData.postalCode,
+        contactName: `${formData.firstName} ${formData.lastName}`,
+        contactEmail: formData.email,
+        contactPhone: formData.phone,
+        method: shippingMethod,
       });
 
-      if (response.data && response.data.url) {
-        window.location.href = response.data.url;
-      } else {
-        alert("Unable to initialize payment. Please try again.");
-        setIsProcessing(false);
-      }
+      window.location.href = response.data.url;
     } catch (error) {
-      alert("An error occurred during checkout. Please try again.");
+      handleClientError(error);
       setIsProcessing(false);
     }
   };
 
   return (
-    <main className={styles.pageWrapper}>
-      <Navbar />
       <div className={styles.container}>
         <header className={styles.header}>
           <h1 className={styles.title}>CHECKOUT</h1>
@@ -285,7 +298,5 @@ export default function CheckoutPage() {
           </aside>
         </div>
       </div>
-      <Footer />
-    </main>
   );
 }

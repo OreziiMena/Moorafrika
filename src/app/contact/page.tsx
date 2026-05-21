@@ -2,10 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Mail } from "lucide-react";
 import styles from "./contact.module.css";
-import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";
 
 // A custom TikTok SVG since it's not standard in Lucide
 const TikTokIcon = ({ className }: { className?: string }) => (
@@ -48,8 +45,6 @@ export default function ContactPage() {
   };
 
   return (
-    <main className={styles.pageWrapper}>
-        <Navbar />
       <div className={styles.container}>
         
         {/* Page Header */}
@@ -133,7 +128,5 @@ export default function ContactPage() {
 
         </div>
       </div>
-      <Footer />
-    </main>
   );
 }

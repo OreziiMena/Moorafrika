@@ -3,14 +3,9 @@
 import Image from "next/image";
 import { motion } from "framer-motion";
 import styles from "./page.module.css";
-import Navbar from "../../components/Navbar"; 
-import Footer from "@/components/Footer";
 
 export default function AboutPage() {
   return (
-    <main className={styles.mainWrapper}>
-      <Navbar />
-      
       <div className={styles.splitLayout}>
         {/* Left Side: The Sticky Image */}
         <div className={styles.imageColumn}>
@@ -86,8 +81,5 @@ export default function AboutPage() {
           </motion.div>
         </div>
       </div>
-
-      <Footer/>
-    </main>
   );
 }

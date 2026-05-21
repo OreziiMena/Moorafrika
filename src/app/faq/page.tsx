@@ -5,8 +5,6 @@ import Link from "next/link";
 import Image from "next/image";
 import { ChevronDown, ChevronUp } from "lucide-react";
 import styles from "./faq.module.css";
-import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";
 
 const faqData = [
   {
@@ -50,8 +48,6 @@ export default function FAQPage() {
   };
 
   return (
-    <main className={styles.pageWrapper}>
-      <Navbar />
       <div className={styles.container}>
         
         {/* LEFT COLUMN: Branding & Info */}
@@ -60,8 +56,8 @@ export default function FAQPage() {
           <h1 className={styles.title}>General FAQs</h1>
           
           <p className={styles.description}>
-            Everything you need to know about the Mo'orafrika Collection and how it works. 
-            Can't find an answer?{' '}
+            Everything you need to know about the Mo&apos;orafrika Collection and how it works. 
+            Can&apos;t find an answer?{' '}
             <Link href="/contact" className={styles.chatLink}>
               Chat to our team.
             </Link>
@@ -121,7 +117,5 @@ export default function FAQPage() {
         </section>
 
       </div>
-      <Footer />
-    </main>
   );
 }

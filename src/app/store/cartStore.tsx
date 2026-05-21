@@ -85,13 +85,13 @@ export const useCartStore = create<CartStore>((set, get) => ({
   },
 }));
 
-if (typeof window !== 'undefined') {
-  setTimeout(() => {
-    try {
-      const store = useCartStore.getState();
-      void store.loadCart();
-    } catch (err) {
-      handleClientError(err);
-    }
-  }, 0);
-}
+// if (typeof window !== 'undefined') {
+//   setTimeout(() => {
+//     try {
+//       const store = useCartStore.getState();
+//       void store.loadCart();
+//     } catch (err) {
+//       handleClientError(err);
+//     }
+//   }, 0);
+// }

@@ -2,8 +2,6 @@
 
 import { useState } from "react";
 import styles from "./size-guide.module.css";
-import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";
 
 // --- DATA EXTRACTED FROM CHARTS ---
 const menTops = [
@@ -52,8 +50,6 @@ export default function SizeGuide() {
   const [activeTab, setActiveTab] = useState<"men" | "women">("men");
 
   return (
-    <main className={styles.pageWrapper}>
-      <Navbar />
       <div className={styles.container}>
 
         <header className={styles.header}>
@@ -198,7 +194,5 @@ export default function SizeGuide() {
         </div>
       )}
         </div>
-        <Footer />
-    </main>
   );
 }

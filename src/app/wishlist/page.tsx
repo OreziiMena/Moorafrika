@@ -7,9 +7,7 @@ import axios from "axios";
 import { useWishlistStore } from "@/app/store/wishliststore";
 import { Trash2, ShoppingBag, HeartOff } from "lucide-react";
 import styles from "./wishlist.module.css";
-import { ProductContract } from "@/contracts/product"; 
-import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";
+import { ProductContract } from "@/contracts/product";
 
 export default function WishlistPage() {
   const { items, toggleWishlist, clearWishlist } = useWishlistStore();
@@ -68,8 +66,6 @@ export default function WishlistPage() {
   if (!isMounted) return null;
 
   return (
-    <div className={styles.pageWrapper}>
-      < Navbar />
       <div className={styles.container}>
         
         {/* Header Layout with clean 'Clear All' functionality */}
@@ -152,7 +148,5 @@ export default function WishlistPage() {
           </div>
         )}
       </div>
-      < Footer />
-    </div>
   );
 }
