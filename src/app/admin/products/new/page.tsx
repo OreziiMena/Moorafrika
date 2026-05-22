@@ -9,7 +9,6 @@ import { handleClientError } from "@/lib/clientErrorHandler";
 import Image from "next/image";
 import Navbar from "@/components/Navbar";
 import styles from "./addProduct.module.css"; 
-import CloudflareR2StorageClient from "@/lib/storage";
 
 export default function AddNewProductPage() {
   const router = useRouter();
@@ -55,55 +54,62 @@ export default function AddNewProductPage() {
     setImagePreviews(imagePreviews.filter((_, idx) => idx !== indexToRemove));
   };
 
-const handleSubmit = async (e: React.FormEvent) => {
-  e.preventDefault();
-  
-  if (imageFiles.length === 0) {
-    alert("Please upload at least one image.");
-    return;
-  }
-
-  setIsSubmitting(true);
-
-  try {
-    const uploadedData = [];
-
-    // Use the established service for media uploads
-    for (const file of imageFiles) {
-      const result = await CloudflareR2StorageClient.uploadMedia(file, "products");
-      uploadedData.push(result); 
-    }
-
-    const payload = {
-      name: formData.name,
-      description: formData.description,
-      price: Number(formData.price),
-      stock_count: Number(formData.stock_count),
-      categoryId: Number(formData.categoryId),
-      sizes: formData.sizes.split(",").map(s => s.trim()).filter(Boolean),
-      imageKey: uploadedData[0].key, 
-      thumbnailKeys: uploadedData.slice(1).map(d => d.key)
-    };
-
-    await axios.post("/api/products", payload);
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
     
-    alert("Product successfully added!");
-    router.push("/admin"); 
-
-  } catch (error: any) {
-    // PROTECTIVE FIX: Ensure we don't pass an object without a 'response' property
-    // if it's not a standard Axios error, we wrap it to prevent the crash
-    if (!error.response) {
-      console.error("Non-Axios Error or Network Error:", error);
-      alert(error.message || "An unexpected error occurred.");
-    } else {
-      // It's a standard Axios error, safe to pass to your handler
-      handleClientError(error); 
+    if (imageFiles.length === 0) {
+      alert("Please upload at least one image.");
+      return;
     }
-  } finally {
-    setIsSubmitting(false);
-  }
-};
+
+    setIsSubmitting(true);
+
+    try {
+      const uploadedData = [];
+
+      for (const file of imageFiles) {
+        const { data } = await axios.post("/api/upload-url", { 
+          fileType: file.type,
+          fileSize: file.size,
+          folder: "products"
+        });
+        
+        const { presignedUrl, key, url } = data;
+
+        await axios.put(presignedUrl, file, {
+          headers: { "Content-Type": file.type }
+        });
+
+        uploadedData.push({ key, url });
+      }
+
+      const payload = {
+        name: formData.name,
+        description: formData.description,
+        price: Number(formData.price),
+        stock_count: Number(formData.stock_count),
+        categoryId: Number(formData.categoryId),
+        sizes: formData.sizes.split(",").map(s => s.trim()).filter(Boolean),
+        imageKey: uploadedData[0].key, 
+        thumbnailKeys: uploadedData.slice(1).map(d => d.key)
+      };
+
+      await axios.post("/api/products", payload);
+      
+      alert("Product successfully added!");
+      router.push("/admin"); 
+
+    } catch (error: any) {
+      if (error.response) {
+        handleClientError(error);
+      } else {
+        console.error("Network Error:", error);
+        alert(error.message || "Upload failed.");
+      }
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   return (
     <main className={styles.pageWrapper}>
