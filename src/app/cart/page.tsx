@@ -34,7 +34,7 @@ export default function CartPage() {
     return (
       <div className={styles.empty}>
         <h1 className={styles.title}>Your collection is empty</h1>
-        <Link href="/collections" className={styles.continueBtn}>
+        <Link href="/collection" className={styles.continueBtn}>
           DISCOVER PIECES
         </Link>
       </div>

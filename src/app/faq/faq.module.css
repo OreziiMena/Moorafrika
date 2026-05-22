@@ -12,11 +12,12 @@
 .container {
   width: 100%;
   max-width: 1200px; 
+  margin: 0 auto; /* Added to perfectly center the container on large screens */
   display: grid;
   grid-template-columns: 350px 1fr; /* Split screen layout */
   gap: 6rem;
   align-items: start;
-  padding: 2rem 1.5rem 4rem 1.5rem;
+  padding: 6rem 1.5rem 4rem 1.5rem; /* Increased top padding to clear the fixed navbar */
 }
 
 /* --- LEFT COLUMN: BRAND & TEXT --- */
@@ -32,6 +33,7 @@
   align-items: flex-start;
   margin-bottom: 4rem;
 }
+
 .stickyImageWrapper {
   position: relative;
   width: 100%;
@@ -63,7 +65,7 @@
 }
 
 .chatLink {
-  color: var(--burnt-umber, #8B3A2B); /* The requested Burnt Umber color */
+  color: var(--burnt-umber, #8B3A2B); 
   text-decoration: underline;
   text-underline-offset: 4px;
   font-weight: 600;
@@ -74,9 +76,10 @@
   opacity: 0.7;
 }
 
+/* --- RIGHT COLUMN: FAQS --- */
 .rightColumn {
   width: 100%;
-  margin-top: 5rem;
+  margin-top: 2rem; /* Adjusted so it aligns better with the left column text */
 }
 
 .accordion {
@@ -85,11 +88,11 @@
 }
 
 .accordionItem {
-  border-bottom: 1px solid rgba(20, 20, 20, 0.1); 
+  border-bottom: 1px solid rgba(253, 251, 247, 0.1); /* Changed to ivory with low opacity for dark mode visibility */
 }
 
 .accordionItem:first-child {
-  border-top: 1px solid rgba(20, 20, 20, 0.1); 
+  border-top: 1px solid rgba(253, 251, 247, 0.1); 
 }
 
 .questionBtn {
@@ -122,14 +125,13 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: var(--antique-gold, #C5A059); /* Gold square */
-  color: var(--ivory, #FDFBF7); /* Ivory Chevron */
+  background-color: var(--antique-gold, #C5A059); 
+  color: var(--ivory, #FDFBF7); 
   width: 42px;
   height: 42px;
-  border-radius: 8px; /* Slightly rounded square */
+  border-radius: 8px; 
   transition: transform 0.3s ease, background-color 0.3s ease;
 }
-
 
 .answerWrapper {
   display: grid;
@@ -161,25 +163,41 @@
   max-width: 90%; 
 }
 
-/* --- RESPONSIVE LOGIC --- */
+/* --- TABLET (Below 1024px) --- */
 @media (max-width: 1024px) {
   .container {
-    grid-template-columns: 1fr; 
-    gap: 4rem;
+    grid-template-columns: 1fr; /* Stacks the layout */
+    gap: 2rem;
+    padding-top: 5rem;
   }
 
   .leftColumn {
     position: relative;
-    top: 5rem;
+    top: 0;
+    margin-left: 0;
   }
+  
+  .brandHeader {
+    margin-bottom: 1.5rem;
+  }
+
   .rightColumn {
-    margin-top: -30rem;
+    margin-top: -2.5rem;
+  }
+
+  .stickyImageWrapper {
+    height: 47vh; 
   }
 }
 
-@media (max-width: 640px) {
+/* --- MOBILE (Below 768px) --- */
+@media (max-width: 768px) {
+  .container {
+    padding: 5rem 1rem 3rem 1rem;
+  }
+
   .title {
-    font-size: 2.2rem;
+    font-size: 1.8rem;
   }
 
   .questionText {
@@ -188,10 +206,17 @@
 
   .questionBtn {
     padding: 1.5rem 0;
+    gap: 1rem;
   }
   
   .toggleIcon {
     width: 36px;
     height: 36px;
+    border-radius: 6px;
+  }
+  
+  .answerText {
+    max-width: 100%;
+    font-size: 0.95rem;
   }
 }
