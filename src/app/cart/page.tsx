@@ -139,6 +139,10 @@ export default function CartPage() {
         })}
     </tbody>
     </table>
+
+    <Link href="/collection" className={styles.checkoutBtn}>
+        ADD MORE PRODUCTS
+    </Link>
 </div>
 
         {/* RIGHT COLUMN: Cart Summary */}
@@ -161,6 +165,7 @@ export default function CartPage() {
                 PROCEED TO CHECKOUT
             </Link>
           </div>
+          
         </aside>
       </div>
     </div>

@@ -52,6 +52,7 @@
   border: none; 
   border-radius: 10px; 
   transition: opacity 0.2s ease;
+  margin-top: 1.5rem;
 }
 
 .continueBtn:hover {
@@ -249,22 +250,21 @@
 
 .checkoutBtn {
   width: 100%;
-  padding: 1.25rem;
-  background-color: #FDFBF7;
-  color: #141414;
-  font-size: 1rem;
-  font-weight: 600;
-  letter-spacing: 0.05em;
-  border: none;
-  cursor: pointer;
-  margin-top: 2rem;
-  transition: opacity 0.2s ease;
-  box-sizing: border-box;
   display: flex;
-  justify-content: center;
   align-items: center;
-  text-align: center;
-  white-space: nowrap;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.8rem;
+  font-size: 0.85rem; 
+  text-transform: uppercase; 
+  letter-spacing: 0.1em;
+  font-weight: 700;
+  cursor: pointer;
+  background-color: var(--ivory);
+  color: var(--obsidian);
+  border: none; 
+  border-radius: 10px; 
+  transition: opacity 0.2s ease;
 }
 
 .checkoutBtn:hover {

@@ -56,12 +56,9 @@ export default function Hero() {
               whileTap={{ scale: 0.98 }}
               className={styles.heroButton}
             >
-              {/* Hover sliding background */}
-              <span className={styles.heroButtonBg}></span>
-
-              <div className={styles.heroButtonText}>
-                <Link href="/collections/all" className={styles.seeMoreBtn}>
-                    See More Collections
+                <div className={styles.heroButtonText}>
+                <Link href="/collection" className={styles.heroButtonText}>
+                    Explore Collections
                     <ArrowRight className={styles.heroButtonIcon} />
                   </Link>
               </div>
