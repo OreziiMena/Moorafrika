@@ -186,7 +186,6 @@ export default function Navbar() {
               <Link href="/" className={styles.mobileNavLink} onClick={() => setIsMobileMenuOpen(false)}>Home</Link>
               <Link href="/about" className={styles.mobileNavLink} onClick={() => setIsMobileMenuOpen(false)}>About</Link>
               <Link href="/collection" className={styles.mobileNavLink} onClick={() => setIsMobileMenuOpen(false)}>Collection</Link>
-              <Link href="/blog" className={styles.mobileNavLink} onClick={() => setIsMobileMenuOpen(false)}>Journal</Link>
 
               <div className={styles.mobileDropdownSection}>
                 <button

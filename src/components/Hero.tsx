@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import Image from "next/image";
 import styles from "./Hero.module.css";
+import Link from 'next/link';
 
 export default function Hero() {
   return (
@@ -58,10 +59,12 @@ export default function Hero() {
               {/* Hover sliding background */}
               <span className={styles.heroButtonBg}></span>
 
-              <span className={styles.heroButtonText}>
-                Explore Collections
-                <ArrowRight className={styles.heroButtonIcon} />
-              </span>
+              <div className={styles.heroButtonText}>
+                <Link href="/collections/all" className={styles.seeMoreBtn}>
+                    See More Collections
+                    <ArrowRight className={styles.heroButtonIcon} />
+                  </Link>
+              </div>
             </motion.button>
           </div>
         </motion.div>
