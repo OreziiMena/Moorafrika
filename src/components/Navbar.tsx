@@ -183,10 +183,10 @@ export default function Navbar() {
             className={styles.mobileMenu}
           >
             <div className={styles.mobileMenuInner}>
-              <Link href="/" className={styles.mobileNavLink}>Home</Link>
-              <Link href="/about" className={styles.mobileNavLink}>About</Link>
-              <Link href="/collection" className={styles.mobileNavLink}>Collection</Link>
-              <Link href="/blog" className={styles.mobileNavLink}>Journal</Link>
+              <Link href="/" className={styles.mobileNavLink} onClick={() => setIsMobileMenuOpen(false)}>Home</Link>
+              <Link href="/about" className={styles.mobileNavLink} onClick={() => setIsMobileMenuOpen(false)}>About</Link>
+              <Link href="/collection" className={styles.mobileNavLink} onClick={() => setIsMobileMenuOpen(false)}>Collection</Link>
+              <Link href="/blog" className={styles.mobileNavLink} onClick={() => setIsMobileMenuOpen(false)}>Journal</Link>
 
               <div className={styles.mobileDropdownSection}>
                 <button
@@ -208,24 +208,23 @@ export default function Navbar() {
                       exit={{ opacity: 0, height: 0 }}
                       className={styles.mobileDropdownContent}
                     >
-                      <Link href="/faq" className={styles.mobileSubLink}>FAQs</Link>
-                      <Link href="/size-guide" className={styles.mobileSubLink}>Size Guide</Link>
-                      <Link href="/contact" className={styles.mobileSubLink}>Contact</Link>
+                      <Link href="/faq" className={styles.mobileSubLink} onClick={() => setIsMobileMenuOpen(false)}>FAQs</Link>
+                      <Link href="/size-guide" className={styles.mobileSubLink} onClick={() => setIsMobileMenuOpen(false)}>Size Guide</Link>
+                      <Link href="/contact" className={styles.mobileSubLink} onClick={() => setIsMobileMenuOpen(false)}>Contact</Link>
                     </motion.div>
                   )}
                 </AnimatePresence>
               </div>
 
-
               <div className={styles.mobileAuthSection}>
                 {user ? (
                   <>
-                    <Link href="/profile" className={styles.mobileAuthBtn}>My Profile</Link>
+                    <Link href="/profile" className={styles.mobileAuthBtn} onClick={() => setIsMobileMenuOpen(false)}>My Profile</Link>
                   </>
                 ) : (
                   <>
-                    <Link href="/login" className={styles.mobileAuthBtn}>Log In</Link>
-                    <Link href="/signup" className={styles.mobileAuthBtnPrimary}>Sign Up</Link>
+                    <Link href="/login" className={styles.mobileAuthBtn} onClick={() => setIsMobileMenuOpen(false)}>Log In</Link>
+                    <Link href="/signup" className={styles.mobileAuthBtnPrimary} onClick={() => setIsMobileMenuOpen(false)}>Sign Up</Link>
                   </>
                 )}
               </div>

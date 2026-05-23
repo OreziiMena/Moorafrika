@@ -10,6 +10,7 @@ import { ProductContract } from "@/contracts/product";
 import axios from "axios";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import { motion, AnimatePresence } from "framer-motion";
 import { handleClientError } from "@/lib/clientErrorHandler";
 import styles from "./product.module.css";
 
@@ -34,6 +35,7 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
   
   const [currentMobileIndex, setCurrentMobileIndex] = useState(0);
   const carouselRef = useRef<HTMLDivElement>(null);
+  const [showSizeError, setShowSizeError] = useState(false);
 
   const { toggleWishlist, isInWishlist } = useWishlistStore();
   const isWishlisted = product ? isInWishlist(product.slug) : false;
@@ -118,7 +120,12 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
       }
     } else {
       if (!selectedSize) {
-        alert("Please select a size first!");
+        setShowSizeError(true);
+        
+        setTimeout(() => {
+          setShowSizeError(false);
+        }, 3000); // Hides after 3 seconds
+        
         return;
       }
       
@@ -292,6 +299,41 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
             </p>
           )}
         </div>
+        <AnimatePresence>
+        {showSizeError && (
+          <motion.div
+            initial={{ opacity: 0, y: 50, x: "-50%" }}
+            animate={{ opacity: 1, y: 0, x: "-50%" }}
+            exit={{ opacity: 0, y: 50, x: "-50%" }}
+            style={{
+              position: "fixed",
+              bottom: "2rem",
+              left: "50%",
+              backgroundColor: "#ef4444",
+              color: "#FDFBF7",
+              padding: "0.75rem 1.5rem",
+              borderRadius: "50px",
+              display: "flex",
+              alignItems: "center",
+              gap: "0.5rem",
+              boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
+              zIndex: 100,
+              width: "max-content",
+              maxWidth: "90vw",
+              fontFamily: "var(--font-clean, sans-serif)",
+              fontSize: "0.9rem",
+              fontWeight: 500,
+            }}
+          >
+            <AlertCircle size={18} />
+            <span style={{ fontFamily: "var(--font-clean, sans-serif)", fontSize: "0.9rem", fontWeight: 500 }}>
+              Please select a size first!
+            </span>
+          </motion.div>
+        )}
+      </AnimatePresence>
       </div>
+
+      
   );
 }
