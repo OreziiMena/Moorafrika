@@ -31,7 +31,7 @@ class ProductService {
     price_asc: { price: 'asc' },
     price_desc: { price: 'desc' },
     popularity: { sales_count: 'desc' },
-    createdAt: { created_at: 'asc' },
+    createdAt: { created_at: 'desc' },
   };
 
   static async getProducts(
@@ -59,7 +59,7 @@ class ProductService {
       deleted_at: null,
     };
 
-    const orderByClause = this.orderMapping[orderBy] || { created_at: 'asc' };
+    const orderByClause = this.orderMapping[orderBy] || { created_at: 'desc' };
 
     const [products, total] = await Promise.all([
       findProducts(where, skip, limit, orderByClause),
