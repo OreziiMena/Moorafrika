@@ -15,7 +15,7 @@ export const DELETE = errorHandler(async (req, { params }) => {
   const { searchParams } = new URL(req.url);
   const size = searchParams.get('size');
 
-  await CartService.removeItemFromCart(id, size);
+  await CartService.removeItemFromCart(id!, size);
 
   return NextResponse.json({ message: 'Cart item removed successfully' });
 });
