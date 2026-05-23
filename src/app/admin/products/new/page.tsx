@@ -1,20 +1,23 @@
 "use client";
 
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import axios from "axios";
-import { ArrowLeft, Save, Upload, X , CheckCircle2, AlertCircle} from "lucide-react";
-import Link from "next/link";
+import { Upload, X , CheckCircle2, AlertCircle} from "lucide-react";
 import { handleClientError } from "@/lib/clientErrorHandler";
 import Image from "next/image";
 import Navbar from "@/components/Navbar";
 import styles from "./addProduct.module.css"; 
+import { toast } from "sonner";
+import CloudflareR2StorageClient from "@/lib/storage";
+import { CategoryContract } from "@/contracts/category";
 
 export default function AddNewProductPage() {
   const router = useRouter();
   const fileInputRef = useRef<HTMLInputElement>(null);
   
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [categories, setCategories] = useState<CategoryContract[]>([]);
   const [imageFiles, setImageFiles] = useState<File[]>([]);
   const [imagePreviews, setImagePreviews] = useState<string[]>([]);
   const [status, setStatus] = useState<{ type: 'success' | 'error', message: string } | null>(null);
@@ -24,9 +27,25 @@ export default function AddNewProductPage() {
     description: "",
     price: "",
     stock_count: "",
-    categoryId: "1", 
+    categoryId: "-1", 
     sizes: "S, M, L, XL" 
   });
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const categoriesResponse = await axios.get<CategoryContract[]>("/api/categories");
+        const fetchedCategories = categoriesResponse.data;
+
+        setCategories(fetchedCategories);
+
+      } catch (error) {
+        handleClientError(error);
+      }
+    };
+
+    fetchCategories();
+  }, []);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -59,30 +78,23 @@ export default function AddNewProductPage() {
     e.preventDefault();
     
     if (imageFiles.length === 0) {
-      alert("Please upload at least one image.");
+      toast.error("Please upload at least one image.");
+      return;
+    }
+
+    if (formData.categoryId === "-1") {
+      toast.error("Please select a category.");
       return;
     }
 
     setIsSubmitting(true);
 
     try {
-      const uploadedData = [];
-
-      for (const file of imageFiles) {
-        const { data } = await axios.post("/api/upload-url", { 
-          fileType: file.type,
-          fileSize: file.size,
-          folder: "products"
-        });
-        
-        const { presignedUrl, key, url } = data;
-
-        await axios.put(presignedUrl, file, {
-          headers: { "Content-Type": file.type }
-        });
-
-        uploadedData.push({ key, url });
-      }
+      const uploadPromises = imageFiles.map(async (file) => {
+        const { key, url } = await CloudflareR2StorageClient.uploadMedia(file, "products");
+        return { key, url };
+      });
+      const uploadedData = await Promise.all(uploadPromises);
 
       const payload = {
         name: formData.name,
@@ -91,7 +103,7 @@ export default function AddNewProductPage() {
         stock_count: Number(formData.stock_count),
         categoryId: Number(formData.categoryId),
         sizes: formData.sizes.split(",").map(s => s.trim()).filter(Boolean),
-        imageKey: uploadedData[0].key, 
+        imageKey: uploadedData[0].key,
         thumbnailKeys: uploadedData.slice(1).map(d => d.key)
       };
 
@@ -100,8 +112,8 @@ export default function AddNewProductPage() {
      setStatus({ type: 'success', message: "Product added successfully!" });
      setTimeout(() => router.push("/admin"), 1200);
 
-    } catch (error: any) {
-        handleClientError(error);
+    } catch (error) {
+      handleClientError(error);
     } finally {
       setIsSubmitting(false);
     }
@@ -148,8 +160,12 @@ export default function AddNewProductPage() {
             <div className={styles.inputGroup}>
               <label className={styles.label}>Category</label>
               <select name="categoryId" value={formData.categoryId} onChange={handleChange} className={styles.input}>
-                <option value="1">Men</option>
-                <option value="2">Women</option>
+                <option value="-1">Select Category</option>
+                {categories.map((category) => (
+                  <option key={category.id} value={category.id}>
+                    {category.name}
+                  </option>
+                ))}
               </select>
             </div>
           </div>
