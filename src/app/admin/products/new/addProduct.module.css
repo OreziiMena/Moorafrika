@@ -201,6 +201,25 @@
   border-bottom: 1px solid #27272a;
   margin: 1rem 0;
 }
+
+.statusBanner {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px;
+  border-radius: 6px;
+  margin-bottom: 1rem;
+  font-weight: 500;
+}
+.statusBanner.success {
+  background: #d4edda;
+  color: #155724;
+}
+.statusBanner.error {
+  background: #f8d7da;
+  color: #721c24;
+}
+
 /* Make the grid stack on mobile */
 @media (max-width: 640px) {
   .inputRow {

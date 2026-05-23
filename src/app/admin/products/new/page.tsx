@@ -3,7 +3,7 @@
 import React, { useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import axios from "axios";
-import { ArrowLeft, Save, Upload, X } from "lucide-react";
+import { ArrowLeft, Save, Upload, X , CheckCircle2, AlertCircle} from "lucide-react";
 import Link from "next/link";
 import { handleClientError } from "@/lib/clientErrorHandler";
 import Image from "next/image";
@@ -17,6 +17,7 @@ export default function AddNewProductPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [imageFiles, setImageFiles] = useState<File[]>([]);
   const [imagePreviews, setImagePreviews] = useState<string[]>([]);
+  const [status, setStatus] = useState<{ type: 'success' | 'error', message: string } | null>(null);
 
   const [formData, setFormData] = useState({
     name: "",
@@ -96,16 +97,11 @@ export default function AddNewProductPage() {
 
       await axios.post("/api/products", payload);
       
-      alert("Product successfully added!");
-      router.push("/admin"); 
+     setStatus({ type: 'success', message: "Product added successfully!" });
+     setTimeout(() => router.push("/admin"), 1200);
 
     } catch (error: any) {
-      if (error.response) {
         handleClientError(error);
-      } else {
-        console.error("Network Error:", error);
-        alert(error.message || "Upload failed.");
-      }
     } finally {
       setIsSubmitting(false);
     }
@@ -116,6 +112,14 @@ export default function AddNewProductPage() {
       <Navbar />
       <div className={styles.container}>
         <h1 className={styles.title}>Add New Product</h1>
+
+        {status && (
+
+        <div className={`${styles.statusBanner} ${styles[status.type]}`}>
+            {status.type === 'success' ? <CheckCircle2 size={20} /> : <AlertCircle size={20} />}
+            {status.message}
+        </div>
+        )}
         <form onSubmit={handleSubmit} className={styles.form}>
           <div className={styles.mediaSection}>
             <h3 className={styles.sectionTitle}>Add Images</h3>
