@@ -156,10 +156,6 @@ export default function CheckoutPage() {
                     <label htmlFor="city">City</label>
                     <input type="text" id="city" value={formData.city} onChange={handleInputChange} required />
                   </div>
-                  <div className={styles.inputWrapper}>
-                    <label htmlFor="postalCode">Postal code</label>
-                    <input type="text" id="postalCode" value={formData.postalCode} onChange={handleInputChange} />
-                  </div>
                   
                   <div className={styles.inputWrapper}>
                     <label htmlFor="country">Country</label>

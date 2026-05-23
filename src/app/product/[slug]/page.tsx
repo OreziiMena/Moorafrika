@@ -264,7 +264,7 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
               className={styles.addToCartBtn}
               style={{
                 backgroundColor:  isInCart ? "transparent" : "",
-                color: isSuccess ? "#141414" : isInCart ? " #ef4444" : "#141414",
+                color : isInCart ? " #ef4444" : "",
                 border: isInCart ? "1px solid #ef4444" : "",
               }}
             >
