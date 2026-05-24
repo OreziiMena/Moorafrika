@@ -16,6 +16,7 @@ export default function Hero() {
           alt="Fashion Hero Background"
           fill
           priority
+          sizes="100vw"
           className={styles.heroImage}
         />
         {/* Overlay */}
