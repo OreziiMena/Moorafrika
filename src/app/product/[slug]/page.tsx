@@ -8,8 +8,6 @@ import { useCartStore } from "@/app/store/cartStore";
 import { useWishlistStore } from "@/app/store/wishliststore";
 import { ProductContract } from "@/contracts/product";
 import axios from "axios";
-import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";
 import { motion, AnimatePresence } from "framer-motion";
 import { handleClientError } from "@/lib/clientErrorHandler";
 import styles from "./product.module.css";
@@ -30,6 +28,7 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
   const [activeImage, setActiveImage] = useState<string>("");
   const [selectedSize, setSelectedSize] = useState<string>("");
   const [quantity, setQuantity] = useState<number>(1);
+  const [isQuantityUpdating, setIsQuantityUpdating] = useState(false);
   const [isAdding, setIsAdding] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   
@@ -40,7 +39,7 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
   const { toggleWishlist, isInWishlist } = useWishlistStore();
   const isWishlisted = product ? isInWishlist(product.slug) : false;
   
-  const { items, addItem, removeItem } = useCartStore();
+  const { items, addItem, removeItem, updateQuantity } = useCartStore();
 
   const existingCartItem = selectedSize 
     ? items.find((item) => item.productId === product?.id && item.size === selectedSize)
@@ -87,19 +86,13 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
 
   if (isLoading) {
     return (
-      <main className={styles.pageWrapper}>
-        <Navbar />
-        <div className={styles.loading}>Loading product details...</div>
-      </main>
+      <div className={styles.loading}>Loading product details...</div>
     );
   }
 
   if (!product) {
     return (
-      <main className={styles.pageWrapper}>
-        <Navbar />
-        <div className={styles.error}>Product not found.</div>
-      </main>
+      <div className={styles.error}>Product not found.</div>
     );
   }
 
@@ -148,6 +141,29 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
         setIsAdding(false);
       }
     }
+  };
+
+  const handleQuantityAction = async(action: 'increase' | 'decrease') => {
+    const inCart = items.find((item) => item.productId === product?.id && item.size === selectedSize)
+    setIsQuantityUpdating(true);
+    if (action === 'increase') {
+      setQuantity(quantity + 1);
+      if (!inCart) return setIsQuantityUpdating(false);
+      await updateQuantity({
+        productId: product.id,
+        size: existingCartItem?.size || "",
+        quantity: quantity + 1
+      });
+    } else {
+      setQuantity(quantity - 1);
+      if (!inCart) return setIsQuantityUpdating(false);
+      await updateQuantity({
+        productId: product.id,
+        size: existingCartItem?.size || "",
+        quantity: quantity - 1
+      });
+    }
+    setIsQuantityUpdating(false);
   };
 
   return (
@@ -246,12 +262,14 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
             <span className={styles.label}>Qty:</span>
             <div className={styles.quantityControls}>
               <button 
-                onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                onClick={() => handleQuantityAction('decrease')}
+                disabled={quantity <= 1 || isQuantityUpdating}
                 className={styles.qtyBtn}
               >-</button>
               <span className={styles.qtyNumber}>{quantity}</span>
               <button 
-                onClick={() => setQuantity(Math.min(product.stock_count, quantity + 1))}
+                onClick={() => handleQuantityAction('increase')}
+                disabled={quantity >= product.stock_count || isQuantityUpdating}
                 className={styles.qtyBtn}
               >+</button>
             </div>
