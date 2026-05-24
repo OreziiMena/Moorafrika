@@ -161,11 +161,11 @@ export default function AdminDashboard() {
           
           {/* Left: Recent Orders (Dynamic) */}
           <section className={styles.section}>
-            <div className={styles.sectionHeader}>
+            <Link className={styles.sectionHeader} href="/admin/orders">
               <h3 className={styles.sectionTitle}>Recent Orders</h3>
               <button className={styles.viewAllBtn}><Eye size={16} /> View All</button>
-            </div>
-            
+            </Link>
+
             <div className={styles.ordersList}>
               {orders.length === 0 ? (
                 <div style={{ padding: '2rem', textAlign: 'center', color: '#a1a1aa', border: '1px solid #27272a', borderRadius: '8px' }}>

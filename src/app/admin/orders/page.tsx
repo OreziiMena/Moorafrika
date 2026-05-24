@@ -2,29 +2,40 @@
 
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { Search, Package, MapPin, Eye, Edit } from "lucide-react";
+import { Search, Package, MapPin, Eye, Edit, ChevronDown } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { handleClientError } from "@/lib/clientErrorHandler";
 import styles from "./adminOrders.module.css";
 
+const STATUS_OPTIONS = [
+  { value: "ALL", label: "All Orders" },
+  { value: "PENDING", label: "Pending" },
+  { value: "PROCESSING", label: "Processing" },
+  { value: "SHIPPED", label: "Shipped" },
+  { value: "DELIVERED", label: "Delivered" },
+  { value: "CANCELLED", label: "Cancelled" },
+];
+
 export default function AdminOrdersPage() {
   const [orders, setOrders] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
+  
+  // Custom Dropdown States
   const [statusFilter, setStatusFilter] = useState("ALL");
+  const [isFilterDropdownOpen, setIsFilterDropdownOpen] = useState(false);
   
   // State for tracking which order is currently being edited
   const [editingOrderId, setEditingOrderId] = useState<string | null>(null);
   const [editStatus, setEditStatus] = useState("");
   const [editNote, setEditNote] = useState("");
   const [isSaving, setIsSaving] = useState(false);
+  const [openStatusEditDropdownId, setOpenStatusEditDropdownId] = useState<string | null>(null);
 
-  // 1. Fetch All Orders (Admin Route)
   const fetchOrders = async () => {
     try {
       setIsLoading(true);
-      // Hitting the admin endpoint you were debugging earlier!
       const response = await axios.get("/api/orders/admin?limit=50"); 
       setOrders(response.data?.data || response.data);
     } catch (error) {
@@ -38,21 +49,20 @@ export default function AdminOrdersPage() {
     fetchOrders();
   }, []);
 
-  // 2. Handle Saving Updates
   const handleSaveUpdate = async (orderId: string) => {
     try {
       setIsSaving(true);
-      // Assuming your backend has a patch endpoint for admin updates
-      await axios.patch(`/api/orders/${orderId}`, {
+      await axios.patch(`/api/orders/admin/${orderId}`, {
         status: editStatus,
-        admin_note: editNote // Using the column we fixed earlier!
+        note: editNote 
       });
       
-      // Reset edit state and refresh list
       setEditingOrderId(null);
+      setOpenStatusEditDropdownId(null);
       await fetchOrders();
-    } catch (error) {
-      handleClientError(error);
+      } catch (error: any) {
+      console.error("Save Update Failed:", error.response?.data || error.message);
+      handleClientError(error); 
     } finally {
       setIsSaving(false);
     }
@@ -62,9 +72,9 @@ export default function AdminOrdersPage() {
     setEditingOrderId(order.id);
     setEditStatus(order.status);
     setEditNote(order.admin_note || order.adminNote || "");
+    setOpenStatusEditDropdownId(null);
   };
 
-  // 3. Filtering Logic
   const filteredOrders = orders.filter((order) => {
     const matchesSearch = order.id.toLowerCase().includes(searchQuery.toLowerCase()) || 
                           (order.contactName && order.contactName.toLowerCase().includes(searchQuery.toLowerCase()));
@@ -84,6 +94,11 @@ export default function AdminOrdersPage() {
   const formatDate = (dateString: string) => {
     if (!dateString) return '';
     return new Date(dateString).toLocaleDateString('en-GB');
+  };
+
+  // Helper to get the display label for a status
+  const getStatusLabel = (statusValue: string) => {
+    return STATUS_OPTIONS.find(opt => opt.value === statusValue)?.label || statusValue;
   };
 
   return (
@@ -116,19 +131,35 @@ export default function AdminOrdersPage() {
             />
           </div>
 
+          {/* Custom Filter Dropdown */}
           <div className={styles.filterWrapper}>
-            <select 
-              className={styles.nativeSelect}
-              value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value)}
+            <div 
+              className={styles.customSelectTrigger}
+              onClick={() => setIsFilterDropdownOpen(!isFilterDropdownOpen)}
             >
-              <option value="ALL">All Statuses</option>
-              <option value="PENDING">Pending</option>
-              <option value="PROCESSING">Processing</option>
-              <option value="SHIPPED">Shipped</option>
-              <option value="DELIVERED">Delivered</option>
-              <option value="CANCELLED">Cancelled</option>
-            </select>
+              <span>{getStatusLabel(statusFilter)}</span>
+              <ChevronDown size={16} className={`${styles.selectIcon} ${isFilterDropdownOpen ? styles.iconOpen : ""}`} />
+            </div>
+
+            {isFilterDropdownOpen && (
+              <div className={styles.customSelectMenu}>
+                <div className={styles.customSelectHeader}>
+                  {getStatusLabel(statusFilter)}
+                </div>
+                {STATUS_OPTIONS.map((option) => (
+                  <div 
+                    key={option.value}
+                    className={`${styles.customSelectOption} ${statusFilter === option.value ? styles.optionActive : ""}`}
+                    onClick={() => {
+                      setStatusFilter(option.value);
+                      setIsFilterDropdownOpen(false);
+                    }}
+                  >
+                    {option.label}
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         </div>
 
@@ -141,6 +172,7 @@ export default function AdminOrdersPage() {
           <div className={styles.ordersList}>
             {filteredOrders.map((order) => {
               const isEditing = editingOrderId === order.id;
+              const isStatusMenuOpen = openStatusEditDropdownId === order.id;
               
               return (
                 <article key={order.id} className={styles.orderCard}>
@@ -153,17 +185,33 @@ export default function AdminOrdersPage() {
                     
                     {/* Status Display or Edit Dropdown */}
                     {isEditing ? (
-                      <select 
-                        className={styles.statusEditSelect}
-                        value={editStatus}
-                        onChange={(e) => setEditStatus(e.target.value)}
-                      >
-                        <option value="PENDING">Pending</option>
-                        <option value="PROCESSING">Processing</option>
-                        <option value="SHIPPED">Shipped</option>
-                        <option value="DELIVERED">Delivered</option>
-                        <option value="CANCELLED">Cancelled</option>
-                      </select>
+                      <div className={styles.editStatusWrapper}>
+                        <div 
+                          className={styles.customSelectTrigger}
+                          style={{ padding: '0.5rem 1rem', background: '#1a1a1a', minWidth: '140px' }}
+                          onClick={() => setOpenStatusEditDropdownId(isStatusMenuOpen ? null : order.id)}
+                        >
+                          <span>{getStatusLabel(editStatus)}</span>
+                          <ChevronDown size={16} className={`${styles.selectIcon} ${isStatusMenuOpen ? styles.iconOpen : ""}`} />
+                        </div>
+
+                        {isStatusMenuOpen && (
+                          <div className={styles.customSelectMenu} style={{ top: 'calc(100% + 4px)', zIndex: 100 }}>
+                            {STATUS_OPTIONS.map((option) => (
+                              <div 
+                                key={option.value}
+                                className={`${styles.customSelectOption} ${editStatus === option.value ? styles.optionActive : ""}`}
+                                onClick={() => {
+                                  setEditStatus(option.value);
+                                  setOpenStatusEditDropdownId(null);
+                                }}
+                              >
+                                {option.label}
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
                     ) : (
                       <span className={`${styles.statusBadge} ${styles[order.status.toLowerCase()]}`}>
                         <Package size={14} />
@@ -185,7 +233,7 @@ export default function AdminOrdersPage() {
                     </span>
                   </div>
 
-                  {/* Customer Info (Admin Specific) */}
+                  {/* Customer Info */}
                   <div className={styles.customerInfo}>
                      <span className={styles.customerName}>{order.contactName}</span>
                      <span>{order.contactEmail}</span>
@@ -237,7 +285,10 @@ export default function AdminOrdersPage() {
                       <div className={styles.editActionButtons}>
                         <button 
                           className={styles.cancelEditBtn} 
-                          onClick={() => setEditingOrderId(null)}
+                          onClick={() => {
+                            setEditingOrderId(null);
+                            setOpenStatusEditDropdownId(null);
+                          }}
                           disabled={isSaving}
                         >
                           Cancel

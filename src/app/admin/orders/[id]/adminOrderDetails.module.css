@@ -13,12 +13,13 @@
 .container {
   width: 100%;
   padding: 2rem;
-  margin-top: 5%;
+  margin-top: 2%;
   margin: 0 auto;
   box-sizing: border-box;
   overflow-x: hidden;
 }
 
+/* Navigation */
 .nav {
   padding: 2rem 2rem 0;
   max-width: 800px;
@@ -43,6 +44,7 @@
   color: var(--ivory, #FDFBF7);
 }
 
+/* Header Section */
 .header {
   display: flex;
   flex-direction: column;
@@ -65,42 +67,6 @@
   margin: 0 0 1.25rem 0;
 }
 
-.statusBadgeWrapper {
-  margin-bottom: 1.5rem;
-}
-
-.statusBadge {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.35rem;
-  padding: 0.4rem 1rem;
-  border-radius: 6px;
-  font-size: 0.85rem;
-  font-weight: 600;
-  text-transform: capitalize;
-  white-space: nowrap;
-}
-
-.statusBadge.processing, .statusBadge.pending {
-  background: rgba(245, 245, 220, 0.1);
-  color: var(--ivory, #FDFBF7);
-}
-
-.statusBadge.delivered {
-  background: rgba(76, 175, 80, 0.15);
-  color: #81c784;
-}
-
-.statusBadge.shipped {
-  background: rgba(33, 150, 243, 0.15);
-  color: #64b5f6;
-}
-
-.statusBadge.cancelled {
-  background: rgba(244, 67, 54, 0.15);
-  color: #e57373;
-}
-
 .copyBtn {
   display: flex;
   align-items: center;
@@ -108,7 +74,7 @@
   gap: 0.5rem;
   width: 100%;
   padding: 0.875rem;
-  background: transparent;
+  background: rgba(245, 245, 220, 0.05);
   border: 1px solid rgba(245, 245, 220, 0.2);
   color: var(--ivory, #FDFBF7);
   border-radius: 8px;
@@ -118,7 +84,7 @@
 }
 
 .copyBtn:hover {
-  background: rgba(245, 245, 220, 0.05);
+  background: rgba(245, 245, 220, 0.1);
 }
 
 /* Card Styling */
@@ -131,11 +97,82 @@
 }
 
 .cardTitle {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
   font-family: var(--font-editorial, 'Playfair Display', serif);
   font-size: 1.3rem;
   font-weight: 700;
   margin: 0 0 1.5rem 0;
   color: var(--ivory, #FDFBF7);
+}
+
+/* Admin Controls Card Specifics */
+.adminCard {
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(245, 245, 220, 0.2);
+}
+
+.adminGrid {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  margin-bottom: 1.5rem;
+}
+
+.adminField label {
+  display: block;
+  font-size: 0.85rem;
+  color: #a0a0a0;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+}
+
+.nativeSelect, .noteInput {
+  width: 100%;
+  background: #1a1a1a;
+  border: 1px solid rgba(245, 245, 220, 0.2);
+  color: #f5f5dc;
+  padding: 0.875rem 1rem;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  font-family: inherit;
+}
+
+.nativeSelect {
+  cursor: pointer;
+}
+
+.noteInput {
+  resize: vertical;
+}
+
+.saveBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  width: 100%;
+  background: #4caf50;
+  color: #fff;
+  border: none;
+  padding: 1rem;
+  border-radius: 8px;
+  font-weight: 700;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.saveBtn:hover:not(:disabled) {
+  opacity: 0.9;
+}
+
+.saveBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  background: #2a2a2a;
+  color: #a0a0a0;
 }
 
 /* Timeline Styling */
@@ -148,6 +185,7 @@
 .timelineItem {
   display: flex;
   gap: 1.25rem;
+  align-items: center;
 }
 
 .timelineIconWrapper {
@@ -161,18 +199,11 @@
 }
 
 .iconPending {
-  color: #a0a0a0;
+  color: #555;
 }
 
 .timelineContent {
   flex: 1;
-}
-
-.timelineHeader {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 0.25rem;
 }
 
 .timelineHeader h3 {
@@ -180,17 +211,6 @@
   font-size: 1.05rem;
   font-weight: 600;
   color: var(--ivory, #FDFBF7);
-}
-
-.timelineHeader span {
-  font-size: 0.85rem;
-  color: #a0a0a0;
-}
-
-.timelineContent p {
-  margin: 0;
-  font-size: 0.9rem;
-  color: #a0a0a0;
 }
 
 /* Items List */
@@ -274,51 +294,7 @@
   color: var(--ivory, #FDFBF7);
 }
 
-.paymentRow {
-  margin-bottom: 0;
-  align-items: center;
-}
-
-.actionButtonGroup {
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-  margin-top: 1.5rem;
-  border-top: 1px solid rgba(245, 245, 220, 0.1);
-  padding-top: 1.5rem;
-}
-
-.payNowBtn {
-  background: var(--ivory, #FDFBF7);
-  color: #1a1a1a;
-  border: none;
-  padding: 1rem;
-  border-radius: 8px;
-  font-weight: 700;
-  cursor: pointer;
-  transition: opacity 0.2s ease;
-}
-
-.payNowBtn:hover {
-  opacity: 0.9;
-}
-
-.cancelBtn {
-  background: transparent;
-  color: #e57373;
-  border: 1px solid rgba(229, 115, 115, 0.3);
-  padding: 1rem;
-  border-radius: 8px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background 0.2s ease;
-}
-
-.cancelBtn:hover {
-  background: rgba(229, 115, 115, 0.1);
-}
-
-/* Address */
+/* Address & Customer Info */
 .addressInfo p {
   margin: 0 0 0.5rem 0;
   color: #a0a0a0;
@@ -327,10 +303,16 @@
 }
 
 .addressInfo .contactName {
-  font-weight: 600;
+  font-weight: 700;
   color: var(--ivory, #FDFBF7);
-  font-size: 1rem;
-  margin-bottom: 0.75rem;
+  font-size: 1.1rem;
+  margin-bottom: 0.25rem;
+}
+
+.divider {
+  height: 1px;
+  background: rgba(245, 245, 220, 0.1);
+  margin: 1rem 0;
 }
 
 /* Loading/Empty State */
@@ -342,111 +324,71 @@
   color: #a0a0a0;
   font-weight: 500;
 }
-
-/* Modal Styling */
-.modalOverlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  background: rgba(0, 0, 0, 0.7);
-  backdrop-filter: blur(4px);
+/* Custom Dropdown Styling for Admin Details */
+.customSelectTrigger {
   display: flex;
-  justify-content: center;
+  justify-content: space-between;
   align-items: center;
-  z-index: 1000;
-  padding: 1rem;
-}
-
-.modalCard {
   background: #1a1a1a;
-  border: 1px solid rgba(245, 245, 220, 0.1);
-  border-radius: 12px;
-  padding: 2rem;
-  max-width: 600px;
-  width: 100%;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-  animation: modalFadeIn 0.2s ease-out forwards;
-}
-
-.modalTitle {
-  font-family: var(--font-editorial, 'Playfair Display', serif);
-  font-size: 1.5rem;
-  color: var(--ivory, #FDFBF7);
-  margin: 0 0 1rem 0;
-}
-
-.modalText {
-  color: #a0a0a0;
-  font-size: 0.95rem;
-  line-height: 1.5;
-  margin: 0 0 2rem 0;
-}
-
-.modalActions {
-  display: flex;
-  gap: 1rem;
-  justify-content: flex-end;
-}
-
-.modalKeepBtn {
-  background: rgba(255, 255, 255, 0.05);
-  color: var(--ivory, #FDFBF7);
   border: 1px solid rgba(245, 245, 220, 0.2);
-  padding: 0.75rem 1.25rem;
-  border-radius: 8px;
-  font-weight: 600;
+  color: #f5f5dc;
+  padding: 0.875rem 1rem;
+  border-radius: 8px; 
+  font-size: 0.95rem;
   cursor: pointer;
-  transition: background 0.2s;
+  transition: all 0.2s ease;
+  user-select: none;
 }
 
-.modalKeepBtn:hover:not(:disabled) {
-  background: rgba(255, 255, 255, 0.1);
+.customSelectTrigger:hover {
+  border-color: rgba(245, 245, 220, 0.4);
 }
 
-.modalConfirmBtn {
-  background: #e57373;
-  color: #1a1a1a;
-  border: none;
-  padding: 0.75rem 1.25rem;
+.selectIcon {
+  color: #f5f5dc;
+  transition: transform 0.2s ease;
+}
+
+.iconOpen {
+  transform: rotate(180deg);
+}
+
+.customSelectMenu {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  width: 100%;
+  background: #222222;
+  border: 1px solid rgba(245, 245, 220, 0.1);
   border-radius: 8px;
-  font-weight: 700;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+  overflow: hidden;
+  z-index: 50;
+  animation: slideDown 0.2s ease forwards;
+}
+
+.customSelectOption {
+  padding: 0.875rem 1rem;
+  color: #a0a0a0;
+  font-size: 0.9rem;
   cursor: pointer;
-  transition: opacity 0.2s;
+  transition: all 0.2s ease;
 }
 
-.modalConfirmBtn:hover:not(:disabled) {
-  opacity: 0.9;
+.customSelectOption:hover {
+  background: rgba(245, 245, 220, 0.05);
+  color: #f5f5dc;
 }
 
-.modalKeepBtn:disabled, .modalConfirmBtn:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
+.optionActive {
+  background: rgba(245, 245, 220, 0.05);
+  color: #f5f5dc;
 }
 
-@keyframes modalFadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-5px); }
+  to { opacity: 1; transform: translateY(0); }
 }
-
-/* Mobile Responsiveness */
-@media (max-width: 600px) {
-  .modalActions {
-    flex-direction: column-reverse;
-  }
-  
-  .modalKeepBtn, .modalConfirmBtn {
-    width: 100%;
-  }
-}
-
 @media (max-width: 768px) {
   .container {
     padding: 1rem;
@@ -455,28 +397,5 @@
   
   .nav {
     padding: 1.5rem 1rem 0;
-    margin-top: 5rem;
-  }
-  
-  .orderIdTitle {
-    font-size: 1.8rem;
-  }
-  
-  .card {
-    padding: 1.25rem;
-  }
-  
-  .itemRow {
-    flex-direction: column;
-    gap: 0.75rem;
-  }
-  
-  .itemImageContainer {
-    width: 100%;
-    height: 120px;
-  }
-  
-  .timelineItem {
-    gap: 0.75rem;
   }
 }

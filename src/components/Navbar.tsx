@@ -109,7 +109,7 @@ export default function Navbar() {
                         className={styles.dropdownMenu}
                         style={{ right: 0, left: 'auto' }} // Align to the right side
                       >
-                        <Link href="/order" className={styles.dropdownItem}>Order History</Link>
+                        <Link href="/order" className={styles.dropdownItem}>My Order History</Link>
                         <button 
                           onClick={() => signOut()} 
                           className={styles.dropdownItem}
@@ -218,7 +218,7 @@ export default function Navbar() {
               <div className={styles.mobileAuthSection}>
                 {user ? (
                   <>
-                    <Link href="/order" className={styles.mobileAuthBtn} onClick={() => setIsMobileMenuOpen(false)}>Order History</Link>
+                    <Link href="/order" className={styles.mobileAuthBtn} onClick={() => setIsMobileMenuOpen(false)}>MyOrder History</Link>
                   </>
                 ) : (
                   <>
