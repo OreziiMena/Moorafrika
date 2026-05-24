@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { Package, Search, ChevronDown, Eye, AlertCircle } from "lucide-react";
 import Image from "next/image";
+import Link from "next/link"
 import Navbar from "@/components/Navbar";
 import { handleClientError } from "@/lib/clientErrorHandler";
 import { UserOrderContract } from "@/contracts/order"; 
@@ -165,9 +166,9 @@ export default function MyOrdersPage() {
                   </div>
                 )}
 
-                <button className={styles.viewDetailsBtn}>
+                <Link href={`/order/${order.id}`} className={styles.viewDetailsBtn}>
                   <Eye size={16} /> View Details
-                </button>
+                </Link>
 
                 <div className={styles.shippingPreview}>
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="1" y="3" width="15" height="13"></rect><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon><circle cx="5.5" cy="18.5" r="2.5"></circle><circle cx="18.5" cy="18.5" r="2.5"></circle></svg>
