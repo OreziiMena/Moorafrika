@@ -45,14 +45,22 @@ export const useCartStore = create<CartStore>((set, get) => ({
 
       if (existingItem) {
         const newQuantity = existingItem.quantity + newItem.quantity;
-        await axios.put(`/api/cart/${encodeURIComponent(existingItem.id)}`, {
+        const res =await axios.put(`/api/cart/${encodeURIComponent(existingItem.id)}`, {
           quantity: newQuantity,
           size: newItem.size
         });
+
+        const newItemRes = res.data as CartItemContract;
+        const updatedCart = currentCart.map((item) =>
+          item.id === existingItem.id ? newItemRes : item
+        );
+        set({ items: updatedCart });
+
       } else {
-        await axios.post('/api/cart', newItem);
+        const res = await axios.post('/api/cart', newItem);
+        const newItemRes = res.data as CartItemContract;
+        set((state) => ({ items: [...state.items, newItemRes] }));
       }
-      await get().loadCart();
       
     } catch (err) {
       handleClientError(err);
@@ -62,7 +70,7 @@ export const useCartStore = create<CartStore>((set, get) => ({
   removeItem: async (id, size) => {
     try {
       await axios.delete(`/api/cart/${encodeURIComponent(id)}?size=${encodeURIComponent(size)}`);
-      await get().loadCart();
+      set((state) => ({ items: state.items.filter((item) => !(item.id === id && item.size === size)) }));
     } catch (err) {
       handleClientError(err);
     }
@@ -70,11 +78,14 @@ export const useCartStore = create<CartStore>((set, get) => ({
 
   updateQuantity: async (item) => {
     try {
-      await axios.put(`/api/cart/${encodeURIComponent(item.productId)}`, {
+      const res = await axios.put(`/api/cart/${encodeURIComponent(item.productId)}`, {
         quantity: Math.max(1, item.quantity),
         size: item.size
       });
-      await get().loadCart();
+      const updatedItem = res.data as CartItemContract;
+      set((state) => ({
+        items: state.items.map((i) => (i.id === updatedItem.id ? updatedItem : i))
+      }));
     } catch (err) {
       handleClientError(err);
     }
