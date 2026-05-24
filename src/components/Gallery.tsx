@@ -73,6 +73,22 @@ const galleryImages = [
 ];
 
 export default function Gallery() {
+  const getImageSizes = (index: number) => {
+    if (index === 0) {
+      return "(max-width: 640px) 100vw, (max-width: 1024px) 66vw, 50vw";
+    }
+
+    if (index === 3) {
+      return "(max-width: 640px) 100vw, (max-width: 1024px) 100vw, 50vw";
+    }
+
+    if (index === 4) {
+      return "(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw";
+    }
+
+    return "(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw";
+  };
+
   return (
     <section className={styles.gallerySection}>
       <div className={styles.container}>
@@ -101,7 +117,7 @@ export default function Gallery() {
                 src={img.src}
                 alt={img.alt}
                 fill
-                unoptimized
+                sizes={getImageSizes(index)}
                 className={styles.image}
               />
             </motion.div>

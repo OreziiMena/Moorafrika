@@ -7,9 +7,6 @@ import { useCartStore } from '../app/store/cartStore';
 import styles from './NewCollections.module.css';
 import { ProductContract } from '../contracts/product';
 import React from 'react';
-import { PagedResponse } from '@/contracts/response';
-import axios from 'axios';
-import { handleClientError } from '@/lib/clientErrorHandler';
 
 //Format currency
 const formatNaira = (amount: number) => {
@@ -25,7 +22,6 @@ function ProductCard({ product }: { product: ProductContract }) {
   const { items, addItem, removeItem } = useCartStore();
 
   const isInCart = items.some((item) => item.product.id === product.id);
-  console.log('Cart items in ProductCard:', items); // Debugging line to check cart items
 
   // 'inStock' isn't in the backend contract yet, I'LL assume it's true for now!
   const isAvailable = product.stock_count > 0;
@@ -110,24 +106,12 @@ function ProductCard({ product }: { product: ProductContract }) {
   );
 }
 
-export default function CollectionsPage() {
-  const [products, setProducts] = React.useState<ProductContract[]>([]);
-
-  React.useEffect(() => {
-    const fetchProducts = async () => {
-      try {
-        const response = await axios.get<PagedResponse<ProductContract>>(
-          '/api/products?limit=4',
-        );
-        const data = response.data;
-        setProducts(data.data);
-      } catch (error) {
-        handleClientError(error);
-      }
-    };
-
-    fetchProducts();
-  }, []);
+export default function CollectionsPage({
+  initialProducts = [],
+}: {
+  initialProducts?: ProductContract[];
+}) {
+  const products = initialProducts;
 
   return (
     <main className={styles.pageWrapper}>

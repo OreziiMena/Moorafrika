@@ -5,19 +5,24 @@ import Features from "@/components/Features";
 import NewCollections from "@/components/NewCollections";
 import Testimonials from "@/components/Testimonials";
 import Newsletter from "@/components/Newsletter";
+import ProductService from "@/services/product.service";
+
+export const dynamic = "force-dynamic";
 
 export const metadata = {
   title: "Moorafrika | Premium Fashion Design",
   description: "Discover Moorafrika's latest collections blending contemporary design with timeless aesthetics.",
 };
 
-export default function Home() {
+export default async function Home() {
+  const collections = await ProductService.getProducts({ page: 1, limit: 4 });
+
   return (
     <main className="main-container">
       <Hero />
       <Gallery />
       <Features />
-      <NewCollections />
+      <NewCollections initialProducts={collections.data} />
       <Testimonials />
       <Newsletter />
     </main>
