@@ -143,7 +143,7 @@ export default function CollectionsPage() {
       </div>
 
       <div className={styles.seeMoreWrapper}>
-        <Link href="/collections/all" className={styles.seeMoreBtn}>
+        <Link href="/collection" className={styles.seeMoreBtn}>
           See More Collections
           <ArrowRight className={styles.heroButtonIcon} />
         </Link>

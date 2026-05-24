@@ -4,7 +4,7 @@ import React, { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import axios from "axios";
-import { Search } from "lucide-react";
+import { Search, ChevronDown } from "lucide-react"; // Added ChevronDown
 import styles from "./collection.module.css";
 import { ProductContract } from "@/contracts/product";
 import { CategoryContract } from "@/contracts/category";
@@ -30,8 +30,14 @@ export default function CollectionPage() {
 
   const [searchQuery, setSearchQuery] = useState("");
   const [debouncedSearchQuery, setDebouncedSearchQuery] = useState("");
+  
+  // Data states
   const [selectedCategory, setSelectedCategory] = useState(-1);
   const [sortOption, setSortOption] = useState("popularity");
+
+  // Dropdown UI states
+  const [isCategoryOpen, setIsCategoryOpen] = useState(false);
+  const [isSortOpen, setIsSortOpen] = useState(false);
 
   const lastAppliedSearchRef = useRef("");
   const lastAppliedCategoryRef = useRef(-1);
@@ -40,7 +46,6 @@ export default function CollectionPage() {
     const timeoutId = window.setTimeout(() => {
       setDebouncedSearchQuery(searchQuery.trim());
     }, 300);
-
     return () => window.clearTimeout(timeoutId);
   }, [searchQuery]);
 
@@ -48,15 +53,11 @@ export default function CollectionPage() {
     const fetchCategories = async () => {
       try {
         const categoriesResponse = await axios.get<CategoryContract[]>("/api/categories");
-        const fetchedCategories = categoriesResponse.data;
-
-        setCategories(fetchedCategories);
-
+        setCategories(categoriesResponse.data);
       } catch (error) {
         handleClientError(error);
       }
     };
-
     fetchCategories();
   }, []);
 
@@ -103,28 +104,14 @@ export default function CollectionPage() {
   }, [debouncedSearchQuery, selectedCategory, currentPage, sortOption]);
 
   const visiblePages = (): PageItem[] => {
-    if (totalPages <= 7) {
-      return Array.from({ length: totalPages }, (_, index) => index + 1);
-    }
-
+    if (totalPages <= 7) return Array.from({ length: totalPages }, (_, index) => index + 1);
     const pages: PageItem[] = [1];
     const startPage = Math.max(2, currentPage - 1);
     const endPage = Math.min(totalPages - 1, currentPage + 1);
-
-    if (startPage > 2) {
-      pages.push("...");
-    }
-
-    for (let page = startPage; page <= endPage; page += 1) {
-      pages.push(page);
-    }
-
-    if (endPage < totalPages - 1) {
-      pages.push("...");
-    }
-
+    if (startPage > 2) pages.push("...");
+    for (let page = startPage; page <= endPage; page += 1) pages.push(page);
+    if (endPage < totalPages - 1) pages.push("...");
     pages.push(totalPages);
-
     return pages;
   };
 
@@ -133,6 +120,22 @@ export default function CollectionPage() {
     setDebouncedSearchQuery("");
     setSelectedCategory(-1);
     setCurrentPage(1);
+  };
+
+  const getCategoryLabel = (id: number) => {
+    if (id === -1) return "All Categories";
+    const cat = categories.find(c => c.id === id);
+    return cat ? cat.name : "All Categories";
+  };
+
+  const getSortLabel = (val: string) => {
+    switch(val) {
+      case "popularity": return "Most Popular";
+      case "createdAt": return "Latest";
+      case "price_asc": return "Price: Low to High";
+      case "price_desc": return "Price: High to Low";
+      default: return "Most Popular";
+    }
   };
 
   return (
@@ -155,31 +158,84 @@ export default function CollectionPage() {
           </div>
 
           <div className={styles.dropdownsWrapper}>
-            <select
-              className={styles.selectInput}
-              value={selectedCategory}
-              onChange={(e) => setSelectedCategory(Number(e.target.value))}
-            >
-              <option value="-1">All Categories</option>
-              {categories.map((category) => (
-                <option key={category.id} value={category.id}>
-                  {category.name}
-                </option>
-              ))}
-            </select>
+            {/* Category Dropdown */}
+            <div className={styles.filterWrapper}>
+              <div 
+                className={styles.customSelectTrigger} 
+                onClick={() => {
+                  setIsCategoryOpen(!isCategoryOpen);
+                  setIsSortOpen(false);
+                }}
+              >
+                <span>{getCategoryLabel(selectedCategory)}</span>
+                <ChevronDown size={16} className={`${styles.selectIcon} ${isCategoryOpen ? styles.iconOpen : ""}`} />
+              </div>
 
-            <select
-              className={styles.selectInput}
-              value={sortOption}
-              onChange={(e) => setSortOption(e.target.value)}
-            >
-              <option value="popularity">Most Popular</option>
-              <option value="createdAt">Latest</option>
-              <option value="price_asc">Price: Low to High</option>
-              <option value="price_desc">Price: High to Low</option>
-            </select>
+              {isCategoryOpen && (
+                <div className={styles.customSelectMenu}>
+                  <div 
+                    className={`${styles.customSelectOption} ${selectedCategory === -1 ? styles.optionActive : ""}`}
+                    onClick={() => {
+                      setSelectedCategory(-1);
+                      setIsCategoryOpen(false);
+                    }}
+                  >
+                    All Categories
+                  </div>
+                  {categories.map((category) => (
+                    <div 
+                      key={category.id}
+                      className={`${styles.customSelectOption} ${selectedCategory === category.id ? styles.optionActive : ""}`}
+                      onClick={() => {
+                        setSelectedCategory(category.id);
+                        setIsCategoryOpen(false);
+                      }}
+                    >
+                      {category.name}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Sort Dropdown */}
+            <div className={styles.filterWrapper}>
+              <div 
+                className={styles.customSelectTrigger} 
+                onClick={() => {
+                  setIsSortOpen(!isSortOpen);
+                  setIsCategoryOpen(false);
+                }}
+              >
+                <span>{getSortLabel(sortOption)}</span>
+                <ChevronDown size={16} className={`${styles.selectIcon} ${isSortOpen ? styles.iconOpen : ""}`} />
+              </div>
+
+              {isSortOpen && (
+                <div className={styles.customSelectMenu}>
+                  {[
+                    { label: "Most Popular", value: "popularity" },
+                    { label: "Latest", value: "createdAt" },
+                    { label: "Price: Low to High", value: "price_asc" },
+                    { label: "Price: High to Low", value: "price_desc" }
+                  ].map((s) => (
+                    <div 
+                      key={s.value}
+                      className={`${styles.customSelectOption} ${sortOption === s.value ? styles.optionActive : ""}`}
+                      onClick={() => {
+                        setSortOption(s.value);
+                        setIsSortOpen(false);
+                      }}
+                    >
+                      {s.label}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
         </div>
+
 
         {isLoading ? (
           <div className={styles.loadingState}>Loading collection...</div>
@@ -204,6 +260,7 @@ export default function CollectionPage() {
                       src={product.imageUrl}
                       alt={product.name}
                       fill
+                      unoptimized
                       sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                       className={styles.productImage}
                     />

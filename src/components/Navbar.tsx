@@ -28,7 +28,7 @@ const CloseIcon = ({ className, strokeWidth = 1.5 }: { className?: string, strok
 export default function Navbar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isResourcesOpen, setIsResourcesOpen] = useState(false);
-  const [isProfileOpen, setIsProfileOpen] = useState(false); // New state for profile dropdown
+  const [isProfileOpen, setIsProfileOpen] = useState(false); 
 
   const { data: session } = useSession();
   const user = session?.user;
@@ -109,7 +109,7 @@ export default function Navbar() {
                         className={styles.dropdownMenu}
                         style={{ right: 0, left: 'auto' }} // Align to the right side
                       >
-                        <Link href="/profile" className={styles.dropdownItem}>My Profile</Link>
+                        <Link href="/order" className={styles.dropdownItem}>Order History</Link>
                         <button 
                           onClick={() => signOut()} 
                           className={styles.dropdownItem}
@@ -218,7 +218,7 @@ export default function Navbar() {
               <div className={styles.mobileAuthSection}>
                 {user ? (
                   <>
-                    <Link href="/profile" className={styles.mobileAuthBtn} onClick={() => setIsMobileMenuOpen(false)}>My Profile</Link>
+                    <Link href="/order" className={styles.mobileAuthBtn} onClick={() => setIsMobileMenuOpen(false)}>Order History</Link>
                   </>
                 ) : (
                   <>
