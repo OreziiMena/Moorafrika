@@ -70,7 +70,6 @@ export default function AdminOrderDetailsPage() {
       await fetchOrder(); 
     } catch (error: any) {
       console.error("Save Update Failed:", error.response?.data || error.message);
-      // FIXED: Passing the raw error object so it bypasses the "Unexpected Error" check
       handleClientError(error); 
     } finally {
       setIsSaving(false);
@@ -103,7 +102,6 @@ export default function AdminOrderDetailsPage() {
     return 'pending';
   };
 
-  // Helper to display the correct label
   const getStatusLabel = (statusValue: string) => {
     return STATUS_OPTIONS.find(opt => opt.value === statusValue)?.label || statusValue || "Select Status";
   };
@@ -129,168 +127,180 @@ export default function AdminOrderDetailsPage() {
           </button>
         </header>
 
-        {/* --- ADMIN CONTROLS CARD --- */}
-        <section className={`${styles.card} ${styles.adminCard}`}>
-          <h2 className={styles.cardTitle}><Edit size={20}/> Admin Controls</h2>
+        {/* TWO-COLUMN LAYOUT WRAPPER */}
+        <div className={styles.gridContainer}>
           
-          <div className={styles.adminGrid}>
-            <div className={styles.adminField}>
-              <label>Update Status</label>
-              
-              {/* Custom Dropdown Implementation */}
-              <div className={styles.editStatusWrapper} style={{ position: 'relative' }}>
-                <div 
-                  className={styles.customSelectTrigger}
-                  onClick={() => setIsStatusDropdownOpen(!isStatusDropdownOpen)}
-                >
-                  <span>{getStatusLabel(editStatus)}</span>
-                  <ChevronDown size={16} className={`${styles.selectIcon} ${isStatusDropdownOpen ? styles.iconOpen : ""}`} />
-                </div>
-
-                {isStatusDropdownOpen && (
-                  <div className={styles.customSelectMenu}>
-                    {STATUS_OPTIONS.map((option) => (
-                      <div 
-                        key={option.value}
-                        className={`${styles.customSelectOption} ${editStatus === option.value ? styles.optionActive : ""}`}
-                        onClick={() => {
-                          setEditStatus(option.value);
-                          setIsStatusDropdownOpen(false);
-                        }}
-                      >
-                        {option.label}
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-            </div>
-
-            <div className={styles.adminField}>
-              <label>Internal Admin Note</label>
-              <textarea 
-                className={styles.noteInput}
-                value={editNote}
-                onChange={(e) => setEditNote(e.target.value)}
-                placeholder="Add tracking numbers, delays, or internal memos here..."
-                rows={3}
-              />
-            </div>
-          </div>
-
-          <button 
-            className={styles.saveBtn} 
-            onClick={handleSaveUpdate}
-            disabled={isSaving || (editStatus === order.status && editNote === (order.admin_note || order.adminNote || ""))}
-          >
-            <Save size={18} /> {isSaving ? "Saving..." : "Save Changes"}
-          </button>
-        </section>
-
-        {/* Section 1: Order Status Timeline */}
-        <section className={styles.card}>
-          <h2 className={styles.cardTitle}>Customer Timeline</h2>
-          <div className={styles.timeline}>
+          {/* ================= LEFT COLUMN ================= */}
+          <div className={styles.leftColumn}>
             
-            <div className={styles.timelineItem}>
-              <div className={styles.timelineIconWrapper}>
-                {getStatusState('PENDING') === 'completed' ? <CheckCircle2 size={24} className={styles.iconCompleted} /> : <Clock size={24} className={styles.iconPending} />}
-              </div>
-              <div className={styles.timelineContent}>
-                <div className={styles.timelineHeader}>
-                  <h3>Order Pending</h3>
-                </div>
-              </div>
-            </div>
-
-            <div className={styles.timelineItem}>
-              <div className={styles.timelineIconWrapper}>
-                {getStatusState('PROCESSING') === 'completed' ? <CheckCircle2 size={24} className={styles.iconCompleted} /> : <Clock size={24} className={styles.iconPending} />}
-              </div>
-              <div className={styles.timelineContent}>
-                <div className={styles.timelineHeader}>
-                  <h3>Processing</h3>
-                </div>
-              </div>
-            </div>
-
-            <div className={styles.timelineItem}>
-              <div className={styles.timelineIconWrapper}>
-                {getStatusState('SHIPPED') === 'completed' ? <CheckCircle2 size={24} className={styles.iconCompleted} /> : <Clock size={24} className={styles.iconPending} />}
-              </div>
-              <div className={styles.timelineContent}>
-                <div className={styles.timelineHeader}>
-                  <h3>Shipped</h3>
-                </div>
-              </div>
-            </div>
-
-            <div className={styles.timelineItem}>
-              <div className={styles.timelineIconWrapper}>
-                {getStatusState('DELIVERED') === 'completed' ? <CheckCircle2 size={24} className={styles.iconCompleted} /> : <Clock size={24} className={styles.iconPending} />}
-              </div>
-              <div className={styles.timelineContent}>
-                <div className={styles.timelineHeader}>
-                  <h3>Delivered</h3>
-                </div>
-              </div>
-            </div>
-
-          </div>
-        </section>
-
-        {/* Section 2: Order Items */}
-        <section className={styles.card}>
-          <h2 className={styles.cardTitle}>Order Items ({order.orderItems?.length || 0})</h2>
-          <div className={styles.itemsList}>
-            {order.orderItems?.map((item: any) => {
-              const itemPrice = item.price_at_purchase || item.priceAtPurchase || item.price || item.product?.price || 0;
-              const itemImage = item.product?.imageUrl || item.product?.image || (item.product?.images && item.product.images[0]) || "/placeholder.png";
-
-              return (
-                <div key={item.id} className={styles.itemRow}>
-                  <div className={styles.itemImageContainer}>
-                    <Image src={itemImage} alt={item.product?.name || "Product"} fill unoptimized className={styles.itemImage} />
+            {/* Timeline */}
+            <section className={styles.card}>
+              <h2 className={styles.cardTitle}>Customer Timeline</h2>
+              <div className={styles.timeline}>
+                <div className={styles.timelineItem}>
+                  <div className={styles.timelineIconWrapper}>
+                    {getStatusState('PENDING') === 'completed' ? <CheckCircle2 size={24} className={styles.iconCompleted} /> : <Clock size={24} className={styles.iconPending} />}
                   </div>
-                  <div className={styles.itemDetails}>
-                    <h3 className={styles.itemName}>{item.product?.name}</h3>
-                    <div className={styles.itemMeta}>
-                      <span>Quantity: {item.quantity}</span>
-                      <span className={styles.itemPrice}>{formatNaira(itemPrice * item.quantity)}</span>
+                  <div className={styles.timelineContent}>
+                    <div className={styles.timelineHeader}>
+                      <h3>Order Pending</h3>
                     </div>
                   </div>
                 </div>
-              );
-            })}
-          </div>
-          
-          <div className={styles.summaryTotals}>
-            <div className={styles.totalRow}>
-              <span>Subtotal:</span>
-              <span>{formatNaira(order.totalAmount)}</span>
-            </div>
-            <div className={`${styles.totalRow} ${styles.grandTotal}`}>
-              <span>Total:</span>
-              <span>{formatNaira(order.totalAmount)}</span>
-            </div>
-          </div>
-        </section>
 
-        {/* Section 3: Shipping & Customer Details */}
-        <section className={styles.card}>
-          <h2 className={styles.cardTitle}>Customer & Shipping Info</h2>
-          <div className={styles.addressInfo}>
-            <p className={styles.contactName}>{order.contactName}</p>
-            <p>{order.contactEmail}</p>
-            <p>Phone: {order.contactPhone}</p>
-            <div className={styles.divider}></div>
-            <p>{order.streetAddress}</p>
-            <p>{order.city}, {order.state}</p>
-            <p>{order.country}</p>
-            {order.zip_code && <p>ZIP: {order.zip_code}</p>}
-          </div>
-        </section>
+                <div className={styles.timelineItem}>
+                  <div className={styles.timelineIconWrapper}>
+                    {getStatusState('PROCESSING') === 'completed' ? <CheckCircle2 size={24} className={styles.iconCompleted} /> : <Clock size={24} className={styles.iconPending} />}
+                  </div>
+                  <div className={styles.timelineContent}>
+                    <div className={styles.timelineHeader}>
+                      <h3>Processing</h3>
+                    </div>
+                  </div>
+                </div>
 
+                <div className={styles.timelineItem}>
+                  <div className={styles.timelineIconWrapper}>
+                    {getStatusState('SHIPPED') === 'completed' ? <CheckCircle2 size={24} className={styles.iconCompleted} /> : <Clock size={24} className={styles.iconPending} />}
+                  </div>
+                  <div className={styles.timelineContent}>
+                    <div className={styles.timelineHeader}>
+                      <h3>Shipped</h3>
+                    </div>
+                  </div>
+                </div>
+
+                <div className={styles.timelineItem}>
+                  <div className={styles.timelineIconWrapper}>
+                    {getStatusState('DELIVERED') === 'completed' ? <CheckCircle2 size={24} className={styles.iconCompleted} /> : <Clock size={24} className={styles.iconPending} />}
+                  </div>
+                  <div className={styles.timelineContent}>
+                    <div className={styles.timelineHeader}>
+                      <h3>Delivered</h3>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            {/* Order Items */}
+            <section className={styles.card}>
+              <h2 className={styles.cardTitle}>Order Items ({order.orderItems?.length || 0})</h2>
+              <div className={styles.itemsList}>
+                {order.orderItems?.map((item: any) => {
+                  const itemPrice = item.price_at_purchase || item.priceAtPurchase || item.price || item.product?.price || 0;
+                  const itemImage = item.product?.imageUrl || item.product?.image || (item.product?.images && item.product.images[0]) || "/placeholder.png";
+
+                  return (
+                    <div key={item.id} className={styles.itemRow}>
+                      <div className={styles.itemImageContainer}>
+                        <Image src={itemImage} alt={item.product?.name || "Product"} fill unoptimized className={styles.itemImage} />
+                      </div>
+                      <div className={styles.itemDetails}>
+                        <h3 className={styles.itemName}>{item.product?.name}</h3>
+                        <div className={styles.itemMeta}>
+                          <span>Quantity: {item.quantity}</span>
+                          <span className={styles.itemPrice}>{formatNaira(itemPrice * item.quantity)}</span>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+              
+              <div className={styles.summaryTotals}>
+                <div className={styles.totalRow}>
+                  <span>Subtotal:</span>
+                  <span>{formatNaira(order.totalAmount)}</span>
+                </div>
+                <div className={`${styles.totalRow} ${styles.grandTotal}`}>
+                  <span>Total:</span>
+                  <span>{formatNaira(order.totalAmount)}</span>
+                </div>
+              </div>
+            </section>
+
+          </div>
+
+
+          {/* ================= RIGHT COLUMN ================= */}
+          <div className={styles.rightColumn}>
+            
+            {/* Admin Controls */}
+            <section className={`${styles.card} ${styles.adminCard}`}>
+              <h2 className={styles.cardTitle}><Edit size={20}/> Admin Controls</h2>
+              
+              <div className={styles.adminGrid}>
+                <div className={styles.adminField}>
+                  <label>Update Status</label>
+                  
+                  <div className={styles.editStatusWrapper} style={{ position: 'relative' }}>
+                    <div 
+                      className={styles.customSelectTrigger}
+                      onClick={() => setIsStatusDropdownOpen(!isStatusDropdownOpen)}
+                    >
+                      <span>{getStatusLabel(editStatus)}</span>
+                      <ChevronDown size={16} className={`${styles.selectIcon} ${isStatusDropdownOpen ? styles.iconOpen : ""}`} />
+                    </div>
+
+                    {isStatusDropdownOpen && (
+                      <div className={styles.customSelectMenu}>
+                        {STATUS_OPTIONS.map((option) => (
+                          <div 
+                            key={option.value}
+                            className={`${styles.customSelectOption} ${editStatus === option.value ? styles.optionActive : ""}`}
+                            onClick={() => {
+                              setEditStatus(option.value);
+                              setIsStatusDropdownOpen(false);
+                            }}
+                          >
+                            {option.label}
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                <div className={styles.adminField}>
+                  <label>Internal Admin Note</label>
+                  <textarea 
+                    className={styles.noteInput}
+                    value={editNote}
+                    onChange={(e) => setEditNote(e.target.value)}
+                    placeholder="Add tracking numbers, delays, or internal memos here..."
+                    rows={3}
+                  />
+                </div>
+              </div>
+
+              <button 
+                className={styles.saveBtn} 
+                onClick={handleSaveUpdate}
+                disabled={isSaving || (editStatus === order.status && editNote === (order.admin_note || order.adminNote || ""))}
+              >
+                <Save size={18} /> {isSaving ? "Saving..." : "Save Changes"}
+              </button>
+            </section>
+
+            {/* Shipping & Customer Details */}
+            <section className={styles.card}>
+              <h2 className={styles.cardTitle}>Customer & Shipping Info</h2>
+              <div className={styles.addressInfo}>
+                <p className={styles.contactName}>{order.contactName}</p>
+                <p>{order.contactEmail}</p>
+                <p>Phone: {order.contactPhone}</p>
+                <div className={styles.divider}></div>
+                <p>{order.streetAddress}</p>
+                <p>{order.city}, {order.state}</p>
+                <p>{order.country}</p>
+                {order.zip_code && <p>ZIP: {order.zip_code}</p>}
+              </div>
+            </section>
+
+          </div>
+
+        </div>
       </div>
     </main>
   );

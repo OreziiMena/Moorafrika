@@ -45,8 +45,8 @@ export default function CheckoutPage() {
   });
 
   const [shippingMethod, setShippingMethod] = useState("standard");
-  const [shippingCost, setShippingCost] = useState(2500);
-  const [isCalculatingShipping, setIsCalculatingShipping] = useState(false);
+  // Hardcoded to 0 for now
+  const shippingCost = 0; 
   const [isProcessing, setIsProcessing] = useState(false);
 
   const subtotal = items.reduce((acc, item) => acc + (item.product.price * item.quantity), 0);
@@ -65,30 +65,6 @@ export default function CheckoutPage() {
       router.push("/collection");
     }
   }, [items, router]);
-
-  useEffect(() => {
-    const fetchShippingRate = async () => {
-      if (!formData.state || !formData.city || items.length === 0) return;
-
-      setIsCalculatingShipping(true);
-      try {
-        const response = await axios.post("/api/shipping-rates", {
-          country: formData.country,
-          state: formData.state,
-          city: formData.city,
-          method: shippingMethod,
-          cartItems: items
-        });
-        setShippingCost(response.data.price || (shippingMethod === "express" ? 5000 : 2500));
-      } catch (error) {
-        setShippingCost(shippingMethod === "express" ? 5000 : 2500);
-      } finally {
-        setIsCalculatingShipping(false);
-      }
-    };
-
-    fetchShippingRate();
-  }, [formData.country, formData.state, formData.city, shippingMethod, items]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { id, value } = e.target;
@@ -219,7 +195,7 @@ export default function CheckoutPage() {
                       />
                       <span>Standard (3-7 Days)</span>
                     </div>
-                    <span>{isCalculatingShipping ? "..." : formatNaira(shippingMethod === "standard" ? shippingCost : shippingCost - 2500)}</span>
+                    <span>{formatNaira(0)}</span>
                   </label>
                   <label className={`${styles.radioLabel} ${shippingMethod === "express" ? styles.activeRadio : ""}`}>
                     <div className={styles.radioInfo}>
@@ -232,12 +208,12 @@ export default function CheckoutPage() {
                       />
                       <span>Express (1-2 Days)</span>
                     </div>
-                    <span>{isCalculatingShipping ? "..." : formatNaira(shippingMethod === "express" ? shippingCost : shippingCost + 2500)}</span>
+                    <span>{formatNaira(0)}</span>
                   </label>
                 </div>
               </section>
 
-              <button type="submit" className={styles.submitBtn} disabled={isProcessing || isCalculatingShipping}>
+              <button type="submit" className={styles.submitBtn} disabled={isProcessing}>
                 {isProcessing ? "PROCESSING..." : "CONTINUE TO PAYMENT"}
               </button>
             </form>
@@ -252,7 +228,7 @@ export default function CheckoutPage() {
                   <p style={{ color: '#a1a1aa' }}>Your cart is empty.</p>
                 ) : (
                   items.map((item) => (
-                    <div key={item.product.id} className={styles.cartItem}>
+                    <div key={`${item.product.id}-${item.size || 'default'}`} className={styles.cartItem}>
                       <div className={styles.itemImage}>
                         <Image 
                           src={item.product.imageUrl} 
@@ -264,7 +240,7 @@ export default function CheckoutPage() {
                       </div>
                       <div className={styles.itemDetails}>
                         <h3>{item.product.name}</h3>
-                        <p>Qty: {item.quantity}</p>
+                        <p>Size: {item.size || "Standard"} | Qty: {item.quantity}</p>
                         <p className={styles.itemPrice}>{formatNaira(item.product.price)}</p>
                       </div>
                     </div>
@@ -279,7 +255,7 @@ export default function CheckoutPage() {
                 </div>
                 <div className={styles.calcRow}>
                   <span>Shipping</span>
-                  <span>{isCalculatingShipping ? "Calculating..." : formatNaira(shippingCost)}</span>
+                  <span>{formatNaira(shippingCost)}</span>
                 </div>
                 <div className={styles.calcRow}>
                   <span>Estimated Tax</span>

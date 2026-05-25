@@ -8,6 +8,8 @@ import Link from "next/link";
 import { handleClientError } from "@/lib/clientErrorHandler";
 import styles from "./adminOrders.module.css";
 
+type PageItem = number | "...";
+
 const STATUS_OPTIONS = [
   { value: "ALL", label: "All Orders" },
   { value: "PENDING", label: "Pending" },
@@ -33,11 +35,19 @@ export default function AdminOrdersPage() {
   const [isSaving, setIsSaving] = useState(false);
   const [openStatusEditDropdownId, setOpenStatusEditDropdownId] = useState<string | null>(null);
 
-  const fetchOrders = async () => {
+  // Pagination States
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const limit = 5;
+
+  const fetchOrders = async (page = 1) => {
     try {
       setIsLoading(true);
-      const response = await axios.get("/api/orders/admin?limit=50"); 
-      setOrders(response.data?.data || response.data);
+      const response = await axios.get(`/api/orders/admin?limit=${limit}&page=${page}`); 
+      
+      // Update data and pagination metadata
+      setOrders(response.data?.data || response.data || []);
+      setTotalPages(response.data?.pagination?.totalPages || 1);
     } catch (error) {
       handleClientError(error);
     } finally {
@@ -46,8 +56,8 @@ export default function AdminOrdersPage() {
   };
 
   useEffect(() => {
-    fetchOrders();
-  }, []);
+    fetchOrders(currentPage);
+  }, [currentPage]);
 
   const handleSaveUpdate = async (orderId: string) => {
     try {
@@ -59,7 +69,7 @@ export default function AdminOrdersPage() {
       
       setEditingOrderId(null);
       setOpenStatusEditDropdownId(null);
-      await fetchOrders();
+      await fetchOrders(currentPage); // Refresh current page
       } catch (error: any) {
       console.error("Save Update Failed:", error.response?.data || error.message);
       handleClientError(error); 
@@ -73,6 +83,18 @@ export default function AdminOrdersPage() {
     setEditStatus(order.status);
     setEditNote(order.admin_note || order.adminNote || "");
     setOpenStatusEditDropdownId(null);
+  };
+
+  const visiblePages = (): PageItem[] => {
+    if (totalPages <= 7) return Array.from({ length: totalPages }, (_, index) => index + 1);
+    const pages: PageItem[] = [1];
+    const startPage = Math.max(2, currentPage - 1);
+    const endPage = Math.min(totalPages - 1, currentPage + 1);
+    if (startPage > 2) pages.push("...");
+    for (let page = startPage; page <= endPage; page += 1) pages.push(page);
+    if (endPage < totalPages - 1) pages.push("...");
+    pages.push(totalPages);
+    return pages;
   };
 
   const filteredOrders = orders.filter((order) => {
@@ -114,7 +136,7 @@ export default function AdminOrdersPage() {
           <div className={styles.orderCount}>
             <Package size={20} />
             <span className={styles.countNumber}>{orders.length}</span>
-            <span className={styles.countText}>total<br />orders</span>
+            <span className={styles.countText}>orders on<br />this page</span>
           </div>
         </header>
 
@@ -330,6 +352,56 @@ export default function AdminOrdersPage() {
             })}
           </div>
         )}
+
+        {/* --- ADDED: NUMBERED PAGINATION --- */}
+        {totalPages > 1 && !isLoading && (
+          <nav className={styles.pagination} aria-label="Orders pages">
+            <button
+              type="button"
+              className={styles.paginationButton}
+              onClick={() => setCurrentPage((page) => Math.max(1, page - 1))}
+              disabled={currentPage === 1}
+            >
+              Previous
+            </button>
+
+            <div className={styles.paginationNumbers}>
+              {visiblePages().map((page, index) => {
+                if (page === "...") {
+                  return (
+                    <span key={`ellipsis-${index}`} className={styles.paginationEllipsis}>
+                      ...
+                    </span>
+                  );
+                }
+
+                const pageNumber = page;
+
+                return (
+                  <button
+                    key={pageNumber}
+                    type="button"
+                    className={pageNumber === currentPage ? styles.paginationButtonActive : styles.paginationButton}
+                    onClick={() => setCurrentPage(pageNumber)}
+                    aria-current={pageNumber === currentPage ? "page" : undefined}
+                  >
+                    {pageNumber}
+                  </button>
+                );
+              })}
+            </div>
+
+            <button
+              type="button"
+              className={styles.paginationButton}
+              onClick={() => setCurrentPage((page) => Math.min(totalPages, page + 1))}
+              disabled={currentPage === totalPages}
+            >
+              Next
+            </button>
+          </nav>
+        )}
+        
       </div>
     </main>
   );

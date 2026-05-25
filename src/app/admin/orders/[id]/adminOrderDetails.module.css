@@ -14,6 +14,7 @@
   width: 100%;
   padding: 2rem;
   margin-top: 2%;
+  max-width: 1200px; /* Increased from 800px to allow dual columns */
   margin: 0 auto;
   box-sizing: border-box;
   overflow-x: hidden;
@@ -22,7 +23,7 @@
 /* Navigation */
 .nav {
   padding: 2rem 2rem 0;
-  max-width: 800px;
+  max-width: 1200px; /* Increased from 800px */
   margin: 0 auto;
 }
 
@@ -72,8 +73,8 @@
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  width: 100%;
-  padding: 0.875rem;
+  width: max-content; /* Stops the button from spanning the whole width now that the container is 1200px */
+  padding: 0.875rem 2rem;
   background: rgba(245, 245, 220, 0.05);
   border: 1px solid rgba(245, 245, 220, 0.2);
   color: var(--ivory, #FDFBF7);
@@ -87,13 +88,33 @@
   background: rgba(245, 245, 220, 0.1);
 }
 
+/* ================= NEW GRID LAYOUT ================= */
+.gridContainer {
+  display: grid;
+  grid-template-columns: 1.6fr 1fr; /* Left side gets 60% of the space, right gets 40% */
+  gap: 2rem;
+  align-items: start; /* Prevents columns from stretching to match each other's height */
+}
+
+.leftColumn {
+  display: flex;
+  flex-direction: column;
+}
+
+.rightColumn {
+  display: flex;
+  flex-direction: column;
+  position: sticky;
+  top: 2rem; /* Keeps the admin controls visible while scrolling down a long list of items */
+}
+
 /* Card Styling */
 .card {
   background: rgba(255, 255, 255, 0.03);
   border: 1px solid rgba(245, 245, 220, 0.1);
   border-radius: 12px;
   padding: 1.5rem;
-  margin-bottom: 1.5rem;
+  margin-bottom: 1.5rem; /* Space between stacked cards */
 }
 
 .cardTitle {
@@ -324,6 +345,7 @@
   color: #a0a0a0;
   font-weight: 500;
 }
+
 /* Custom Dropdown Styling for Admin Details */
 .customSelectTrigger {
   display: flex;
@@ -389,6 +411,18 @@
   from { opacity: 0; transform: translateY(-5px); }
   to { opacity: 1; transform: translateY(0); }
 }
+
+/* Responsive Layout */
+@media (max-width: 968px) {
+  .gridContainer {
+    grid-template-columns: 1fr; 
+  }
+  
+  .rightColumn {
+    position: static;
+  }
+}
+
 @media (max-width: 768px) {
   .container {
     padding: 1rem;
@@ -397,5 +431,9 @@
   
   .nav {
     padding: 1.5rem 1rem 0;
+  }
+
+  .copyBtn {
+    width: 100%; 
   }
 }

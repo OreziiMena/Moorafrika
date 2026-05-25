@@ -61,83 +61,81 @@ export default function CartPage() {
         <th>REMOVE</th>
         </tr>
     </thead>
-    <tbody>
-        {items.map((item) => {
-        // Calculate the total for this row (price * quantity)
-        const rowTotal = item.product.price * item.quantity;
+<tbody>
+  {items.map((item) => {
+    const rowTotal = item.product.price * item.quantity;
 
-        return (
-            <tr key={item.id}>
-            <td className={styles.thumbnailCell}>
-                <div className={styles.imageWrapper}>
-                <Image 
-                    src={item.product.imageUrl} 
-                    alt={item.product.name} 
-                    fill 
-                    className={styles.image} 
-                />
-                </div>
-            </td>
-            <td className={styles.titleCell}>
-                <h2>{item.product.name}</h2>
-                {item.size && <p>{item.size}</p>}
-            </td>
+    return (
+      <tr key={item.id}>
+        <td className={styles.thumbnailCell}>
+          {/* --- WRAPPER ADDED HERE --- */}
+          <Link href={`/product/${item.product.slug}`} className={styles.imageLink}>
+            <div className={styles.imageWrapper}>
+              <Image 
+                src={item.product.imageUrl} 
+                alt={item.product.name} 
+                fill 
+                className={styles.image} 
+              />
+            </div>
+          </Link>
+        </td>
+        
+        <td className={styles.titleCell}>
+          <h2>{item.product.name}</h2>
+          {item.size && <p>{item.size}</p>}
+        </td>
+        
+        <td>₦{item.product.price.toLocaleString()}</td>
+        
+        <td>
+            <div className={styles.qtySelector}>
+            <button 
+                type="button"
+                className={styles.qtyBtn}
+                onClick={() => handleUpdateQuantity({...item, quantity: item.quantity - 1})}
+                disabled={loadingItemId === item.product.id || item.quantity <= 1}
+            >
+                −
+            </button>
             
-            {/* Add the Naira symbol and commas back for the display */}
-            <td>₦{item.product.price.toLocaleString()}</td>
-            
-            <td>
-                <div className={styles.qtySelector}>
-                {/* Minus Button */}
-                <button 
-                    type="button"
-                    className={styles.qtyBtn}
-                    onClick={() => handleUpdateQuantity({...item, quantity: item.quantity - 1})}
-                    disabled={loadingItemId === item.product.id || item.quantity <= 1}
-                >
-                    −
-                </button>
-                
-                {/* The Number Input */}
-                <input 
-                    type="number" 
-                    min="1" 
-                    value={item.quantity} 
-                    onChange={(e) => handleUpdateQuantity({...item, quantity: parseInt(e.target.value) || 1})}
-                    className={styles.qtyInput}
-                />
+            <input 
+                type="number" 
+                min="1" 
+                value={item.quantity} 
+                onChange={(e) => handleUpdateQuantity({...item, quantity: parseInt(e.target.value) || 1})}
+                className={styles.qtyInput}
+            />
 
-                {/* Plus Button */}
-                <button 
-                    type="button"
-                    className={styles.qtyBtn}
-                    onClick={() => handleUpdateQuantity({...item, quantity: item.quantity + 1})}
-                    disabled={loadingItemId === item.product.id || item.quantity >= item.product.stock_count}
-                >
-                    +
-                </button>
-                </div>
-            </td>
-            <td className={styles.totalCell}>
-                {/* Format the calculated row total */}
-                ₦{rowTotal.toLocaleString()}
-            </td>
-            <td className={styles.removeCell}>
-                <button 
-                    onClick={() => {
-                        setLoadingItemId(item.product.id);
-                        removeItem(item.product.id, item.size).then(() => setLoadingItemId(null));
-                    }} 
-                    className={styles.removeBtn}
-                    disabled={loadingItemId === item.product.id}
-                >
-                    <Trash2 size={18} strokeWidth={1.5} />
-                </button>
-            </td>
-            </tr>
-        );
-        })}
-    </tbody>
+            <button 
+                type="button"
+                className={styles.qtyBtn}
+                onClick={() => handleUpdateQuantity({...item, quantity: item.quantity + 1})}
+                disabled={loadingItemId === item.product.id || item.quantity >= item.product.stock_count}
+            >
+                +
+            </button>
+            </div>
+        </td>
+        <td className={styles.totalCell}>
+            ₦{rowTotal.toLocaleString()}
+        </td>
+        <td className={styles.removeCell}>
+            <button 
+                onClick={() => {
+                    setLoadingItemId(item.product.id);
+                    removeItem(item.product.id, item.size).then(() => setLoadingItemId(null));
+                }} 
+                className={styles.removeBtn}
+                disabled={loadingItemId === item.product.id}
+            >
+                <Trash2 size={18} strokeWidth={1.5} />
+            </button>
+        </td>
+      </tr>
+    );
+  })}
+</tbody>
     </table>
 
     <Link href="/collection" className={styles.checkoutBtn}>
