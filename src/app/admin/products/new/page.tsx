@@ -6,7 +6,6 @@ import axios from "axios";
 import { Upload, X , CheckCircle2, AlertCircle} from "lucide-react";
 import { handleClientError } from "@/lib/clientErrorHandler";
 import Image from "next/image";
-import Navbar from "@/components/Navbar";
 import styles from "./addProduct.module.css"; 
 import { toast } from "sonner";
 import CloudflareR2StorageClient from "@/lib/storage";
@@ -120,8 +119,6 @@ export default function AddNewProductPage() {
   };
 
   return (
-    <main className={styles.pageWrapper}>
-      <Navbar />
       <div className={styles.container}>
         <h1 className={styles.title}>Add New Product</h1>
 
@@ -196,6 +193,5 @@ export default function AddNewProductPage() {
           </button>
         </form>
       </div>
-    </main>
   );
 }
