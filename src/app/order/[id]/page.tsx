@@ -7,6 +7,7 @@ import axios from "axios";
 import { ArrowLeft, Copy, CheckCircle2, Clock } from "lucide-react";
 import { handleClientError } from "@/lib/clientErrorHandler";
 import styles from "./id.module.css";
+import { UserOrderContract } from "@/contracts/order";
 
 // Assuming you have an Order contract. Adjust fields as necessary.
 export default function OrderDetailsPage() {
@@ -14,7 +15,7 @@ export default function OrderDetailsPage() {
   const router = useRouter();
   const orderId = params.id as string;
 
-  const [order, setOrder] = useState<any>(null);
+  const [order, setOrder] = useState<UserOrderContract | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isActionLoading, setIsActionLoading] = useState(false);
   const [copied, setCopied] = useState(false);
@@ -24,9 +25,10 @@ export default function OrderDetailsPage() {
   const fetchOrder = async () => {
     try {
       setIsLoading(true);
-      const response = await axios.get(`/api/orders/${orderId}`);
+      const response = await axios.get<UserOrderContract>(`/api/orders/${orderId}`);
       // Safely extract data depending on how the backend wraps it
-      setOrder(response.data?.data || response.data);
+      setOrder(response.data);
+      console.log(typeof response.data.createdAt)
     } catch (error) {
       handleClientError(error);
     } finally {
@@ -121,7 +123,7 @@ export default function OrderDetailsPage() {
         {/* Header Information */}
         <header className={styles.header}>
           <h1 className={styles.orderIdTitle}>Order #{order.id?.split('-')[0].toUpperCase()}</h1>
-          <p className={styles.dateText}>Placed on {formatDate(order.createdAt || order.created_at)}</p>
+          <p className={styles.dateText}>Placed on {formatDate(order.createdAt.toString())}</p>
           
           <div className={styles.statusBadgeWrapper}>
             <span className={`${styles.statusBadge} ${styles[order.status?.toLowerCase() || 'pending']}`}>
@@ -146,7 +148,7 @@ export default function OrderDetailsPage() {
               <div className={styles.timelineContent}>
                 <div className={styles.timelineHeader}>
                   <h3>Order Pending</h3>
-                  <span>{formatDate(order.createdAt || order.created_at)}</span>
+                  <span>{formatDate(order.createdAt.toString())}</span>
                 </div>
                 <p>Your order is awaiting payment for processing</p>
               </div>
@@ -159,7 +161,7 @@ export default function OrderDetailsPage() {
               <div className={styles.timelineContent}>
                 <div className={styles.timelineHeader}>
                   <h3>Processing</h3>
-                  {getStatusState('PROCESSING') === 'completed' && <span>{formatDate(order.updatedAt || order.updated_at)}</span>}
+                  {getStatusState('PROCESSING') === 'completed' && <span>{formatDate(order.updatedAt.toString())}</span>}
                 </div>
                 <p>Your order is being prepared</p>
               </div>
@@ -196,11 +198,11 @@ export default function OrderDetailsPage() {
         <section className={styles.card}>
           <h2 className={styles.cardTitle}>Order Items ({order.orderItems?.length || 0})</h2>
           <div className={styles.itemsList}>
-            {order.orderItems?.map((item: any) => {
+            {order.orderItems?.map((item) => {
               // Extract the correct price value safely
-              const itemPrice = item.price_at_purchase || item.priceAtPurchase || item.price || item.product?.price || 0;
+              const itemPrice = item.priceAtPurchase;
               // Extract image URL safely
-              const itemImage = item.product?.imageUrl || item.product?.image || (item.product?.images && item.product.images[0]) || "/placeholder.png";
+              const itemImage = item.product.imageUrl;
 
               return (
                 <div key={item.id} className={styles.itemRow}>

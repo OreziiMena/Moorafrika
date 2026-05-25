@@ -5,10 +5,10 @@ import axios from "axios";
 import { Package, Search, ChevronDown, Eye, AlertCircle } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link"
-import Navbar from "@/components/Navbar";
 import { handleClientError } from "@/lib/clientErrorHandler";
 import { UserOrderContract } from "@/contracts/order"; 
 import styles from "./orders.module.css";
+import { PagedResponse } from "@/contracts/response";
 
 export default function MyOrdersPage() {
   const [orders, setOrders] = useState<UserOrderContract[]>([]);
@@ -22,11 +22,9 @@ export default function MyOrdersPage() {
       try {
         setIsLoading(true);
     
-        const response = await axios.get("/api/orders");
+        const response = await axios.get<PagedResponse<UserOrderContract>>("/api/orders");
         
-        const fetchedOrders = Array.isArray(response.data) 
-          ? response.data 
-          : response.data?.data || [];
+        const fetchedOrders = response.data.data;
           
         setOrders(fetchedOrders);
         
