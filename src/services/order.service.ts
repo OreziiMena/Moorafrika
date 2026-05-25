@@ -122,6 +122,14 @@ class OrderService {
     if (cart.items.length === 0) {
       throw new Error('Cart is empty');
     }
+
+    // Check cart item quantity and available stocks_count before creating order
+    for (const item of cart.items) {
+      if (item.quantity > item.product.stock_count) {
+        throw new BadRequestError('One or more items in your cart exceed available stock');
+      }
+    }
+
     const totalAmount = cart.items.reduce(
       (sum, item) => sum + item.quantity * item.product.price,
       0,
@@ -179,9 +187,10 @@ class OrderService {
 
     await updateOrderStatus(order.id, { status: 'PROCESSING' });
     for (const item of order.orderItems) {
+      const quantityToRemove = Math.min(item.quantity, item.product.stock_count);
       await ProductService.updateSoldProduct(
         item.product.slug,
-        -item.quantity,
+        -quantityToRemove,
       );
     }
   }
@@ -201,6 +210,13 @@ class OrderService {
 
     if (order.status !== 'PENDING') {
       throw new Error('Payment can only be initialized for pending orders');
+    }
+
+    // Check order item quantity and available stocks_count before initializing payment
+    for (const item of order.orderItems) {
+      if (item.quantity > item.product.stock_count) {
+        throw new BadRequestError('Cannot process payment at this time. One or more items in your order exceed available stock.');
+      }
     }
 
     const totalAmount = order.orderItems.reduce(
