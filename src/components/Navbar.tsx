@@ -218,7 +218,7 @@ export default function Navbar() {
               <div className={styles.mobileAuthSection}>
                 {user ? (
                   <>
-                    <Link href="/order" className={styles.mobileAuthBtn} onClick={() => setIsMobileMenuOpen(false)}>MyOrder History</Link>
+                    <Link href="/order" className={styles.mobileAuthBtn} onClick={() => setIsMobileMenuOpen(false)}>My Order History</Link>
                   </>
                 ) : (
                   <>
