@@ -90,10 +90,10 @@ class OrderService {
   }
 
   static async getOrderById(orderId: string): Promise<AdminOrderContract> {
-    const user = await AuthService.authorizeUser();
+    await AuthService.authorizeUser(['ADMIN']);
     const order = await findOrders(
       true,
-      { id: orderId, userId: user.id },
+      { id: orderId },
       0,
       1,
     );
