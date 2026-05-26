@@ -91,12 +91,7 @@ class OrderService {
 
   static async getOrderById(orderId: string): Promise<AdminOrderContract> {
     await AuthService.authorizeUser(['ADMIN']);
-    const order = await findOrders(
-      true,
-      { id: orderId },
-      0,
-      1,
-    );
+    const order = await findOrders(true, { id: orderId }, 0, 1);
 
     if (order.length < 1) {
       throw new NotFoundError('Order not found');
@@ -126,7 +121,9 @@ class OrderService {
     // Check cart item quantity and available stocks_count before creating order
     for (const item of cart.items) {
       if (item.quantity > item.product.stock_count) {
-        throw new BadRequestError('One or more items in your cart exceed available stock');
+        throw new BadRequestError(
+          'One or more items in your cart exceed available stock',
+        );
       }
     }
 
@@ -163,13 +160,20 @@ class OrderService {
         }) as Prisma.OrderItemCreateManyInput,
     );
 
-    await createOrderItems(orderItems);
-    const url = await paystackCheckout({
-      orderId: order.id,
-      email: contactEmail,
-      totalAmount,
-    });
-    if (!url) {
+    let url: string | undefined;
+    try {
+      url = await paystackCheckout({
+        orderId: order.id,
+        email: contactEmail,
+        totalAmount,
+      });
+      if (!url) {
+        await deleteOrder(order.id);
+        throw new Error('Failed to initialize payment');
+      }
+      await createOrderItems(orderItems);
+    } catch (e) {
+      console.log(e);
       await deleteOrder(order.id);
       throw new Error('Failed to initialize payment');
     }
@@ -187,7 +191,10 @@ class OrderService {
 
     await updateOrderStatus(order.id, { status: 'PROCESSING' });
     for (const item of order.orderItems) {
-      const quantityToRemove = Math.min(item.quantity, item.product.stock_count);
+      const quantityToRemove = Math.min(
+        item.quantity,
+        item.product.stock_count,
+      );
       await ProductService.updateSoldProduct(
         item.product.slug,
         -quantityToRemove,
@@ -215,7 +222,9 @@ class OrderService {
     // Check order item quantity and available stocks_count before initializing payment
     for (const item of order.orderItems) {
       if (item.quantity > item.product.stock_count) {
-        throw new BadRequestError('Cannot process payment at this time. One or more items in your order exceed available stock.');
+        throw new BadRequestError(
+          'Cannot process payment at this time. One or more items in your order exceed available stock.',
+        );
       }
     }
 
