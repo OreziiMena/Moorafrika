@@ -167,7 +167,7 @@ export default function MyOrdersPage() {
                     </div>
                   )}
 
-                  <Link href={`/order/${order.id}`} className={styles.viewDetailsBtn}>
+                  <Link href={`/orders/${order.id}`} className={styles.viewDetailsBtn}>
                     <Eye size={16} /> View Details
                   </Link>
 
