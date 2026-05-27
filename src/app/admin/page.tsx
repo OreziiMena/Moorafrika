@@ -7,7 +7,7 @@ import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { 
   ShoppingCart, Package, Users, TrendingUp, 
-  Plus, BarChart2, Settings, FileText, Eye, Tag,
+  Plus, BarChart2, Settings, Eye, Tag,
   DollarSign
 } from "lucide-react";
 import styles from "./admin.module.css";
@@ -25,45 +25,31 @@ const formatNaira = (amount: number) => {
 };
 
 export default function AdminDashboard() {
-  const { data: session, status } = useSession();
+  const { data: session, status: authStatus } = useSession();
   const router = useRouter();
 
-  const [activeTab, setActiveTab] = useState("overview");
-  
-  // Real Backend States
   const [orders, setOrders] = useState<AdminOrderContract[]>([]);
   const [stats, setStats] = useState<DashboardStatsContract | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Security Check
   useEffect(() => {
-    if (status === "unauthenticated") {
+    if (authStatus === "unauthenticated") {
       router.push("/login");
     }
-    // When you adds roles, uncomment this:
-    // else if (session?.user?.role !== "ADMIN" && status === "authenticated") { 
-    //   router.push("/"); 
-    // }
-  }, [status, router, session]);
+  }, [authStatus, router]);
 
-  //Fetch Real Data from Backend
   useEffect(() => {
-    // Only fetch if authenticated
-    if (status !== "authenticated") return;
+    if (authStatus !== "authenticated") return;
 
     const fetchAdminData = async () => {
       try {
-        // Fetch KPI Stats
-        const statsRes = await axios.get<DashboardStatsContract>("/api/stats");
+        const [statsRes, ordersRes] = await Promise.all([
+          axios.get<DashboardStatsContract>("/api/stats"),
+          axios.get<PagedResponse<AdminOrderContract>>("/api/orders/admin?limit=5")
+        ]);
         setStats(statsRes.data);
-
-        // Fetch Recent Orders
-        const ordersRes = await axios.get<PagedResponse<AdminOrderContract>>("/api/orders/admin?limit=5");
-        const fetchedOrders = ordersRes.data;
-        setOrders(fetchedOrders.data)
-
+        setOrders(ordersRes.data.data);
       } catch (error) {
-        console.error("Failed to fetch admin dashboard data:", error);
         handleClientError(error);
       } finally {
         setIsLoading(false);
@@ -71,9 +57,9 @@ export default function AdminDashboard() {
     };
 
     fetchAdminData();
-  }, [status]);
+  }, [authStatus]);
 
-  if (status === "loading" || isLoading) {
+  if (authStatus === "loading" || isLoading) {
     return (
       <div className={styles.container} style={{ textAlign: 'center', paddingTop: '10rem' }}>
         <p style={{ color: '#a1a1aa' }}>Loading Admin Dashboard...</p>
@@ -89,7 +75,6 @@ export default function AdminDashboard() {
           </div>
         </header>
 
-        {/*KPI GRID */}
         <div className={styles.kpiGrid}>
           <div className={styles.kpiCard}>
             <div className={styles.kpiHeader}>
@@ -140,7 +125,6 @@ export default function AdminDashboard() {
           </div>
         </div>
 
-      {/* QUICK ACTIONS */}
         <section className={styles.section}>
           <h3 className={styles.sectionTitle}>Quick Actions</h3>
           <div className={styles.quickActionsGrid}>
@@ -156,10 +140,7 @@ export default function AdminDashboard() {
           </div>
         </section>
 
-        {/* MAIN SPLIT CONTENT */}
         <div className={styles.mainSplit}>
-          
-          {/* Left: Recent Orders (Dynamic) */}
           <section className={styles.section}>
             <Link className={styles.sectionHeader} href="/admin/orders">
               <h3 className={styles.sectionTitle}>Recent Orders</h3>
@@ -180,8 +161,8 @@ export default function AdminDashboard() {
                     </div>
                     
                     <div className={styles.orderMeta}>
-                      <span className={`${styles.statusBadge} ${styles[order.status] || styles.pending}`}>
-                        {order.status || "pending"}
+                      <span className={`${styles.statusBadge} ${styles[order.status.toLowerCase()]}`}>
+                        {order.status}
                       </span>
                       <p className={styles.orderTotal}>{formatNaira(order.totalAmount)}</p>
                     </div>
@@ -191,7 +172,6 @@ export default function AdminDashboard() {
             </div>
           </section>
 
-          {/* Right: Admin Tools */}
           <section className={styles.section}>
             <h3 className={styles.sectionTitle}>Admin Tools</h3>
             <div className={styles.toolsGrid}>
@@ -221,7 +201,6 @@ export default function AdminDashboard() {
               </Link>
             </div>
           </section>
-
         </div>
       </div>
   );

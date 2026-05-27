@@ -24,13 +24,9 @@ export default function AdminOrderDetailsPage() {
   const [order, setOrder] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [copied, setCopied] = useState(false);
-  
-  // Admin Edit States
   const [editStatus, setEditStatus] = useState("");
   const [editNote, setEditNote] = useState("");
   const [isSaving, setIsSaving] = useState(false);
-  
-  // Custom Dropdown State
   const [isStatusDropdownOpen, setIsStatusDropdownOpen] = useState(false);
 
   const fetchOrder = async () => {
@@ -42,8 +38,7 @@ export default function AdminOrderDetailsPage() {
       setOrder(fetchedOrder);
       setEditStatus(fetchedOrder.status);
       setEditNote(fetchedOrder.admin_note || fetchedOrder.adminNote || "");
-    } catch (error: any) {
-      console.error("ADMIN FETCH FAILED:", error.response?.data || error.message);
+    } catch (error) {
       handleClientError(error);
     } finally {
       setIsLoading(false);
@@ -69,7 +64,6 @@ export default function AdminOrderDetailsPage() {
       });
       await fetchOrder(); 
     } catch (error: any) {
-      console.error("Save Update Failed:", error.response?.data || error.message);
       handleClientError(error); 
     } finally {
       setIsSaving(false);
@@ -127,13 +121,8 @@ export default function AdminOrderDetailsPage() {
           </button>
         </header>
 
-        {/* TWO-COLUMN LAYOUT WRAPPER */}
         <div className={styles.gridContainer}>
-          
-          {/* ================= LEFT COLUMN ================= */}
           <div className={styles.leftColumn}>
-            
-            {/* Timeline */}
             <section className={styles.card}>
               <h2 className={styles.cardTitle}>Customer Timeline</h2>
               <div className={styles.timeline}>
@@ -142,9 +131,7 @@ export default function AdminOrderDetailsPage() {
                     {getStatusState('PENDING') === 'completed' ? <CheckCircle2 size={24} className={styles.iconCompleted} /> : <Clock size={24} className={styles.iconPending} />}
                   </div>
                   <div className={styles.timelineContent}>
-                    <div className={styles.timelineHeader}>
-                      <h3>Order Pending</h3>
-                    </div>
+                    <div className={styles.timelineHeader}><h3>Order Pending</h3></div>
                   </div>
                 </div>
 
@@ -153,9 +140,7 @@ export default function AdminOrderDetailsPage() {
                     {getStatusState('PROCESSING') === 'completed' ? <CheckCircle2 size={24} className={styles.iconCompleted} /> : <Clock size={24} className={styles.iconPending} />}
                   </div>
                   <div className={styles.timelineContent}>
-                    <div className={styles.timelineHeader}>
-                      <h3>Processing</h3>
-                    </div>
+                    <div className={styles.timelineHeader}><h3>Processing</h3></div>
                   </div>
                 </div>
 
@@ -164,9 +149,7 @@ export default function AdminOrderDetailsPage() {
                     {getStatusState('SHIPPED') === 'completed' ? <CheckCircle2 size={24} className={styles.iconCompleted} /> : <Clock size={24} className={styles.iconPending} />}
                   </div>
                   <div className={styles.timelineContent}>
-                    <div className={styles.timelineHeader}>
-                      <h3>Shipped</h3>
-                    </div>
+                    <div className={styles.timelineHeader}><h3>Shipped</h3></div>
                   </div>
                 </div>
 
@@ -175,15 +158,12 @@ export default function AdminOrderDetailsPage() {
                     {getStatusState('DELIVERED') === 'completed' ? <CheckCircle2 size={24} className={styles.iconCompleted} /> : <Clock size={24} className={styles.iconPending} />}
                   </div>
                   <div className={styles.timelineContent}>
-                    <div className={styles.timelineHeader}>
-                      <h3>Delivered</h3>
-                    </div>
+                    <div className={styles.timelineHeader}><h3>Delivered</h3></div>
                   </div>
                 </div>
               </div>
             </section>
 
-            {/* Order Items */}
             <section className={styles.card}>
               <h2 className={styles.cardTitle}>Order Items ({order.orderItems?.length || 0})</h2>
               <div className={styles.itemsList}>
@@ -200,6 +180,7 @@ export default function AdminOrderDetailsPage() {
                         <h3 className={styles.itemName}>{item.product?.name}</h3>
                         <div className={styles.itemMeta}>
                           <span>Quantity: {item.quantity}</span>
+                          {item.size && <span className={styles.itemSize}>Size: {item.size}</span>}
                           <span className={styles.itemPrice}>{formatNaira(itemPrice * item.quantity)}</span>
                         </div>
                       </div>
@@ -219,21 +200,15 @@ export default function AdminOrderDetailsPage() {
                 </div>
               </div>
             </section>
-
           </div>
 
-
-          {/* ================= RIGHT COLUMN ================= */}
           <div className={styles.rightColumn}>
-            
-            {/* Admin Controls */}
             <section className={`${styles.card} ${styles.adminCard}`}>
               <h2 className={styles.cardTitle}><Edit size={20}/> Admin Controls</h2>
               
               <div className={styles.adminGrid}>
                 <div className={styles.adminField}>
                   <label>Update Status</label>
-                  
                   <div className={styles.editStatusWrapper} style={{ position: 'relative' }}>
                     <div 
                       className={styles.customSelectTrigger}
@@ -283,7 +258,6 @@ export default function AdminOrderDetailsPage() {
               </button>
             </section>
 
-            {/* Shipping & Customer Details */}
             <section className={styles.card}>
               <h2 className={styles.cardTitle}>Customer & Shipping Info</h2>
               <div className={styles.addressInfo}>
@@ -297,9 +271,7 @@ export default function AdminOrderDetailsPage() {
                 {order.zip_code && <p>ZIP: {order.zip_code}</p>}
               </div>
             </section>
-
           </div>
-
         </div>
       </div>
     </main>

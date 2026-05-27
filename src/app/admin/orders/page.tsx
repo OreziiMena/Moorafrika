@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { Search, Package, MapPin, Eye, Edit, ChevronDown } from "lucide-react";
 import Image from "next/image";
@@ -23,19 +23,13 @@ export default function AdminOrdersPage() {
   const [orders, setOrders] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
-  
-  // Custom Dropdown States
   const [statusFilter, setStatusFilter] = useState("ALL");
   const [isFilterDropdownOpen, setIsFilterDropdownOpen] = useState(false);
-  
-  // State for tracking which order is currently being edited
   const [editingOrderId, setEditingOrderId] = useState<string | null>(null);
   const [editStatus, setEditStatus] = useState("");
   const [editNote, setEditNote] = useState("");
   const [isSaving, setIsSaving] = useState(false);
   const [openStatusEditDropdownId, setOpenStatusEditDropdownId] = useState<string | null>(null);
-
-  // Pagination States
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const limit = 5;
@@ -43,9 +37,7 @@ export default function AdminOrdersPage() {
   const fetchOrders = async (page = 1) => {
     try {
       setIsLoading(true);
-      const response = await axios.get(`/api/orders/admin?limit=${limit}&page=${page}`); 
-      
-      // Update data and pagination metadata
+      const response = await axios.get(`/api/orders/admin?limit=${limit}&page=${page}`);
       setOrders(response.data?.data || response.data || []);
       setTotalPages(response.data?.pagination?.totalPages || 1);
     } catch (error) {
@@ -64,15 +56,13 @@ export default function AdminOrdersPage() {
       setIsSaving(true);
       await axios.patch(`/api/orders/admin/${orderId}`, {
         status: editStatus,
-        note: editNote 
+        note: editNote
       });
-      
       setEditingOrderId(null);
       setOpenStatusEditDropdownId(null);
-      await fetchOrders(currentPage); // Refresh current page
-      } catch (error: any) {
-      console.error("Save Update Failed:", error.response?.data || error.message);
-      handleClientError(error); 
+      await fetchOrders(currentPage);
+    } catch (error: any) {
+      handleClientError(error);
     } finally {
       setIsSaving(false);
     }
@@ -98,8 +88,8 @@ export default function AdminOrdersPage() {
   };
 
   const filteredOrders = orders.filter((order) => {
-    const matchesSearch = order.id.toLowerCase().includes(searchQuery.toLowerCase()) || 
-                          (order.contactName && order.contactName.toLowerCase().includes(searchQuery.toLowerCase()));
+    const matchesSearch = order.id.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (order.contactName && order.contactName.toLowerCase().includes(searchQuery.toLowerCase()));
     const matchesStatus = statusFilter === "ALL" || order.status === statusFilter;
     return matchesSearch && matchesStatus;
   });
@@ -118,7 +108,6 @@ export default function AdminOrdersPage() {
     return new Date(dateString).toLocaleDateString('en-GB');
   };
 
-  // Helper to get the display label for a status
   const getStatusLabel = (statusValue: string) => {
     return STATUS_OPTIONS.find(opt => opt.value === statusValue)?.label || statusValue;
   };
@@ -126,8 +115,6 @@ export default function AdminOrdersPage() {
   return (
     <main className={styles.pageWrapper}>
       <div className={styles.container}>
-        
-        {/* Header Section */}
         <header className={styles.header}>
           <div>
             <h1 className={styles.title}>Manage Orders</h1>
@@ -140,7 +127,6 @@ export default function AdminOrdersPage() {
           </div>
         </header>
 
-        {/* Filters Card */}
         <div className={styles.filtersCard}>
           <div className={styles.searchWrapper}>
             <Search className={styles.searchIcon} size={18} />
@@ -153,9 +139,8 @@ export default function AdminOrdersPage() {
             />
           </div>
 
-          {/* Custom Filter Dropdown */}
           <div className={styles.filterWrapper}>
-            <div 
+            <div
               className={styles.customSelectTrigger}
               onClick={() => setIsFilterDropdownOpen(!isFilterDropdownOpen)}
             >
@@ -165,11 +150,8 @@ export default function AdminOrdersPage() {
 
             {isFilterDropdownOpen && (
               <div className={styles.customSelectMenu}>
-                <div className={styles.customSelectHeader}>
-                  {getStatusLabel(statusFilter)}
-                </div>
                 {STATUS_OPTIONS.map((option) => (
-                  <div 
+                  <div
                     key={option.value}
                     className={`${styles.customSelectOption} ${statusFilter === option.value ? styles.optionActive : ""}`}
                     onClick={() => {
@@ -185,7 +167,6 @@ export default function AdminOrdersPage() {
           </div>
         </div>
 
-        {/* Orders List */}
         {isLoading ? (
           <div className={styles.loadingState}>Loading orders...</div>
         ) : filteredOrders.length === 0 ? (
@@ -195,20 +176,17 @@ export default function AdminOrdersPage() {
             {filteredOrders.map((order) => {
               const isEditing = editingOrderId === order.id;
               const isStatusMenuOpen = openStatusEditDropdownId === order.id;
-              
+
               return (
                 <article key={order.id} className={styles.orderCard}>
-                  
-                  {/* Card Header */}
                   <div className={styles.cardHeader}>
                     <h2 className={styles.orderId}>
                       Order #{order.id.split('-')[0].toUpperCase()}
                     </h2>
-                    
-                    {/* Status Display or Edit Dropdown */}
+
                     {isEditing ? (
                       <div className={styles.editStatusWrapper}>
-                        <div 
+                        <div
                           className={styles.customSelectTrigger}
                           style={{ padding: '0.5rem 1rem', background: '#1a1a1a', minWidth: '140px' }}
                           onClick={() => setOpenStatusEditDropdownId(isStatusMenuOpen ? null : order.id)}
@@ -220,7 +198,7 @@ export default function AdminOrdersPage() {
                         {isStatusMenuOpen && (
                           <div className={styles.customSelectMenu} style={{ top: 'calc(100% + 4px)', zIndex: 100 }}>
                             {STATUS_OPTIONS.map((option) => (
-                              <div 
+                              <div
                                 key={option.value}
                                 className={`${styles.customSelectOption} ${editStatus === option.value ? styles.optionActive : ""}`}
                                 onClick={() => {
@@ -242,7 +220,6 @@ export default function AdminOrdersPage() {
                     )}
                   </div>
 
-                  {/* Card Meta Data */}
                   <div className={styles.cardMeta}>
                     <span className={styles.metaItem}>
                       📅 {formatDate(order.createdAt || order.created_at)}
@@ -255,13 +232,11 @@ export default function AdminOrdersPage() {
                     </span>
                   </div>
 
-                  {/* Customer Info */}
                   <div className={styles.customerInfo}>
-                     <span className={styles.customerName}>{order.contactName}</span>
-                     <span>{order.contactEmail}</span>
+                    <span className={styles.customerName}>{order.contactName}</span>
+                    <span>{order.contactEmail}</span>
                   </div>
 
-                  {/* Item Preview */}
                   {order.orderItems && order.orderItems.length > 0 && (
                     <div className={styles.itemsListPreview}>
                       {order.orderItems.map((item: any) => {
@@ -269,17 +244,17 @@ export default function AdminOrdersPage() {
                         return (
                           <div key={item.id} className={styles.itemPreview}>
                             <div className={styles.itemImageWrapper}>
-                              <Image 
-                                src={itemImage} 
-                                alt={item.product?.name || "Product"} 
-                                fill 
+                              <Image
+                                src={itemImage}
+                                alt={item.product?.name || "Product"}
+                                fill
                                 unoptimized
                                 className={styles.itemImage}
                               />
                             </div>
                             <div className={styles.itemDetails}>
                               <h3 className={styles.itemName}>{item.product?.name}</h3>
-                              <p className={styles.itemQty}>Qty: {item.quantity}</p>
+                              <p className={styles.itemQty}>Qty: {item.quantity} | Size: {item.size || "N/A"}</p>
                             </div>
                           </div>
                         );
@@ -287,26 +262,24 @@ export default function AdminOrdersPage() {
                     </div>
                   )}
 
-                  {/* Admin Note Editing Area */}
                   {isEditing && (
                     <div className={styles.editSection}>
-                      <label className={styles.editLabel}>Admin Note (Internal only)</label>
-                      <textarea 
+                      <label className={styles.editLabel}>Admin Note</label>
+                      <textarea
                         className={styles.noteInput}
                         value={editNote}
                         onChange={(e) => setEditNote(e.target.value)}
-                        placeholder="Add tracking number or internal notes here..."
+                        placeholder="Add internal notes here..."
                         rows={3}
                       />
                     </div>
                   )}
 
-                  {/* Actions Area */}
                   <div className={styles.cardActions}>
                     {isEditing ? (
                       <div className={styles.editActionButtons}>
-                        <button 
-                          className={styles.cancelEditBtn} 
+                        <button
+                          className={styles.cancelEditBtn}
                           onClick={() => {
                             setEditingOrderId(null);
                             setOpenStatusEditDropdownId(null);
@@ -315,8 +288,8 @@ export default function AdminOrdersPage() {
                         >
                           Cancel
                         </button>
-                        <button 
-                          className={styles.saveBtn} 
+                        <button
+                          className={styles.saveBtn}
                           onClick={() => handleSaveUpdate(order.id)}
                           disabled={isSaving}
                         >
@@ -328,32 +301,28 @@ export default function AdminOrdersPage() {
                         <Edit size={16} /> Quick Update
                       </button>
                     )}
-                    
+
                     <Link href={`/admin/orders/${order.id}`} className={styles.viewDetailsBtn}>
                       <Eye size={16} /> View Full Details
                     </Link>
                   </div>
 
-                  {/* Shipping Preview */}
                   <div className={styles.shippingPreview}>
                     <MapPin size={16} />
                     <span>Shipping to: {order.contactName}, {order.streetAddress}, {order.city}</span>
                   </div>
-                  
-                  {/* Display Note if it exists and we aren't editing */}
-                  {!isEditing && (order.admin_note || order.adminNote) && (
-                     <div className={styles.existingNote}>
-                       <strong>Admin Note:</strong> {order.admin_note || order.adminNote}
-                     </div>
-                  )}
 
+                  {!isEditing && (order.admin_note || order.adminNote) && (
+                    <div className={styles.existingNote}>
+                      <strong>Admin Note:</strong> {order.admin_note || order.adminNote}
+                    </div>
+                  )}
                 </article>
               );
             })}
           </div>
         )}
 
-        {/* --- ADDED: NUMBERED PAGINATION --- */}
         {totalPages > 1 && !isLoading && (
           <nav className={styles.pagination} aria-label="Orders pages">
             <button
@@ -374,9 +343,7 @@ export default function AdminOrdersPage() {
                     </span>
                   );
                 }
-
                 const pageNumber = page;
-
                 return (
                   <button
                     key={pageNumber}
@@ -401,7 +368,6 @@ export default function AdminOrdersPage() {
             </button>
           </nav>
         )}
-        
       </div>
     </main>
   );

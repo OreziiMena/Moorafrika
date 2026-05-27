@@ -247,6 +247,8 @@
   font-size: 0.75rem;
   font-weight: 600;
   text-transform: capitalize;
+  display: inline-flex;
+  align-items: center;
 }
 
 .processing {
@@ -265,6 +267,24 @@
   background-color: rgba(16, 185, 129, 0.1);
   color: #34d399;
   border: 1px solid rgba(16, 185, 129, 0.2);
+}
+
+.cancelled {
+  background-color: rgba(239, 68, 68, 0.1);
+  color: #f87171;
+  border: 1px solid rgba(239, 68, 68, 0.2);
+}
+
+.failed {
+  background-color: rgba(239, 68, 68, 0.1);
+  color: #f87171;
+  border: 1px solid rgba(239, 68, 68, 0.2);
+}
+
+.shipped {
+  background-color: rgba(139, 92, 246, 0.1);
+  color: #a78bfa;
+  border: 1px solid rgba(139, 92, 246, 0.2);
 }
 
 /* Admin Tools Grid */

@@ -5,7 +5,7 @@ import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
 import { useCartStore } from "../app/store/cartStore"; 
-import { Search, Heart, ShoppingCart, ChevronDown } from "lucide-react";
+import { Search, Heart, ShoppingCart, ChevronDown, LayoutDashboard } from "lucide-react";
 import styles from "./Navbar.module.css";
 import { useSession, signOut } from "next-auth/react";
 import { useWishlistStore } from "@/app/store/wishliststore";
@@ -31,7 +31,8 @@ export default function Navbar() {
   const [isProfileOpen, setIsProfileOpen] = useState(false); 
 
   const { data: session } = useSession();
-  const user = session?.user;
+  const user = session?.user as any;
+  const isAdmin = user?.role === "ADMIN";
   
   const { items } = useCartStore();
 
@@ -88,7 +89,6 @@ export default function Navbar() {
           </div>
 
           <div className={styles.rightSide}>
-
             {user ? (
               <div className={styles.desktopAuthSection}>
                 <div
@@ -107,9 +107,10 @@ export default function Navbar() {
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: 10 }}
                         className={styles.dropdownMenu}
-                        style={{ right: 0, left: 'auto' }} // Align to the right side
+                        style={{ right: 0, left: 'auto' }}
                       >
                         <Link href="/order" className={styles.dropdownItem}>My Order History</Link>
+                        {isAdmin && <Link href="/admin" className={styles.dropdownItem} style={{ color: '#3b82f6', fontWeight: 600 }}>Admin Dashboard</Link>}
                         <button 
                           onClick={() => signOut()} 
                           className={styles.dropdownItem}
@@ -134,20 +135,10 @@ export default function Navbar() {
               <Heart strokeWidth={1.5} className={styles.iconSize} />
               {wishlistCount > 0 && (
                 <span style={{
-                  position: "absolute",
-                  top: "-4px",
-                  right: "-4px", 
-                  backgroundColor: "#e11d48", 
-                  color: "#FDFBF7",
-                  fontSize: "0.65rem",
-                  fontWeight: "bold",
-                  borderRadius: "50%",
-                  minWidth: "16px", 
-                  height: "16px",
-                  display: "flex",
-                  justifyContent: "center",
-                  alignItems: "center",
-                  padding: "0 4px"
+                  position: "absolute", top: "-4px", right: "-4px", backgroundColor: "#e11d48", 
+                  color: "#FDFBF7", fontSize: "0.65rem", fontWeight: "bold", borderRadius: "50%",
+                  minWidth: "16px", height: "16px", display: "flex", justifyContent: "center",
+                  alignItems: "center", padding: "0 4px"
                 }}>
                   {wishlistCount}
                 </span>
@@ -156,18 +147,12 @@ export default function Navbar() {
             
             <Link href="/cart" className={styles.iconBtn} style={{ position: 'relative', display: 'flex' }}>
               <ShoppingCart strokeWidth={1.5} className={styles.iconSize} />
-              {items.length > 0 && (
-                <span className={styles.cartBadge}>{items.length}</span>
-              )}
+              {items.length > 0 && <span className={styles.cartBadge}>{items.length}</span>}
             </Link>
 
             <div className={styles.mobileMenuBtnContainer}>
               <button onClick={toggleMobileMenu} className={styles.mobileMenuBtn}>
-                {isMobileMenuOpen ? (
-                  <CloseIcon strokeWidth={1.5} className={styles.mobileIconSize} />
-                ) : (
-                  <MenuIcon strokeWidth={1.5} className={styles.mobileIconSize} />
-                )}
+                {isMobileMenuOpen ? <CloseIcon strokeWidth={1.5} className={styles.mobileIconSize} /> : <MenuIcon strokeWidth={1.5} className={styles.mobileIconSize} />}
               </button>
             </div>
           </div>
@@ -188,16 +173,9 @@ export default function Navbar() {
               <Link href="/collection" className={styles.mobileNavLink} onClick={() => setIsMobileMenuOpen(false)}>Collection</Link>
 
               <div className={styles.mobileDropdownSection}>
-                <button
-                  onClick={toggleResources}
-                  className={styles.mobileDropdownBtn}
-                >
+                <button onClick={toggleResources} className={styles.mobileDropdownBtn}>
                   Info
-                  <ChevronDown
-                    className={`${styles.chevronIcon} ${
-                      isResourcesOpen ? styles.rotate180 : ""
-                    }`}
-                  />
+                  <ChevronDown className={`${styles.chevronIcon} ${isResourcesOpen ? styles.rotate180 : ""}`} />
                 </button>
                 <AnimatePresence>
                   {isResourcesOpen && (
@@ -219,6 +197,7 @@ export default function Navbar() {
                 {user ? (
                   <>
                     <Link href="/order" className={styles.mobileAuthBtn} onClick={() => setIsMobileMenuOpen(false)}>My Order History</Link>
+                    {isAdmin && <Link href="/admin" className={styles.mobileAuthBtn} onClick={() => setIsMobileMenuOpen(false)} style={{ color: '#3b82f6' }}>Admin Dashboard</Link>}
                   </>
                 ) : (
                   <>

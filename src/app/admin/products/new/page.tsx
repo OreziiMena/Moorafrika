@@ -3,10 +3,10 @@
 import React, { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import axios from "axios";
-import { Upload, X , CheckCircle2, AlertCircle} from "lucide-react";
+import { Upload, X , CheckCircle2, AlertCircle, ChevronDown} from "lucide-react";
 import { handleClientError } from "@/lib/clientErrorHandler";
 import Image from "next/image";
-import styles from "./addProduct.module.css"; 
+import styles from "../new/addProduct.module.css"; 
 import { toast } from "sonner";
 import CloudflareR2StorageClient from "@/lib/storage";
 import { CategoryContract } from "@/contracts/category";
@@ -14,6 +14,7 @@ import { CategoryContract } from "@/contracts/category";
 export default function AddNewProductPage() {
   const router = useRouter();
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [isCategoryOpen, setIsCategoryOpen] = useState(false);
   
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [categories, setCategories] = useState<CategoryContract[]>([]);
@@ -154,18 +155,45 @@ export default function AddNewProductPage() {
               <label className={styles.label}>Product Name</label>
               <input required type="text" name="name" value={formData.name} onChange={handleChange} className={styles.input} />
             </div>
-            <div className={styles.inputGroup}>
-              <label className={styles.label}>Category</label>
-              <select name="categoryId" value={formData.categoryId} onChange={handleChange} className={styles.input}>
-                <option value="-1">Select Category</option>
-                {categories.map((category) => (
-                  <option key={category.id} value={category.id}>
-                    {category.name}
-                  </option>
-                ))}
-              </select>
-            </div>
+           
+           <div className={styles.inputGroup}>
+          <label className={styles.label}>Category</label>
+          
+          {/* Custom Dropdown Trigger */}
+          <div 
+            className={styles.customSelectTrigger} 
+            onClick={() => setIsCategoryOpen(!isCategoryOpen)}
+          >
+            <span>
+              {formData.categoryId === "-1" 
+                ? "Select Category" 
+                : categories.find(c => c.id.toString() === formData.categoryId)?.name}
+            </span>
+                
+            <ChevronDown size={16} className={isCategoryOpen ? styles.iconOpen : ""} />
           </div>
+
+         
+          {isCategoryOpen && (
+            <div className={styles.customSelectMenu}>
+              {/* You can remove this static 'Select Category' option if you want to force a choice */}
+              
+              {categories.map((category) => (
+                <div 
+                  key={category.id}
+                  className={`${styles.customSelectOption} ${formData.categoryId === category.id.toString() ? styles.optionActive : ""}`}
+                  onClick={() => {
+                    setFormData({ ...formData, categoryId: category.id.toString() });
+                    setIsCategoryOpen(false);
+                  }}
+                >
+                  {category.name}
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+        </div>
 
           <div className={styles.inputGroup}>
             <label className={styles.label}>Description</label>

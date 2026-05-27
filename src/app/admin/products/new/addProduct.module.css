@@ -83,6 +83,22 @@
   transition: opacity 0.2s ease, transform 0.1s ease;
 }
 
+.deleteBtn {
+  background-color: transparent;
+  color: #ef4444;
+  margin-top: 1rem;
+  padding: 1rem;
+  border: none;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+  transition: opacity 0.2s ease, transform 0.1s ease;
+}
 .submitBtn:hover:not(:disabled) {
   opacity: 0.9;
 }
@@ -96,8 +112,6 @@
   color: #71717a;
   cursor: not-allowed;
 }
-
-/* --- Add to addProduct.module.css --- */
 
 .mediaSection {
   background-color: rgba(253, 251, 247, 0.02);
@@ -218,6 +232,58 @@
 .statusBanner.error {
   background: #f8d7da;
   color: #721c24;
+}
+/* Custom Dropdown Styling */
+.customSelectTrigger {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.8rem;
+  border: 1px solid #3f3f46;
+  border-radius: 4px;
+  background-color: #18181b;
+  color: #fff;
+  cursor: pointer;
+  
+}
+
+.customSelectMenu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: 100%;
+  background-color: #18181b;
+  border: 1px solid #3f3f46;
+  border-radius: 4px;
+  z-index: 10;
+  margin-top: 4px;
+}
+
+.customSelectOption {
+  padding: 0.8rem;
+  cursor: pointer;
+  color: #a1a1aa;
+}
+
+.customSelectOption:hover {
+  background-color: #27272a;
+  color: #fff;
+}
+
+.optionActive {
+  background-color: #27272a;
+  color: #fff;
+  font-weight: 600;
+}
+
+.iconOpen {
+  transform: rotate(180deg);
+  transition: transform 0.2s;
+}
+
+.inputGroup {
+  position: relative;
+  margin-bottom: 1.5rem;
 }
 
 /* Make the grid stack on mobile */

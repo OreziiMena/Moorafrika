@@ -149,15 +149,40 @@
   font-size: 0.75rem;
   font-weight: 600;
 }
-
-.statusBadge.processing, .statusBadge.pending {
-  background: rgba(245, 245, 220, 0.1);
-  color: #f5f5dc;
+.processing {
+  background-color: rgba(59, 130, 246, 0.1);
+  color: #60a5fa;
+  border: 1px solid rgba(59, 130, 246, 0.2);
 }
 
-.statusBadge.delivered {
-  background: rgba(76, 175, 80, 0.15);
-  color: #81c784;
+.pending {
+  background-color: rgba(245, 158, 11, 0.1);
+  color: #fbbf24;
+  border: 1px solid rgba(245, 158, 11, 0.2);
+}
+
+.completed {
+  background-color: rgba(16, 185, 129, 0.1);
+  color: #34d399;
+  border: 1px solid rgba(16, 185, 129, 0.2);
+}
+
+.cancelled {
+  background-color: rgba(239, 68, 68, 0.1);
+  color: #f87171;
+  border: 1px solid rgba(239, 68, 68, 0.2);
+}
+
+.failed {
+  background-color: rgba(239, 68, 68, 0.1);
+  color: #f87171;
+  border: 1px solid rgba(239, 68, 68, 0.2);
+}
+
+.shipped {
+  background-color: rgba(139, 92, 246, 0.1);
+  color: #a78bfa;
+  border: 1px solid rgba(139, 92, 246, 0.2);
 }
 
 .cardMeta {
