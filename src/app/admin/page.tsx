@@ -8,7 +8,8 @@ import { useRouter } from "next/navigation";
 import { 
   ShoppingCart, Package, Users, TrendingUp, 
   Plus, BarChart2, Settings, Eye, Tag,
-  DollarSign
+  DollarSign,
+  List
 } from "lucide-react";
 import styles from "./admin.module.css";
 import { DashboardStatsContract } from "@/contracts/stats";
@@ -187,18 +188,11 @@ export default function AdminDashboard() {
                 <Tag size={24} className={styles.toolIcon} />
                 <span>Discounts</span>
               </Link>
-              <Link href="/admin/customers" className={styles.toolCard}>
-                <Users size={24} className={styles.toolIcon} />
-                <span>Customers</span>
+              <Link href="/admin/categories" className={styles.toolCard}>
+                <List size={24} className={styles.toolIcon} />
+                <span>Categories</span>
               </Link>
-              <Link href="/admin/analytics" className={styles.toolCard}>
-                <BarChart2 size={24} className={styles.toolIcon} />
-                <span>Analytics</span>
-              </Link>
-              <Link href="/admin/settings" className={styles.toolCard}>
-                <Settings size={24} className={styles.toolIcon} />
-                <span>Settings</span>
-              </Link>
+              
             </div>
           </section>
         </div>

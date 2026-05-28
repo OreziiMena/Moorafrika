@@ -48,6 +48,8 @@ export default function EditProductPage({ params }: { params: Promise<{ slug: st
             ? prodRes.data.sizes 
             : (typeof prodRes.data.sizes === 'string' ? prodRes.data.sizes.split(",") : [])
         );
+         const category =catRes.data.find((c) => c.name === prodRes.data.category);
+         setFormData((prev) => ({...prev, categoryId: category ? category.id.toString() : "-1" }));
       } catch (error) {
         handleClientError(error);
       }
