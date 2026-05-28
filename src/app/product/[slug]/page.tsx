@@ -245,18 +245,33 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
                 <Ruler size={14} /> Size guide
               </Link>
             </div>
-            <div className={styles.pillGrid}>
-              {product.sizes.map((size) => (
-                <button
-                  key={size}
-                  onClick={() => setSelectedSize(size)}
-                  className={`${styles.sizePill} ${selectedSize === size ? styles.activePill : ""}`}
-                >
-                  {size}
-                </button>
-              ))}
+           
+           <div className={styles.pillGrid}>
+              {Array.isArray(product.sizes) 
+                ? product.sizes.map((size) => (
+                    <button
+                      key={size}
+                      onClick={() => setSelectedSize(size)}
+                      className={`${styles.sizePill} ${selectedSize === size ? styles.activePill : ""}`}
+                    >
+                      {size}
+                    </button>
+                  ))
+                : (product.sizes as unknown as string)?.split(",").map((size, index) => {
+                    const cleanSize = size.trim();
+                    return (
+                      <button
+                        key={index}
+                        onClick={() => setSelectedSize(cleanSize)}
+                        className={`${styles.sizePill} ${selectedSize === cleanSize ? styles.activePill : ""}`}
+                      >
+                        {cleanSize}
+                      </button>
+                    );
+                  })
+              }
             </div>
-          </div>
+            </div>
 
           <div className={styles.selectorGroup}>
             <span className={styles.label}>Qty:</span>

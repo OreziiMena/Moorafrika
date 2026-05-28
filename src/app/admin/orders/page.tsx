@@ -123,7 +123,7 @@ export default function AdminOrdersPage() {
           <div className={styles.orderCount}>
             <Package size={20} />
             <span className={styles.countNumber}>{orders.length}</span>
-            <span className={styles.countText}>orders on<br />this page</span>
+            <span className={styles.countText}>orders </span>
           </div>
         </header>
 

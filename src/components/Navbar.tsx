@@ -109,7 +109,7 @@ export default function Navbar() {
                         className={styles.dropdownMenu}
                         style={{ right: 0, left: 'auto' }}
                       >
-                        <Link href="/order" className={styles.dropdownItem}>My Order History</Link>
+                        <Link href="/orders" className={styles.dropdownItem}>My Order History</Link>
                         {isAdmin && <Link href="/admin" className={styles.dropdownItem} style={{ color: '#3b82f6', fontWeight: 600 }}>Admin Dashboard</Link>}
                         <button 
                           onClick={() => signOut()} 
@@ -196,7 +196,7 @@ export default function Navbar() {
               <div className={styles.mobileAuthSection}>
                 {user ? (
                   <>
-                    <Link href="/order" className={styles.mobileAuthBtn} onClick={() => setIsMobileMenuOpen(false)}>My Order History</Link>
+                    <Link href="/orders" className={styles.mobileAuthBtn} onClick={() => setIsMobileMenuOpen(false)}>My Order History</Link>
                     {isAdmin && <Link href="/admin" className={styles.mobileAuthBtn} onClick={() => setIsMobileMenuOpen(false)} style={{ color: '#3b82f6' }}>Admin Dashboard</Link>}
                   </>
                 ) : (

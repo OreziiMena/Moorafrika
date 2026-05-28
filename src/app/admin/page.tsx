@@ -183,7 +183,7 @@ export default function AdminDashboard() {
                 <Package size={24} className={styles.toolIcon} />
                 <span>Products</span>
               </Link>
-              <Link href="/admin/discounts" className={styles.toolCard}>
+              <Link href="/admin/discounts/new" className={styles.toolCard}>
                 <Tag size={24} className={styles.toolIcon} />
                 <span>Discounts</span>
               </Link>
