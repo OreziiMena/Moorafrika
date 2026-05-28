@@ -175,12 +175,22 @@ export default function EditProductPage({ params }: { params: Promise<{ slug: st
             </div>
           )}
         </div>
-
+        
+      <div className={styles.inputGroup}>
+        <label className={styles.label}>Description</label>
         <textarea required name="description" rows={4} value={formData.description} onChange={handleChange} className={styles.input} placeholder="Description" />
+      </div>
 
         <div className={styles.inputRow}>
+          <div className={styles.inputGroup}>
+            <label className={styles.label}>Price</label>
           <input required type="number" name="price" value={formData.price} onChange={handleChange} className={styles.input} placeholder="Price" />
+          </div>
+
+          <div className={styles.inputGroup}>
+            <label className={styles.label}>Stock Count</label>
           <input required type="number" name="stock_count" value={formData.stock_count} onChange={handleChange} className={styles.input} placeholder="Stock" />
+          </div>
         </div>
 
         <div className={styles.inputGroup}>
