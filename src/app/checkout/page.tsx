@@ -9,6 +9,7 @@ import { useCartStore } from "@/app/store/cartStore";
 import { useSession } from "next-auth/react";
 import { toast } from "sonner";
 import { handleClientError } from "@/lib/clientErrorHandler";
+import { ProductContract } from "@/contracts/product";
 
 const formatNaira = (amount: number) => {
   return new Intl.NumberFormat("en-NG", {

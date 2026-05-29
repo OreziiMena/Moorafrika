@@ -7,6 +7,7 @@ import { useCartStore } from '../store/cartStore';
 import styles from './page.module.css';
 import { useEffect, useState } from 'react';
 import { CartItemContract } from '@/contracts/cart';
+import { ProductContract } from '@/contracts/product';
 import { useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import { toast } from 'sonner';
