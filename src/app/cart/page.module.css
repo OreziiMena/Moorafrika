@@ -392,3 +392,32 @@
     padding: 8rem 1rem 4rem 1rem;
   }
 }
+
+/* Discount Styling */
+.priceContainer {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+  justify-content: center;
+}
+
+.discountedPrice {
+  color: #8B3A2B;
+  font-weight: 600;
+}
+
+.slashedPrice {
+  text-decoration: line-through;
+  opacity: 0.5;
+  font-size: 0.85em;
+  color: #FDFBF7;
+}
+
+.discountBadge {
+  background-color: #8B3A2B;
+  color: #FDFBF7;
+  padding: 0.1rem 0.3rem;
+  border-radius: 4px;
+  font-size: 0.7rem;
+  font-weight: 700;
+}

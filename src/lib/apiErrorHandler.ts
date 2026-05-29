@@ -79,7 +79,7 @@ export const errorHandler =
           return NextResponse.json(
             {
               error: 'ValidationError',
-              message: 'Invalid data provided for database operation',
+              message: err.message || 'Invalid data provided for database operation',
             },
             { status: 400 },
           );
@@ -96,7 +96,7 @@ export const errorHandler =
         return NextResponse.json(
           {
             error: 'ValidationError',
-            message: 'Invalid query or payload for database operation',
+            message: err.message || 'Invalid query or payload for database operation',
           },
           { status: 400 },
         );

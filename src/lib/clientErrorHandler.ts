@@ -15,10 +15,16 @@ interface ErrorData {
 type SetErrors = (errors: Record<string, string>) => void;
 
 const handelValidationError = (payload: {
-  issues: ValidationErrorIssue[];
+  issues?: ValidationErrorIssue[];
+  message?: string;
   setErrors?: SetErrors;
 }) => {
-  const { issues, setErrors } = payload;
+  const { issues = [], message, setErrors } = payload;
+
+  if (issues.length === 0) {
+    toast.error('Validation Error', { description: message || 'Please check your inputs.' });
+    return;
+  }
 
   if (setErrors) {
     const formattedErrors: Record<string, string> = {};
@@ -52,7 +58,8 @@ export const handleClientError = (
 
   if (errorData.error === 'ValidationError') {
     return handelValidationError({
-      issues: errorData.issues!,
+      issues: errorData.issues,
+      message: errorData.message,
       setErrors: payload?.setErrors,
     });
   } else if (payload?.setErrorMsg) {

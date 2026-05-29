@@ -6,6 +6,7 @@ import NewCollections from "@/components/NewCollections";
 import Testimonials from "@/components/Testimonials";
 import Newsletter from "@/components/Newsletter";
 import ProductService from "@/services/product.service";
+import HomeDiscountBanner from "@/components/HomeDiscountBanner";
 
 export const dynamic = "force-dynamic";
 
@@ -25,6 +26,7 @@ export default async function Home() {
       <NewCollections initialProducts={collections.data} />
       <Testimonials />
       <Newsletter />
+      <HomeDiscountBanner />
     </main>
   );
 }

@@ -14,7 +14,7 @@ export const productMapper = (product: Prisma.ProductGetPayload<{
   sales_count: product.sales_count,
   imageUrl: CloudflareStorageServer.generatePublicUrl(product.imageKey),
   thumbnails: product.thumbnailKeys.map(CloudflareStorageServer.generatePublicUrl),
-  sizes: product.sizes,
+  sizes: Array.isArray(product.sizes) ? product.sizes : [],
   category: product.category.name,
   createdAt: product.created_at,
   updatedAt: product.updated_at,

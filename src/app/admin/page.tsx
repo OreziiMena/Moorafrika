@@ -132,8 +132,8 @@ export default function AdminDashboard() {
             <Link href="/admin/products/new" className={styles.actionBtn}>
               <Plus size={18} /> Add New Product
             </Link>
-            <Link href="/admin/discounts/new" className={styles.actionBtnSecondary}>
-              <Tag size={18} /> Create Discount
+            <Link href="/admin/discounts" className={styles.actionBtnSecondary}>
+              <Tag size={18} /> Manage Discounts
             </Link>
             <Link href="/admin/orders" className={styles.actionBtnSecondary}>
               <Package size={18} /> Manage Orders
@@ -184,7 +184,7 @@ export default function AdminDashboard() {
                 <Package size={24} className={styles.toolIcon} />
                 <span>Products</span>
               </Link>
-              <Link href="/admin/discounts/new" className={styles.toolCard}>
+              <Link href="/admin/discounts" className={styles.toolCard}>
                 <Tag size={24} className={styles.toolIcon} />
                 <span>Discounts</span>
               </Link>

@@ -61,6 +61,7 @@ describe('DiscountService', () => {
 
     await expect(
       DiscountService.createNewDiscount({
+        title: 'Summer Sale',
         description: 'Sale',
         percentage: 20,
         productId: 'product-1',
@@ -70,6 +71,7 @@ describe('DiscountService', () => {
     ).resolves.toEqual({ id: 'discount-1' });
 
     expect(mocks.createDiscountMock).toHaveBeenCalledWith({
+      title: 'Summer Sale',
       description: 'Sale',
       percentage: 20,
       expiresAt: new Date('2026-06-01T00:00:00.000Z'),
@@ -77,6 +79,31 @@ describe('DiscountService', () => {
       product: {
         connect: { id: 'product-1' },
       },
+    });
+  });
+
+  it('creates a global discount without a product connection', async () => {
+    mocks.authorizeUserMock.mockResolvedValue({ id: 'admin-1' });
+    mocks.createDiscountMock.mockResolvedValue({ id: 'discount-1' });
+    mocks.discountMapperMock.mockReturnValue({ id: 'discount-1' });
+
+    await expect(
+      DiscountService.createNewDiscount({
+        title: 'Global Sale',
+        description: 'Sale',
+        percentage: 20,
+        productId: null,
+        expiresAt: new Date('2026-06-01T00:00:00.000Z'),
+        imageKey: 'discounts/sale.png',
+      } as never),
+    ).resolves.toEqual({ id: 'discount-1' });
+
+    expect(mocks.createDiscountMock).toHaveBeenCalledWith({
+      title: 'Global Sale',
+      description: 'Sale',
+      percentage: 20,
+      expiresAt: new Date('2026-06-01T00:00:00.000Z'),
+      imageKey: 'discounts/sale.png',
     });
   });
 

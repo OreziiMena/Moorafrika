@@ -24,6 +24,7 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
   const { slug } = React.use(params);
   const [product, setProduct] = useState<ProductContract | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [discounts, setDiscounts] = useState<any[]>([]);
   
   const [activeImage, setActiveImage] = useState<string>("");
   const [selectedSize, setSelectedSize] = useState<string>("");
@@ -64,6 +65,43 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
 
     fetchProduct();
   }, [slug]);
+
+  useEffect(() => {
+    const fetchDiscounts = async () => {
+      try {
+        const response = await axios.get<any[]>("/api/discounts");
+        const now = new Date();
+        const active = response.data.filter(
+          (d) => new Date(d.expiresAt) > now
+        );
+        setDiscounts(active);
+      } catch (error) {
+        console.error("Failed to fetch discounts", error);
+      }
+    };
+    fetchDiscounts();
+  }, []);
+
+  const getProductDiscountPercentage = (p: ProductContract) => {
+    const percentages = discounts.map((d) => {
+      const matchesProduct = d.productId === p.id || (Array.isArray(d.productIds) && d.productIds.includes(p.id));
+      if (matchesProduct) return d.percentage;
+
+      const matchesCategory = d.category && d.category.name === p.category;
+      if (matchesCategory) return d.percentage;
+
+      const isGlobal = !d.productId && !d.categoryId && (!Array.isArray(d.productIds) || d.productIds.length === 0);
+      if (isGlobal) return d.percentage;
+
+      return 0;
+    });
+
+    const maxPct = Math.max(0, ...percentages);
+    return maxPct > 0 ? maxPct : null;
+  };
+
+  const pct = product ? getProductDiscountPercentage(product) : null;
+  const discountedPrice = product && pct ? product.price * (1 - pct / 100) : null;
 
   useEffect(() => {
     const syncPageAndCartData = () => {
@@ -232,7 +270,23 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
 
         <div className={styles.detailsSection}>
           <h1 className={styles.title}>{product.name}</h1>
-          <p className={styles.price}>{formatNaira(product.price)}</p>
+          {discountedPrice !== null ? (
+            <div className={styles.priceContainer}>
+              <span className={styles.discountedPrice}>
+                {formatNaira(discountedPrice)}
+              </span>
+              <span className={styles.slashedPrice}>
+                {formatNaira(product.price)}
+              </span>
+              {pct && (
+                <span className={styles.discountBadge}>
+                  -{pct}%
+                </span>
+              )}
+            </div>
+          ) : (
+            <p className={styles.price}>{formatNaira(product.price)}</p>
+          )}
           
           <div className={styles.description}>
             <p>{product.description}</p>
@@ -247,29 +301,22 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
             </div>
            
            <div className={styles.pillGrid}>
-              {Array.isArray(product.sizes) 
-                ? product.sizes.map((size) => (
-                    <button
-                      key={size}
-                      onClick={() => setSelectedSize(size)}
-                      className={`${styles.sizePill} ${selectedSize === size ? styles.activePill : ""}`}
-                    >
-                      {size}
-                    </button>
-                  ))
-                : (product.sizes as unknown as string)?.split(",").map((size, index) => {
-                    const cleanSize = size.trim();
-                    return (
-                      <button
-                        key={index}
-                        onClick={() => setSelectedSize(cleanSize)}
-                        className={`${styles.sizePill} ${selectedSize === cleanSize ? styles.activePill : ""}`}
-                      >
-                        {cleanSize}
-                      </button>
-                    );
-                  })
-              }
+              {(Array.isArray(product.sizes)
+                ? product.sizes
+                : (typeof product.sizes === 'string' ? (product.sizes as string).split(",") : [])
+              ).map((size, index) => {
+                const cleanSize = typeof size === 'string' ? size.trim() : '';
+                if (!cleanSize) return null;
+                return (
+                  <button
+                    key={index}
+                    onClick={() => setSelectedSize(cleanSize)}
+                    className={`${styles.sizePill} ${selectedSize === cleanSize ? styles.activePill : ""}`}
+                  >
+                    {cleanSize}
+                  </button>
+                );
+              })}
             </div>
             </div>
 

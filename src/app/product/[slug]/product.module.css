@@ -391,3 +391,36 @@
     height: 500px;
   }
 }
+
+/* Discount & Price Slicing styling */
+.priceContainer {
+  display: flex;
+  align-items: baseline;
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+}
+
+.discountedPrice {
+  color: #8B3A2B;
+  font-size: 1.75rem;
+  font-weight: 700;
+  font-family: var(--font-clean, sans-serif);
+}
+
+.slashedPrice {
+  text-decoration: line-through;
+  opacity: 0.5;
+  font-size: 1.15rem;
+  font-family: var(--font-clean, sans-serif);
+  color: #FDFBF7;
+}
+
+.discountBadge {
+  background-color: #8B3A2B;
+  color: #FDFBF7;
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  transform: translateY(-2px);
+}

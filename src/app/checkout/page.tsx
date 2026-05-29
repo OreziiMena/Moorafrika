@@ -48,8 +48,49 @@ export default function CheckoutPage() {
   // Hardcoded to 0 for now
   const shippingCost = 0; 
   const [isProcessing, setIsProcessing] = useState(false);
+  const [discounts, setDiscounts] = useState<any[]>([]);
 
-  const subtotal = items.reduce((acc, item) => acc + (item.product.price * item.quantity), 0);
+  useEffect(() => {
+    const fetchDiscounts = async () => {
+      try {
+        const response = await axios.get<any[]>('/api/discounts');
+        const now = new Date();
+        const active = response.data.filter(
+          (d) => new Date(d.expiresAt) > now
+        );
+        setDiscounts(active);
+      } catch (error) {
+        console.error("Failed to fetch discounts", error);
+      }
+    };
+    fetchDiscounts();
+  }, []);
+
+  const getProductDiscountPercentage = (p: ProductContract) => {
+    const percentages = discounts.map((d) => {
+      const matchesProduct = d.productId === p.id || (Array.isArray(d.productIds) && d.productIds.includes(p.id));
+      if (matchesProduct) return d.percentage;
+
+      const matchesCategory = d.category && d.category.name === p.category;
+      if (matchesCategory) return d.percentage;
+
+      const isGlobal = !d.productId && !d.categoryId && (!Array.isArray(d.productIds) || d.productIds.length === 0);
+      if (isGlobal) return d.percentage;
+
+      return 0;
+    });
+
+    const maxPct = Math.max(0, ...percentages);
+    return maxPct > 0 ? maxPct : null;
+  };
+
+  const getDiscountedPrice = (product: ProductContract) => {
+    const pct = getProductDiscountPercentage(product);
+    if (pct) return product.price * (1 - pct / 100);
+    return product.price;
+  };
+
+  const subtotal = items.reduce((acc, item) => acc + (getDiscountedPrice(item.product) * item.quantity), 0);
   const tax = subtotal * 0.075;
   const total = subtotal + shippingCost + tax;
 
@@ -227,24 +268,39 @@ export default function CheckoutPage() {
                 {items.length === 0 ? (
                   <p style={{ color: '#a1a1aa' }}>Your cart is empty.</p>
                 ) : (
-                  items.map((item) => (
-                    <div key={`${item.product.id}-${item.size || 'default'}`} className={styles.cartItem}>
-                      <div className={styles.itemImage}>
-                        <Image 
-                          src={item.product.imageUrl} 
-                          alt={item.product.name}
-                          width={60}
-                          height={80}
-                          style={{ objectFit: 'cover', borderRadius: '4px' }}
-                        />
+                  items.map((item) => {
+                    const pct = getProductDiscountPercentage(item.product);
+                    const discountedPrice = pct ? item.product.price * (1 - pct / 100) : null;
+                    return (
+                      <div key={`${item.product.id}-${item.size || 'default'}`} className={styles.cartItem}>
+                        <div className={styles.itemImage}>
+                          <Image 
+                            src={item.product.imageUrl} 
+                            alt={item.product.name}
+                            width={60}
+                            height={80}
+                            style={{ objectFit: 'cover', borderRadius: '4px' }}
+                          />
+                        </div>
+                        <div className={styles.itemDetails}>
+                          <h3>{item.product.name}</h3>
+                          <p>Size: {item.size || "Standard"} | Qty: {item.quantity}</p>
+                          {discountedPrice !== null ? (
+                            <p className={styles.itemPrice}>
+                              <span style={{ color: '#8B3A2B', fontWeight: 600, marginRight: '0.5rem' }}>
+                                {formatNaira(discountedPrice)}
+                              </span>
+                              <span style={{ textDecoration: 'line-through', opacity: 0.5, fontSize: '0.85em' }}>
+                                {formatNaira(item.product.price)}
+                              </span>
+                            </p>
+                          ) : (
+                            <p className={styles.itemPrice}>{formatNaira(item.product.price)}</p>
+                          )}
+                        </div>
                       </div>
-                      <div className={styles.itemDetails}>
-                        <h3>{item.product.name}</h3>
-                        <p>Size: {item.size || "Standard"} | Qty: {item.quantity}</p>
-                        <p className={styles.itemPrice}>{formatNaira(item.product.price)}</p>
-                      </div>
-                    </div>
-                  ))
+                    );
+                  })
                 )}
               </div>
 

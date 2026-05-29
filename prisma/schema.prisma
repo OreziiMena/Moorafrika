@@ -63,7 +63,8 @@ model Category {
   updated_at DateTime  @updatedAt
   deleted_at DateTime?
 
-  products Product[]
+  products  Product[]
+  discounts Discount[]
 
   @@map("categories")
 }
@@ -97,13 +98,17 @@ model Product {
 
 model Discount {
   id          String   @id @default(uuid())
+  title       String
   description String?
   percentage  Float
-  productId   String   @unique
+  productId   String?  @unique
+  categoryId  Int?
+  productIds  String[] @default([])
   imageKey    String?
   expiresAt   DateTime
 
-  product Product @relation(fields: [productId], references: [id])
+  product  Product?  @relation(fields: [productId], references: [id])
+  category Category? @relation(fields: [categoryId], references: [id])
 
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt

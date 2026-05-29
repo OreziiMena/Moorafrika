@@ -7,6 +7,7 @@ const include = {
       category: true,
     },
   },
+  category: true,
 };
 
 export const getAllDiscounts = () =>

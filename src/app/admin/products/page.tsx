@@ -6,6 +6,7 @@ import Image from "next/image";
 import axios from "axios";
 import { Search, ChevronDown, Edit, Plus } from "lucide-react"; 
 import styles from "../../collection/collection.module.css";
+import adminStyles from "../admin.module.css";
 import { ProductContract } from "@/contracts/product";
 import { CategoryContract } from "@/contracts/category";
 import { PagedResponse } from "@/contracts/response";
@@ -101,11 +102,14 @@ export default function AdminProductList() {
 
   return (
     <div className={styles.container}>
-      <header className={styles.header}>
-        <div>
-          <h1 className={styles.title}>Your Products</h1>
+      <header className={styles.header} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "3rem", flexWrap: "wrap", gap: "1rem" }}>
+        <div style={{ textAlign: "left" }}>
+          <h1 className={styles.title} style={{ marginBottom: "0.25rem" }}>Your Products</h1>
           <p className={styles.subtitle}>Manage your store products</p>
         </div>
+        <Link href="/admin/products/new" className={adminStyles.actionBtn} style={{ textDecoration: "none", display: "flex", alignItems: "center", gap: "0.5rem" }}>
+          <Plus size={18} /> Add New Product
+        </Link>
       </header>
 
       <div className={styles.filtersContainer}>

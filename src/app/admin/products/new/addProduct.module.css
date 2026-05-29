@@ -295,3 +295,8 @@
     padding-top: 6rem;
   }
 }
+
+.selectIcon {
+  color: var(--ivory, #FDFBF7);
+  transition: transform 0.2s ease;
+}

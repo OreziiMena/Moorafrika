@@ -28,17 +28,19 @@ class DiscountService {
   ): Promise<DiscountContract> {
     await AuthService.authorizeUser(['ADMIN']);
 
-    const { description, percentage, productId, expiresAt, imageKey } = payload;
+    const validatedData = createDiscountSchema.parse(payload);
+
+    const { title, description, percentage, productId, categoryId, productIds, expiresAt, imageKey } = validatedData;
 
     const discount = await createDiscount({
+      title,
       description,
       percentage,
       expiresAt,
       imageKey,
-
-      product: {
-        connect: { id: productId },
-      },
+      productIds: productIds || [],
+      ...(productId ? { product: { connect: { id: productId } } } : {}),
+      ...(categoryId ? { category: { connect: { id: categoryId } } } : {}),
     });
 
     return discountMapper(discount);

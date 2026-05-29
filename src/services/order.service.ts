@@ -23,6 +23,7 @@ import CartService from './cart.service';
 import { BadRequestError, NotFoundError } from '@/lib/errors';
 import ProductService from './product.service';
 import { paystackCheckout } from '@/services/paystack/checkout';
+import { prisma } from '@/lib/prisma';
 
 interface GetOrdersParams {
   page?: number;
@@ -127,8 +128,38 @@ class OrderService {
       }
     }
 
+    const now = new Date();
+    const activeDiscounts = await prisma.discount.findMany({
+      where: {
+        expiresAt: {
+          gt: now,
+        },
+      },
+      include: {
+        category: true,
+      },
+    });
+
+    const getDiscountedPrice = (product: { id: string; price: number; category: string }) => {
+      const percentages = activeDiscounts.map((d) => {
+        const matchesProduct = d.productId === product.id || d.productIds.includes(product.id);
+        if (matchesProduct) return d.percentage;
+
+        const matchesCategory = d.category && d.category.name === product.category;
+        if (matchesCategory) return d.percentage;
+
+        const isGlobal = !d.productId && !d.categoryId && d.productIds.length === 0;
+        if (isGlobal) return d.percentage;
+
+        return 0;
+      });
+
+      const maxPct = Math.max(0, ...percentages);
+      return product.price * (1 - maxPct / 100);
+    };
+
     const totalAmount = cart.items.reduce(
-      (sum, item) => sum + item.quantity * item.product.price,
+      (sum, item) => sum + item.quantity * getDiscountedPrice(item.product),
       0,
     );
 
@@ -154,7 +185,7 @@ class OrderService {
         ({
           quantity: item.quantity,
           size: item.size,
-          price_at_purchase: item.product.price,
+          price_at_purchase: getDiscountedPrice(item.product),
           orderId: order.id,
           productId: item.productId,
         }) as Prisma.OrderItemCreateManyInput,

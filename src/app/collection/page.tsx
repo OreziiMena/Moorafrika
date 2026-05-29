@@ -4,7 +4,7 @@ import React, { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import axios from "axios";
-import { Search, ChevronDown } from "lucide-react"; // Added ChevronDown
+import { Search, ChevronDown } from "lucide-react";
 import styles from "./collection.module.css";
 import { ProductContract } from "@/contracts/product";
 import { CategoryContract } from "@/contracts/category";
@@ -27,15 +27,23 @@ export default function CollectionPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [isLoading, setIsLoading] = useState(true);
+  
+  const [discounts, setDiscounts] = useState<any[]>([]);
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const activeDiscount = discounts[currentIndex] || null;
+  const [timeLeft, setTimeLeft] = useState<{
+    days: number;
+    hours: number;
+    minutes: number;
+    seconds: number;
+  } | null>(null);
 
   const [searchQuery, setSearchQuery] = useState("");
   const [debouncedSearchQuery, setDebouncedSearchQuery] = useState("");
   
-  // Data states
   const [selectedCategory, setSelectedCategory] = useState(-1);
   const [sortOption, setSortOption] = useState("popularity");
 
-  // Dropdown UI states
   const [isCategoryOpen, setIsCategoryOpen] = useState(false);
   const [isSortOpen, setIsSortOpen] = useState(false);
 
@@ -60,6 +68,59 @@ export default function CollectionPage() {
     };
     fetchCategories();
   }, []);
+
+  useEffect(() => {
+    const fetchDiscounts = async () => {
+      try {
+        const response = await axios.get<any[]>("/api/discounts");
+        const now = new Date();
+        const active = response.data.filter(
+          (d) => new Date(d.expiresAt) > now
+        );
+        setDiscounts(active);
+        setCurrentIndex(0);
+      } catch (error) {
+        console.error("Failed to fetch discounts", error);
+      }
+    };
+    fetchDiscounts();
+  }, []);
+
+  useEffect(() => {
+    if (discounts.length <= 1) return;
+    const interval = setInterval(() => {
+      setCurrentIndex((prev) => (prev + 1) % discounts.length);
+    }, 6000);
+    return () => clearInterval(interval);
+  }, [discounts.length]);
+
+  useEffect(() => {
+    if (!activeDiscount) return;
+
+    const calculateTimeLeft = () => {
+      const difference = +new Date(activeDiscount.expiresAt) - +new Date();
+      if (difference <= 0) return null;
+
+      return {
+        days: Math.floor(difference / (1000 * 60 * 60 * 24)),
+        hours: Math.floor((difference / (1000 * 60 * 60)) % 24),
+        minutes: Math.floor((difference / 1000 / 60) % 60),
+        seconds: Math.floor((difference / 1000) % 60),
+      };
+    };
+
+    setTimeLeft(calculateTimeLeft());
+
+    const timer = setInterval(() => {
+      const time = calculateTimeLeft();
+      setTimeLeft(time);
+      if (!time) {
+        clearInterval(timer);
+      }
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, [activeDiscount]);
 
   useEffect(() => {
     const filtersChanged =
@@ -138,11 +199,78 @@ export default function CollectionPage() {
     }
   };
 
+  const getProductDiscountPercentage = (p: ProductContract) => {
+    const percentages = discounts.map((d) => {
+      const matchesProduct = d.productId === p.id || (Array.isArray(d.productIds) && d.productIds.includes(p.id));
+      if (matchesProduct) return d.percentage;
+
+      const matchesCategory = d.category && d.category.name === p.category;
+      if (matchesCategory) return d.percentage;
+
+      const isGlobal = !d.productId && !d.categoryId && (!Array.isArray(d.productIds) || d.productIds.length === 0);
+      if (isGlobal) return d.percentage;
+
+      return 0;
+    });
+
+    const maxPct = Math.max(0, ...percentages);
+    return maxPct > 0 ? maxPct : null;
+  };
+
   return (
       <div className={styles.container}>
         <header className={styles.header}>
           <h1 className={styles.title}>OUR COLLECTION</h1>
           <p className={styles.subtitle}>Explore our latest arrivals and premium selections</p>
+
+          {activeDiscount && (
+            <div className={styles.discountBanner}>
+              <span className={styles.badge}>-{activeDiscount.percentage}%</span>
+              <div className={styles.bannerText}>
+                <h3>{activeDiscount.title}</h3> 
+                {activeDiscount.description && <p>{activeDiscount.description}</p>}
+              </div>
+              {timeLeft ? (
+                <div className={styles.countdownContainer}>
+                  <div className={styles.countdownUnit}>
+                    <span className={styles.countdownNumber}>{String(timeLeft.days).padStart(2, "0")}</span>
+                    <span className={styles.countdownLabel}>Days</span>
+                  </div>
+                  <div className={styles.countdownDivider}>:</div>
+                  <div className={styles.countdownUnit}>
+                    <span className={styles.countdownNumber}>{String(timeLeft.hours).padStart(2, "0")}</span>
+                    <span className={styles.countdownLabel}>Hrs</span>
+                  </div>
+                  <div className={styles.countdownDivider}>:</div>
+                  <div className={styles.countdownUnit}>
+                    <span className={styles.countdownNumber}>{String(timeLeft.minutes).padStart(2, "0")}</span>
+                    <span className={styles.countdownLabel}>Mins</span>
+                  </div>
+                  <div className={styles.countdownDivider}>:</div>
+                  <div className={styles.countdownUnit}>
+                    <span className={styles.countdownNumber}>{String(timeLeft.seconds).padStart(2, "0")}</span>
+                    <span className={styles.countdownLabel}>Secs</span>
+                  </div>
+                </div>
+              ) : (
+                <div className={styles.expiredLabel}>Sale Ended</div>
+              )}
+
+              {discounts.length > 1 && (
+                <div className={styles.bannerDots}>
+                  {discounts.map((_, idx) => (
+                    <button
+                      key={idx}
+                      type="button"
+                      className={`${styles.bannerDot} ${idx === currentIndex ? styles.bannerDotActive : ""}`}
+                      onClick={() => setCurrentIndex(idx)}
+                      aria-label={`Go to slide ${idx + 1}`}
+                    />
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
         </header>
 
         <div className={styles.filtersContainer}>
@@ -252,39 +380,60 @@ export default function CollectionPage() {
         ) : (
           <>
             <div className={styles.productGrid}>
-              {products.map((product) => (
-                <Link href={`/product/${product.slug}`} key={product.id} className={styles.productCard}>
-                  
-                  <div className={styles.imageContainer}>
-                    <Image
-                      src={product.imageUrl}
-                      alt={product.name}
-                      fill
-                      unoptimized
-                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                      className={styles.productImage}
-                    />
-                  </div>
+              {products.map((product) => {
+                const pct = getProductDiscountPercentage(product);
+                const discountedPrice = pct ? product.price * (1 - pct / 100) : null;
 
-                  <div className={styles.productDetails}>
-                    <div className={styles.cardHeader}>
-                      <h3 className={styles.productName}>{product.name}</h3>
-                      {product.stock_count > 0 ? (
-                        <span className={styles.inStockBadge}>In Stock</span>
-                      ) : (
-                        <span className={styles.outOfStockBadge}>Sold Out</span>
+                return (
+                  <Link href={`/product/${product.slug}`} key={product.id} className={styles.productCard}>
+                    
+                    <div className={styles.imageContainer}>
+                      <Image
+                        src={product.imageUrl}
+                        alt={product.name}
+                        fill
+                        unoptimized
+                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                        className={styles.productImage}
+                      />
+                      {pct && (
+                        <span className={styles.gridBadge}>
+                          -{pct}%
+                        </span>
                       )}
                     </div>
-                    
-                    <p className={styles.productPrice}>{formatNaira(product.price)}</p>
-                    
-                    <div className={styles.gridCartBtn}>
-                      ADD TO CART
-                    </div>
-                  </div>
 
-                </Link>
-              ))}
+                    <div className={styles.productDetails}>
+                      <div className={styles.cardHeader}>
+                        <h3 className={styles.productName}>{product.name}</h3>
+                        {product.stock_count > 0 ? (
+                          <span className={styles.inStockBadge}>In Stock</span>
+                        ) : (
+                          <span className={styles.outOfStockBadge}>Sold Out</span>
+                        )}
+                      </div>
+                      
+                      {discountedPrice !== null ? (
+                        <div className={styles.priceContainer}>
+                          <span className={styles.discountedPrice}>
+                            {formatNaira(discountedPrice)}
+                          </span>
+                          <span className={styles.slashedPrice}>
+                            {formatNaira(product.price)}
+                          </span>
+                        </div>
+                      ) : (
+                        <p className={styles.productPrice}>{formatNaira(product.price)}</p>
+                      )}
+                      
+                      <div className={styles.gridCartBtn}>
+                        ADD TO CART
+                      </div>
+                    </div>
+
+                  </Link>
+                );
+              })}
             </div>
 
             {totalPages > 1 && (
