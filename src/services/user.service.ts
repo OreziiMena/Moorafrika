@@ -15,6 +15,9 @@ import {
 } from '@/validationSchemas/user';
 import { userMapper } from '@/mapper/user';
 import { AuthProvider } from '@prisma/client';
+import { v4 as uuidv4 } from 'uuid';
+import { prisma } from '@/lib/prisma';
+import { sendPasswordResetEmail } from './resend/password';
 
 class UserService {
   static async getProfile() {
@@ -86,6 +89,71 @@ class UserService {
     }
 
     return userMapper(user);
+  }
+
+  static async forgotPassword(data: { email: string}) {
+    const email = z.email('Invalid Email format').parse(data.email);
+
+    const user = await findUserByEmail(email);
+    if (!user) {
+      return { message: 'If a user with that email exists, a password reset email has been sent' };
+    }
+
+    const resetToken = uuidv4();
+
+    await prisma.passwordResetToken.deleteMany({
+      where: {
+        userId: user.id,
+      }
+    });
+
+    await prisma.passwordResetToken.create({
+      data: {
+        userId: user.id,
+        token: resetToken,
+        expiresAt: new Date(Date.now() + 3600000), // 1 hour from now
+      }
+    })
+
+    await sendPasswordResetEmail(email, resetToken);
+
+    return { message: 'If a user with that email exists, a password reset email has been sent' };
+  }
+
+  static async resetPassword(data: { token: string, newPassword: string }) {
+    const { token, newPassword } = z.object({
+      token: z.string(),
+      newPassword: z.string().min(6, 'Password must be at least 6 characters'),
+    }).parse(data);
+
+    const resetTokenRecord = await prisma.passwordResetToken.findUnique({
+      where: { token },
+      include: { user: { include: { authMethods: true } } },
+    });
+
+    if (!resetTokenRecord || resetTokenRecord.expiresAt < new Date()) {
+      throw new BadRequestError('Invalid or expired password reset token');
+    }
+
+    const newPasswordHash = await bcrypt.hash(newPassword, 10);
+
+    const localAuthMethod = resetTokenRecord.user.authMethods.find(
+      (method) => method.provider === AuthProvider.LOCAL,
+    );
+
+    if (!localAuthMethod) {
+      await AuthService.createLocalAuthMethod(resetTokenRecord.user.id, newPasswordHash);
+    } else {
+      await updateLocalAuthMethod(localAuthMethod.id, newPasswordHash);
+    }
+
+    await prisma.passwordResetToken.deleteMany({
+      where: {
+        userId: resetTokenRecord.userId,
+      }
+    });
+
+    return { message: 'Password reset successfully' };
   }
 }
 
