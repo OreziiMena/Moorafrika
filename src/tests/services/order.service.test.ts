@@ -17,6 +17,9 @@ const mocks = vi.hoisted(() => ({
   pageResponseMapperMock: vi.fn(),
   userOrderMapperMock: vi.fn(),
   adminOrderMapperMock: vi.fn(),
+  discountFindManyMock: vi.fn(),
+  orderItemUpdateMock: vi.fn(),
+  orderUpdateMock: vi.fn(),
 }));
 
 vi.mock('@/services/auth.service', () => ({
@@ -45,6 +48,7 @@ vi.mock('@/services/cart.service', () => ({
 vi.mock('@/services/product.service', () => ({
   default: {
     updateProductStock: mocks.updateProductStockMock,
+    updateSoldProduct: mocks.updateProductStockMock,
   },
 }));
 
@@ -67,12 +71,30 @@ vi.mock('@/mapper/order', () => ({
   adminOrderMapper: mocks.adminOrderMapperMock,
 }));
 
+vi.mock('@/lib/prisma', () => ({
+  prisma: {
+    discount: {
+      findMany: vi.fn().mockResolvedValue([]),
+    },
+    orderItem: {
+      update: vi.fn(),
+    },
+    order: {
+      update: vi.fn(),
+    },
+  },
+}));
+
+import { prisma } from '@/lib/prisma';
 import OrderService from '@/services/order.service';
 import { NotFoundError } from '@/lib/errors';
 
 describe('OrderService', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    prisma.discount.findMany = vi.fn().mockResolvedValue([]);
+    prisma.orderItem.update = vi.fn().mockResolvedValue({});
+    prisma.order.update = vi.fn().mockResolvedValue({});
   });
 
   it('returns paginated current user orders', async () => {
@@ -134,7 +156,7 @@ describe('OrderService', () => {
 
     await expect(OrderService.getOrderById('order-1')).resolves.toEqual({ id: 'order-1' });
 
-    expect(mocks.findOrdersMock).toHaveBeenCalledWith(true, { id: 'order-1', userId: 'admin-1' }, 0, 1);
+    expect(mocks.findOrdersMock).toHaveBeenCalledWith(true, { id: 'order-1' }, 0, 1);
   });
 
   it('creates an order, charges checkout, and clears the cart', async () => {
@@ -156,7 +178,11 @@ describe('OrderService', () => {
     ];
 
     mocks.createOrderSchemaParseMock.mockReturnValue({
-      deliveryAddress: '12 Market Road',
+      streetAddress: '12 Market Road',
+      city: 'Lagos',
+      state: 'Lagos',
+      zipCode: '100001',
+      country: 'Nigeria',
       contactEmail: 'buyer@example.com',
       contactName: 'Buyer Name',
       contactPhone: '+2347000000000',
@@ -178,7 +204,11 @@ describe('OrderService', () => {
     ).resolves.toBe('https://paystack.example.com/checkout');
 
     expect(mocks.createOrderMock).toHaveBeenCalledWith({
-      delivery_address: '12 Market Road',
+      street_address: '12 Market Road',
+      city: 'Lagos',
+      state: 'Lagos',
+      zip_code: '100001',
+      country: 'Nigeria',
       contact_email: 'buyer@example.com',
       contact_name: 'Buyer Name',
       contact_phone: '+2347000000000',
@@ -250,14 +280,14 @@ describe('OrderService', () => {
     mocks.findUniqueOrderMock.mockResolvedValue({
       id: 'order-1',
       orderItems: [
-        { quantity: 2, product: { slug: 'product-one' } },
-        { quantity: 1, product: { slug: 'product-two' } },
+        { quantity: 2, product: { slug: 'product-one', stock_count: 10 } },
+        { quantity: 1, product: { slug: 'product-two', stock_count: 10 } },
       ],
     });
 
     await expect(OrderService.processPaidOrder('order-1')).resolves.toBeUndefined();
 
-    expect(mocks.updateOrderStatusMock).toHaveBeenCalledWith('order-1', 'PROCESSING');
+    expect(mocks.updateOrderStatusMock).toHaveBeenCalledWith('order-1', { status: 'PROCESSING' });
     expect(mocks.updateProductStockMock).toHaveBeenCalledWith('product-one', -2);
     expect(mocks.updateProductStockMock).toHaveBeenCalledWith('product-two', -1);
   });
@@ -270,8 +300,8 @@ describe('OrderService', () => {
       status: 'PENDING',
       contact_email: 'buyer@example.com',
       orderItems: [
-        { quantity: 2, price_at_purchase: 1000 },
-        { quantity: 1, price_at_purchase: 2500 },
+        { quantity: 2, price_at_purchase: 1000, product: { id: 'product-1', price: 1000, category: { name: 'Clothing' } } },
+        { quantity: 1, price_at_purchase: 2500, product: { id: 'product-2', price: 2500, category: { name: 'Clothing' } } },
       ],
     });
     mocks.paystackCheckoutMock.mockResolvedValue('https://paystack.example.com/order');

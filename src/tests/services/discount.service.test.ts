@@ -76,6 +76,7 @@ describe('DiscountService', () => {
       percentage: 20,
       expiresAt: new Date('2026-06-01T00:00:00.000Z'),
       imageKey: 'discounts/sale.png',
+      productIds: [],
       product: {
         connect: { id: 'product-1' },
       },
@@ -104,6 +105,7 @@ describe('DiscountService', () => {
       percentage: 20,
       expiresAt: new Date('2026-06-01T00:00:00.000Z'),
       imageKey: 'discounts/sale.png',
+      productIds: [],
     });
   });
 

@@ -99,6 +99,7 @@ describe('CartService', () => {
         {
           id: 'item-1',
           productId: 'product-1',
+          size: 'L',
         },
       ],
     };
@@ -124,12 +125,11 @@ describe('CartService', () => {
 
     expect(mocks.updateCartItemQuantityMock).toHaveBeenCalledWith('item-1', {
       quantity: 5,
-      size: 'L',
     });
     expect(mocks.mapCartItemMock).toHaveBeenCalledWith(updatedCartItem);
   });
 
-  it('throws when updating a cart item that does not exist', async () => {
+  it('creates a cart item when updating a cart item that does not exist', async () => {
     mocks.authorizeUserMock.mockResolvedValue({ id: 'user-1' });
     mocks.updateCartItemSchemaParseMock.mockReturnValue({
       productId: 'product-1',
@@ -141,6 +141,8 @@ describe('CartService', () => {
       user_id: 'user-1',
       items: [],
     });
+    mocks.createCartItemMock.mockResolvedValue({ id: 'item-1', quantity: 5 });
+    mocks.mapCartItemMock.mockReturnValue({ id: 'item-1', quantity: 5 });
 
     await expect(
       CartService.updateCartItemQuantity({
@@ -148,7 +150,14 @@ describe('CartService', () => {
         quantity: 5,
         size: 'L',
       } as never),
-    ).rejects.toBeInstanceOf(NotFoundError);
+    ).resolves.toEqual({ id: 'item-1', quantity: 5 });
+
+    expect(mocks.createCartItemMock).toHaveBeenCalledWith('cart-1', 'product-1', {
+      quantity: 5,
+      size: 'L',
+      cart: { connect: { id: 'cart-1' } },
+      product: { connect: { id: 'product-1' } },
+    });
   });
 
   it('removes an existing item from the cart', async () => {
@@ -159,6 +168,7 @@ describe('CartService', () => {
         {
           id: 'item-1',
           productId: 'product-1',
+          size: 'M',
         },
       ],
     };
@@ -166,7 +176,7 @@ describe('CartService', () => {
     mocks.authorizeUserMock.mockResolvedValue({ id: 'user-1' });
     mocks.findCartByUserIdMock.mockResolvedValue(cart);
 
-    await expect(CartService.removeItemFromCart('product-1')).resolves.toBeUndefined();
+    await expect(CartService.removeItemFromCart('product-1', 'M')).resolves.toBeUndefined();
 
     expect(mocks.deleteCartItemMock).toHaveBeenCalledWith('item-1');
   });
@@ -179,6 +189,6 @@ describe('CartService', () => {
       items: [],
     });
 
-    await expect(CartService.removeItemFromCart('product-1')).rejects.toBeInstanceOf(NotFoundError);
+    await expect(CartService.removeItemFromCart('product-1', 'M')).rejects.toBeInstanceOf(NotFoundError);
   });
 });

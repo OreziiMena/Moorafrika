@@ -59,6 +59,8 @@ describe('UserService', () => {
 
   it('returns the authorized profile', async () => {
     mocks.authorizeUserMock.mockResolvedValue({ id: 'user-1' });
+    mocks.findUserByIdMock.mockResolvedValue({ id: 'user-1' });
+    mocks.userMapperMock.mockReturnValue({ id: 'user-1' });
 
     await expect(UserService.getProfile()).resolves.toEqual({ id: 'user-1' });
   });

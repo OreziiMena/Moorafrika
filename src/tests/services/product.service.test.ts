@@ -76,6 +76,9 @@ describe('ProductService', () => {
       },
       5,
       5,
+      {
+        created_at: 'desc',
+      },
     );
     expect(result.pagination).toEqual({
       page: 2,
@@ -192,7 +195,6 @@ describe('ProductService', () => {
       name: 'Updated Shirt',
       description: 'Updated shirt',
       price: 30,
-      categoryId: 5,
       sizes: ['L'],
       imageKey: 'products/updated-shirt.png',
       thumbnailKeys: ['products/updated-shirt-thumb.png'],

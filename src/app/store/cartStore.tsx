@@ -70,7 +70,7 @@ export const useCartStore = create<CartStore>((set, get) => ({
   removeItem: async (id, size) => {
     try {
       await axios.delete(`/api/cart/${encodeURIComponent(id)}?size=${encodeURIComponent(size)}`);
-      set((state) => ({ items: state.items.filter((item) => !(item.id === id && item.size === size)) }));
+      set((state) => ({ items: state.items.filter((item) => !(item.productId === id && item.size === size)) }));
     } catch (err) {
       handleClientError(err);
     }

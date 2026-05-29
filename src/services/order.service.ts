@@ -45,6 +45,8 @@ class OrderService {
       countOrders({ userId: user.id, ...statusFilter }),
     ]);
 
+    await this.syncPendingOrders(orders);
+
     return pageResponseMapper({
       data: orders.map(userOrderMapper),
       page,
@@ -65,6 +67,8 @@ class OrderService {
     if (order.length < 1) {
       throw new NotFoundError('Order not found');
     }
+
+    await this.syncPendingOrders(order);
 
     return userOrderMapper(order[0]);
   }
@@ -250,6 +254,8 @@ class OrderService {
       throw new Error('Payment can only be initialized for pending orders');
     }
 
+    await this.syncPendingOrders([order]);
+
     // Check order item quantity and available stocks_count before initializing payment
     for (const item of order.orderItems) {
       if (item.quantity > item.product.stock_count) {
@@ -316,6 +322,66 @@ class OrderService {
     await updateOrderStatus(order.id, { status, adminNote: note });
 
     return;
+  }
+
+  static async syncPendingOrders(orders: any[]) {
+    const pendingOrders = orders.filter(o => o.status === 'PENDING');
+    if (pendingOrders.length === 0) return;
+
+    const now = new Date();
+    const activeDiscounts = await prisma.discount.findMany({
+      where: {
+        expiresAt: {
+          gt: now,
+        },
+      },
+      include: {
+        category: true,
+      },
+    });
+
+    for (const order of pendingOrders) {
+      let orderTotalChanged = false;
+      let newTotalAmount = 0;
+
+      for (const item of order.orderItems) {
+        const product = item.product;
+        const percentages = activeDiscounts.map((d) => {
+          const matchesProduct = d.productId === product.id || d.productIds.includes(product.id);
+          if (matchesProduct) return d.percentage;
+
+          const matchesCategory = d.category && d.category.name === product.category.name;
+          if (matchesCategory) return d.percentage;
+
+          const isGlobal = !d.productId && !d.categoryId && d.productIds.length === 0;
+          if (isGlobal) return d.percentage;
+
+          return 0;
+        });
+
+        const maxPct = Math.max(0, ...percentages);
+        const currentPrice = product.price * (1 - maxPct / 100);
+
+        if (item.price_at_purchase !== currentPrice) {
+          await prisma.orderItem.update({
+            where: { id: item.id },
+            data: { price_at_purchase: currentPrice }
+          });
+          item.price_at_purchase = currentPrice;
+          orderTotalChanged = true;
+        }
+
+        newTotalAmount += item.quantity * currentPrice;
+      }
+
+      if (orderTotalChanged || order.totalAmount !== newTotalAmount) {
+        await prisma.order.update({
+          where: { id: order.id },
+          data: { totalAmount: newTotalAmount }
+        });
+        order.totalAmount = newTotalAmount;
+      }
+    }
   }
 }
 

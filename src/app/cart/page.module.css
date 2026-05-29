@@ -302,12 +302,12 @@
   }
   .table tr {
     display: grid;
-    grid-template-columns: 80px 1fr auto;
+    grid-template-columns: 140px 1fr;
     grid-template-areas:
-      "thumb title   title"
-      "thumb price   price"
-      "qty   total   total"
-      "qty   remove  remove";
+      "thumb title"
+      "thumb price"
+      "qty   total"
+      "qty   remove";
     row-gap: 0;
     column-gap: 0;
     padding: 0.3rem;
