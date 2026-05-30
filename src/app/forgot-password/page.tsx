@@ -20,7 +20,7 @@ export default function ForgotPasswordPage() {
 
     try {
       const res = await axios.post("/api/auth/forgot-password", { email });
-      setMessage(res.data.message || "If a user with that email exists, a password reset email has been sent.");
+      setMessage(res.data.message || "Password reset email has been sent.");
     } catch (error: any) {
       setErrorMsg(error.response?.data?.message || "Failed to request password reset. Please try again.");
     } finally {
