@@ -9,7 +9,7 @@ import styles from "./Testimonials.module.css";
 const reviews: Review[] = [
   {
     id: "1",
-    name: "Sarah Jenkins",
+    name: "EJiofor Elliot",
     rating: 5,
     text: "The quality is simply unmatched. The structured blazer fits perfectly and the material feels incredibly premium."
   },
@@ -21,13 +21,13 @@ const reviews: Review[] = [
   },
   {
     id: "3",
-    name: "Elena Rodriguez",
+    name: "Olise Chibuzor",
     rating: 4,
-    text: "Beautiful designs. The cashmere knit is the softest I've ever owned. Will definitely be purchasing more."
+    text: "Beautiful designs. The material is the softest I've ever owned. Will definitely be purchasing more."
   },
   {
     id: "4",
-    name: "James Wilson",
+    name: "Amina Yusuf",
     rating: 5,
     text: "Every piece tells a story. I appreciate the attention to detail and the high-end customer service experience."
   }

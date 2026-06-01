@@ -7,6 +7,7 @@ import Testimonials from "@/components/Testimonials";
 import Newsletter from "@/components/Newsletter";
 import ProductService from "@/services/product.service";
 import HomeDiscountBanner from "@/components/HomeDiscountBanner";
+import PromoModal from "@/components/PromoModal";
 
 export const dynamic = "force-dynamic";
 
@@ -20,6 +21,7 @@ export default async function Home() {
 
   return (
     <main className="main-container">
+      <PromoModal />
       <Hero />
       <Gallery />
       <Features />
