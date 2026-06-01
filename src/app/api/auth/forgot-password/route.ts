@@ -6,5 +6,5 @@ export const POST = errorHandler(async (request) => {
   const body = await request.json();
   const result = await UserService.forgotPassword(body);
 
-  return NextResponse.json({ message: result.message });
+  return NextResponse.json({ message: "Failed to request password reset. Please try again." });
 });

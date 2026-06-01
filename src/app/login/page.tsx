@@ -90,7 +90,7 @@ export default function LoginPage() {
           </div>
 
           <button type="submit" className={styles.submitBtn} disabled={isLoading}>
-            {isLoading ? "AUTHENTICATING..." : "SIGN IN"}
+            {isLoading ? "LOGGING IN..." : "LOG IN"}
           </button>
         </form>
 
