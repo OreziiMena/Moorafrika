@@ -9,7 +9,7 @@ const nextConfig: NextConfig = {
       },
       {
         protocol: 'https',
-        hostname: 'pub-*.r2.dev', 
+        hostname: 'files.moorafrika.com', 
       },
     ],
   },
