@@ -108,6 +108,19 @@ export default function AdminOrdersPage() {
     return new Date(dateString).toLocaleDateString('en-GB');
   };
 
+  const getShippingDetails = (method: string) => {
+    switch (method?.toLowerCase()) {
+      case 'within_port_harcourt':
+        return { name: "Port Harcourt Delivery", fee: 5000 };
+      case 'outside_port_harcourt_doors':
+        return { name: "Door Delivery", fee: 20000 };
+      case 'outside_port_harcourt_pickup':
+        return { name: "Pickup", fee: 10000 };
+      default:
+        return { name: "Standard Shipping", fee: 0 };
+    }
+  };
+
   const getStatusLabel = (statusValue: string) => {
     return STATUS_OPTIONS.find(opt => opt.value === statusValue)?.label || statusValue;
   };
@@ -309,7 +322,7 @@ export default function AdminOrdersPage() {
 
                   <div className={styles.shippingPreview}>
                     <MapPin size={16} />
-                    <span>Shipping to: {order.contactName}, {order.streetAddress}, {order.city}</span>
+                    <span>Shipping ({getShippingDetails(order.shippingMethod).name}): to {order.contactName}, {order.streetAddress}, {order.city}</span>
                   </div>
 
                   {!isEditing && (order.admin_note || order.adminNote) && (

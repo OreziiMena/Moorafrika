@@ -103,6 +103,26 @@ export default function AdminOrderDetailsPage() {
   if (isLoading) return <div className={styles.loadingWrapper}>Loading order details...</div>;
   if (!order) return <div className={styles.loadingWrapper}>Order not found.</div>;
 
+  const subtotal = order.orderItems?.reduce((sum: any, item: any) => {
+    const itemPrice = item.price_at_purchase || item.priceAtPurchase || item.price || item.product?.price || 0;
+    return sum + (itemPrice * item.quantity);
+  }, 0) || 0;
+
+  const getShippingDetails = (method: string) => {
+    switch (method?.toLowerCase()) {
+      case 'within_port_harcourt':
+        return { name: "Port Harcourt Delivery", fee: 5000 };
+      case 'outside_port_harcourt_doors':
+        return { name: "Door Delivery", fee: 20000 };
+      case 'outside_port_harcourt_pickup':
+        return { name: "Pickup", fee: 10000 };
+      default:
+        return { name: "Standard Shipping", fee: 0 };
+    }
+  };
+
+  const shippingInfo = getShippingDetails(order.shippingMethod);
+
   return (
     <main className={styles.pageWrapper}>
       <nav className={styles.nav}>
@@ -192,8 +212,14 @@ export default function AdminOrderDetailsPage() {
               <div className={styles.summaryTotals}>
                 <div className={styles.totalRow}>
                   <span>Subtotal:</span>
-                  <span>{formatNaira(order.totalAmount)}</span>
+                  <span>{formatNaira(subtotal)}</span>
                 </div>
+                {order.shippingMethod && (
+                  <div className={styles.totalRow}>
+                    <span>Shipping ({shippingInfo.name}):</span>
+                    <span>{formatNaira(shippingInfo.fee)}</span>
+                  </div>
+                )}
                 <div className={`${styles.totalRow} ${styles.grandTotal}`}>
                   <span>Total:</span>
                   <span>{formatNaira(order.totalAmount)}</span>
@@ -269,6 +295,14 @@ export default function AdminOrderDetailsPage() {
                 <p>{order.city}, {order.state}</p>
                 <p>{order.country}</p>
                 {order.zip_code && <p>ZIP: {order.zip_code}</p>}
+                {order.shippingMethod && (
+                  <>
+                    <div className={styles.divider}></div>
+                    <p style={{ margin: 0, color: 'var(--ivory, #FDFBF7)' }}>
+                      <strong>Shipping Method:</strong> ({shippingInfo.name} - {formatNaira(shippingInfo.fee)})
+                    </p>
+                  </>
+                )}
               </div>
             </section>
           </div>

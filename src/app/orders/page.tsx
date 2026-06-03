@@ -48,6 +48,19 @@ export default function MyOrdersPage() {
     });
   };
 
+  const getShippingDetails = (method: string) => {
+    switch (method?.toLowerCase()) {
+      case 'within_port_harcourt':
+        return { name: "Port Harcourt Delivery", fee: 5000 };
+      case 'outside_port_harcourt_doors':
+        return { name: "Door Delivery", fee: 20000 };
+      case 'outside_port_harcourt_pickup':
+        return { name: "Pickup", fee: 10000 };
+      default:
+        return { name: "Standard Shipping", fee: 0 };
+    }
+  };
+
   const filteredOrders = orders.filter(order => {
     const matchesSearch = order.id.toLowerCase().includes(searchQuery.toLowerCase()) || 
                           order.orderItems.some(item => item.product.name.toLowerCase().includes(searchQuery.toLowerCase()));
@@ -173,7 +186,7 @@ export default function MyOrdersPage() {
 
                   <div className={styles.shippingPreview}>
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="1" y="3" width="15" height="13"></rect><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon><circle cx="5.5" cy="18.5" r="2.5"></circle><circle cx="18.5" cy="18.5" r="2.5"></circle></svg>
-                    <span>Shipping to: {order.contactName}, {order.streetAddress}</span>
+                    <span>Shipping ({getShippingDetails(order.shippingMethod).name}): to {order.contactName}, {order.streetAddress}</span>
                   </div>
                 </div>
               );

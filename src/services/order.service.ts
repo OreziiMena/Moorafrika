@@ -390,6 +390,9 @@ class OrderService {
         newTotalAmount += item.quantity * currentPrice;
       }
 
+      // Add shipping fee to total amount
+      newTotalAmount += OrderService.SHIPPING_FEES[order.shippingMethod.toLowerCase() as ShippingMethod];
+
       if (orderTotalChanged || order.totalAmount !== newTotalAmount) {
         await prisma.order.update({
           where: { id: order.id },

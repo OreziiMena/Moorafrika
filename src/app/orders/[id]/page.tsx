@@ -110,6 +110,23 @@ export default function OrderDetailsPage() {
   if (isLoading) return <div className={styles.loadingWrapper}>Loading order...</div>;
   if (!order) return <div className={styles.loadingWrapper}>Order not found.</div>;
 
+  const subtotal = order.orderItems?.reduce((sum, item) => sum + (item.priceAtPurchase * item.quantity), 0) || 0;
+
+  const getShippingDetails = (method: string) => {
+    switch (method?.toLowerCase()) {
+      case 'within_port_harcourt':
+        return { name: "Within Port Harcourt", fee: 5000 };
+      case 'outside_port_harcourt_doors':
+        return { name: "Outside Port Harcourt (Door Delivery)", fee: 20000 };
+      case 'outside_port_harcourt_pickup':
+        return { name: "Outside Port Harcourt (Pickup)", fee: 10000 };
+      default:
+        return { name: "Standard Shipping", fee: 0 };
+    }
+  };
+
+  const shippingInfo = getShippingDetails(order.shippingMethod);
+
   return (
     <main className={styles.pageWrapper}>
       {/* Top Navigation */}
@@ -230,7 +247,11 @@ export default function OrderDetailsPage() {
           <div className={styles.summaryTotals}>
             <div className={styles.totalRow}>
               <span>Subtotal:</span>
-              <span>{formatNaira(order.totalAmount)}</span>
+              <span>{formatNaira(subtotal)}</span>
+            </div>
+            <div className={styles.totalRow}>
+              <span>Shipping ({shippingInfo.name}):</span>
+              <span>{formatNaira(shippingInfo.fee)}</span>
             </div>
             <div className={`${styles.totalRow} ${styles.grandTotal}`}>
               <span>Total:</span>
@@ -268,6 +289,10 @@ export default function OrderDetailsPage() {
             <p>{order.streetAddress}</p>
             <p>{order.city}, {order.state}</p>
             <p>Phone: {order.contactPhone}</p>
+            <div style={{ margin: '1rem 0', borderTop: '1px solid rgba(253, 251, 247, 0.1)' }}></div>
+            <p style={{ margin: 0, color: 'var(--ivory, #FDFBF7)' }}>
+              <strong>Shipping Method:</strong> {shippingInfo.name} ({formatNaira(shippingInfo.fee)})
+            </p>
           </div>
         </section>
 

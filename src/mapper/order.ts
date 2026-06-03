@@ -2,6 +2,7 @@ import { UserOrderContract, OrderItemContract, AdminOrderContract } from '@/cont
 import { productMapper } from './product';
 import { Prisma } from '@prisma/client';
 import { userMapper } from './user';
+import { ShippingMethod } from '@/types';
 
 type UserOrderWithItems = Prisma.OrderGetPayload<{
   include: {
@@ -50,6 +51,7 @@ export const userOrderMapper = (
   note: order.note,
   adminNote: order.admin_note,
   status: order.status,
+  shippingMethod: order.shippingMethod.toLowerCase() as ShippingMethod,
   orderItems: order.orderItems.map(mapOrderItem),
   shippedAt: order.shipped_at,
   deliveredAt: order.delivered_at,

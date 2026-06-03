@@ -1,6 +1,7 @@
 import { OrderStatus } from '@prisma/client';
 import { ProductContract } from './product';
 import { UserContract } from './user';
+import { ShippingMethod } from '@/types';
 
 export interface OrderItemContract {
   id: string;
@@ -32,6 +33,7 @@ export interface UserOrderContract {
   note: string | null;
   adminNote: string | null;
   status: OrderStatus;
+  shippingMethod: ShippingMethod;
   orderItems: OrderItemContract[];
 
   shippedAt: Date | null;
