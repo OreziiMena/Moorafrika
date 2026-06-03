@@ -24,6 +24,12 @@ enum OrderStatus {
   CANCELLED // Order has been cancelled by the customer (before payment)
 }
 
+enum ShippingMethod {
+  WITHIN_PORT_HARCOURT
+  OUTSIDE_PORT_HARCOURT_DOORS
+  OUTSIDE_PORT_HARCOURT_PICKUP
+}
+
 model User {
   id        String   @id @default(uuid())
   email     String   @unique
@@ -191,6 +197,7 @@ model Order {
   note              String?
   admin_note        String?
   status            OrderStatus @default(PENDING)
+  shippingMethod    ShippingMethod
   orderItems        OrderItem[]
 
   shipped_at   DateTime?

@@ -24,6 +24,7 @@ import { BadRequestError, NotFoundError } from '@/lib/errors';
 import ProductService from './product.service';
 import { paystackCheckout } from '@/services/paystack/checkout';
 import { prisma } from '@/lib/prisma';
+import { ShippingMethod } from '@/types';
 
 interface GetOrdersParams {
   page?: number;
@@ -32,6 +33,12 @@ interface GetOrdersParams {
 }
 
 class OrderService {
+  private static SHIPPING_FEES: Record<ShippingMethod, number> = {
+    within_port_harcourt: 5000,
+    outside_port_harcourt_doors: 20000,
+    outside_port_harcourt_pickup: 10000,
+  };
+
   static async getCurrentUserOrders(
     payload: GetOrdersParams,
   ): Promise<PagedResponse<UserOrderContract>> {
@@ -115,12 +122,13 @@ class OrderService {
       contactName,
       contactPhone,
       note,
+      shippingMethod,
     } = createOrderSchema.parse(payload);
 
     const user = await AuthService.authorizeUser();
     const cart = await CartService.getUserCart();
     if (cart.items.length === 0) {
-      throw new Error('Cart is empty');
+      throw new BadRequestError('Cart is empty');
     }
 
     // Check cart item quantity and available stocks_count before creating order
@@ -162,10 +170,13 @@ class OrderService {
       return product.price * (1 - maxPct / 100);
     };
 
-    const totalAmount = cart.items.reduce(
+    let totalAmount = cart.items.reduce(
       (sum, item) => sum + item.quantity * getDiscountedPrice(item.product),
       0,
     );
+
+    // Add shipping fee to total amount
+    totalAmount += OrderService.SHIPPING_FEES[shippingMethod];
 
     const orderPayload = {
       street_address: streetAddress,
@@ -178,6 +189,7 @@ class OrderService {
       contact_phone: contactPhone,
       note,
       totalAmount,
+      shippingMethod: shippingMethod.toUpperCase(),
 
       user: { connect: { id: user.id } },
     } as Prisma.OrderCreateInput;
@@ -265,10 +277,14 @@ class OrderService {
       }
     }
 
-    const totalAmount = order.orderItems.reduce(
+    let totalAmount = order.orderItems.reduce(
       (sum, item) => sum + item.quantity * item.price_at_purchase,
       0,
     );
+
+    // Add shipping fee to total amount
+    totalAmount += OrderService.SHIPPING_FEES[order.shippingMethod.toLowerCase() as ShippingMethod];
+
     const url = await paystackCheckout({
       orderId: order.id,
       email: order.contact_email,

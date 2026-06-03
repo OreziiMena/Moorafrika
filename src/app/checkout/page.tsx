@@ -45,9 +45,8 @@ export default function CheckoutPage() {
     phone: user?.phone || ""
   });
 
-  const [shippingMethod, setShippingMethod] = useState("standard");
-  // Hardcoded to 0 for now
-  const shippingCost = 0; 
+  const [shippingMethod, setShippingMethod] = useState("door");
+
   const [isProcessing, setIsProcessing] = useState(false);
   const [discounts, setDiscounts] = useState<any[]>([]);
 
@@ -92,8 +91,7 @@ export default function CheckoutPage() {
   };
 
   const subtotal = items.reduce((acc, item) => acc + (getDiscountedPrice(item.product) * item.quantity), 0);
-  const tax = subtotal * 0.075;
-  const total = subtotal + shippingCost + tax;
+  // const tax = subtotal * 0.075;
 
   useEffect(() => {
     if (status === "unauthenticated") {
@@ -107,6 +105,36 @@ export default function CheckoutPage() {
       router.push("/collection");
     }
   }, [items, router]);
+
+  const calculateShippingCost = (state: string, shippingMethod: string) => {
+    if (state === "Rivers") {
+      return 5000;
+    }
+
+    switch (shippingMethod) {
+      case "door":
+        return 20000;
+      case "pick-up":
+        return 10000;
+      default:
+        return 0;
+    }
+  };
+
+  const mapShippingToMethod = (state: string, shippingMethod: string) => {
+    if (state === "Rivers") {
+      return "within_port_harcourt";
+    }
+
+    switch (shippingMethod) {
+      case "door":
+        return "outside_port_harcourt_doors";
+      case "pick-up":
+        return "outside_port_harcourt_pickup";
+      default:
+        return "outside_port_harcourt_doors";
+    }
+  };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { id, value } = e.target;
@@ -136,7 +164,7 @@ export default function CheckoutPage() {
         contactName: `${formData.firstName} ${formData.lastName}`,
         contactEmail: formData.email,
         contactPhone: formData.phone,
-        method: shippingMethod,
+        shippingMethod: mapShippingToMethod(formData.state, shippingMethod)
       });
 
       window.location.href = response.data.url;
@@ -145,6 +173,9 @@ export default function CheckoutPage() {
       setIsProcessing(false);
     }
   };
+
+  const shippingCost = calculateShippingCost(formData.state, shippingMethod);
+  const total = subtotal + shippingCost;
 
   return (
       <div className={styles.container}>
@@ -226,31 +257,31 @@ export default function CheckoutPage() {
               <section className={styles.formGroup}>
                 <h2 className={styles.sectionTitle}>Select a Shipping Method</h2>
                 <div className={styles.radioGroup}>
-                  <label className={`${styles.radioLabel} ${shippingMethod === "standard" ? styles.activeRadio : ""}`}>
+                  <label className={`${styles.radioLabel} ${shippingMethod === "door" ? styles.activeRadio : ""}`}>
                     <div className={styles.radioInfo}>
                       <input 
                         type="radio" 
                         name="shipping" 
-                        value="standard" 
-                        checked={shippingMethod === "standard"}
+                        value="door" 
+                        checked={shippingMethod === "door"}
                         onChange={(e) => setShippingMethod(e.target.value)}
                       />
-                      <span>Standard (3-7 Days)</span>
+                      <span>Door-to-Door</span>
                     </div>
-                    <span>{formatNaira(0)}</span>
+                    <span>{formatNaira(calculateShippingCost(formData.state, "door"))}</span>
                   </label>
-                  <label className={`${styles.radioLabel} ${shippingMethod === "express" ? styles.activeRadio : ""}`}>
+                  <label className={`${styles.radioLabel} ${shippingMethod === "pick-up" ? styles.activeRadio : ""}`}>
                     <div className={styles.radioInfo}>
                       <input 
                         type="radio" 
                         name="shipping" 
-                        value="express" 
-                        checked={shippingMethod === "express"}
+                        value="pick-up" 
+                        checked={shippingMethod === "pick-up"}
                         onChange={(e) => setShippingMethod(e.target.value)}
                       />
-                      <span>Express (1-2 Days)</span>
+                      <span>Pick-up</span>
                     </div>
-                    <span>{formatNaira(0)}</span>
+                    <span>{formatNaira(calculateShippingCost(formData.state, "pick-up"))}</span>
                   </label>
                 </div>
               </section>
@@ -313,10 +344,6 @@ export default function CheckoutPage() {
                 <div className={styles.calcRow}>
                   <span>Shipping</span>
                   <span>{formatNaira(shippingCost)}</span>
-                </div>
-                <div className={styles.calcRow}>
-                  <span>Estimated Tax</span>
-                  <span>{formatNaira(tax)}</span>
                 </div>
                 <div className={`${styles.calcRow} ${styles.totalRow}`}>
                   <span>Estimated total</span>

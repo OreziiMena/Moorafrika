@@ -12,3 +12,5 @@ export interface Review {
   text: string;
   avatar?: string;
 }
+
+export type ShippingMethod = 'within_port_harcourt' | 'outside_port_harcourt_doors' | 'outside_port_harcourt_pickup';

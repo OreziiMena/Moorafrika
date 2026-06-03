@@ -10,6 +10,7 @@ export const createOrderSchema = z.object({
   contactPhone: z.string(),
   contactEmail: z.string(),
   note: z.string().max(500).optional(),
+  shippingMethod: z.enum(['within_port_harcourt', 'outside_port_harcourt_doors', 'outside_port_harcourt_pickup']),
 })
 
 export const adminUpdateOrder = z.object({
