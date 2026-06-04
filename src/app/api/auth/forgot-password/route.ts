@@ -4,7 +4,7 @@ import UserService from "@/services/user.service";
 
 export const POST = errorHandler(async (request) => {
   const body = await request.json();
-  const result = await UserService.forgotPassword(body);
+  const { message } = await UserService.forgotPassword(body);
 
-  return NextResponse.json({ message: "Failed to request password reset. Please try again." });
+  return NextResponse.json({ message });
 });
