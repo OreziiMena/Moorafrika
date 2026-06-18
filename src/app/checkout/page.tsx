@@ -91,7 +91,7 @@ export default function CheckoutPage() {
   };
 
   const subtotal = items.reduce((acc, item) => acc + (getDiscountedPrice(item.product) * item.quantity), 0);
-  // const tax = subtotal * 0.075;
+  const tax = subtotal * 0.075;
 
   useEffect(() => {
     if (status === "unauthenticated") {
@@ -175,7 +175,7 @@ export default function CheckoutPage() {
   };
 
   const shippingCost = calculateShippingCost(formData.state, shippingMethod);
-  const total = subtotal + shippingCost;
+  const total = subtotal + shippingCost + tax;
 
   return (
       <div className={styles.container}>
@@ -344,6 +344,10 @@ export default function CheckoutPage() {
                 <div className={styles.calcRow}>
                   <span>Shipping</span>
                   <span>{formatNaira(shippingCost)}</span>
+                </div>
+                <div className={styles.calcRow}>
+                  <span>VAT (7.5%)</span>
+                  <span>{formatNaira(tax)}</span>
                 </div>
                 <div className={`${styles.calcRow} ${styles.totalRow}`}>
                   <span>Estimated total</span>
