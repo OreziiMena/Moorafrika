@@ -22,12 +22,40 @@ const channels = [
 
 const domain = process.env.ROOT_DOMAIN || 'http://localhost:3000';
 
+function calculateGrossAmount(desiredNet: number) {
+  const percentageFee = 0.015;
+  const additionalFee = 100;
+  const feeCap = 2000;
+
+  let gross;
+
+  // First estimate assuming additional fee applies
+  gross = (desiredNet + additionalFee) / (1 - percentageFee);
+
+  let fee = gross * percentageFee;
+
+  if (gross > 2500) {
+    fee += additionalFee;
+  }
+
+  fee = Math.min(fee, feeCap);
+
+  gross = desiredNet + fee;
+
+  return {
+    netAmount: desiredNet,
+    fee: Math.ceil(fee),
+    grossAmount: Math.ceil(gross),
+    paystackAmountKobo: Math.ceil(gross * 100),
+  };
+}
+
 export const paystackCheckout = async ({
   totalAmount,
   email,
   orderId,
 }: CheckoutItemsParams) => {
-  const totalAmountInKobo = Math.round(totalAmount * 100);
+  const totalAmountInKobo = calculateGrossAmount(totalAmount).paystackAmountKobo;
   try {
     const checkout = await paystack.transaction.initialize({
       amount: totalAmountInKobo.toString(),
