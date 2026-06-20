@@ -122,6 +122,10 @@ export default function AdminOrderDetailsPage() {
   };
 
   const shippingInfo = getShippingDetails(order.shippingMethod);
+  const shippingFee = order.shippingMethod ? shippingInfo.fee : 0;
+  const hasTax = order.totalAmount > (subtotal + shippingFee) || order.status === 'PENDING';
+  const tax = hasTax ? subtotal * 0.075 : 0;
+  const displayedTotal = hasTax ? (subtotal + shippingFee + tax) : order.totalAmount;
 
   return (
     <main className={styles.pageWrapper}>
@@ -220,9 +224,15 @@ export default function AdminOrderDetailsPage() {
                     <span>{formatNaira(shippingInfo.fee)}</span>
                   </div>
                 )}
+                {tax > 0 && (
+                  <div className={styles.totalRow}>
+                    <span>VAT (7.5%):</span>
+                    <span>{formatNaira(tax)}</span>
+                  </div>
+                )}
                 <div className={`${styles.totalRow} ${styles.grandTotal}`}>
                   <span>Total:</span>
-                  <span>{formatNaira(order.totalAmount)}</span>
+                  <span>{formatNaira(displayedTotal)}</span>
                 </div>
               </div>
             </section>

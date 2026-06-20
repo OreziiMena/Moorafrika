@@ -54,19 +54,19 @@ export const handleClientError = (
     return;
   }
   
-  const errorData = error.response?.data as ErrorData;
+  const errorData = error.response?.data as ErrorData | undefined;
 
-  if (errorData.error === 'ValidationError') {
+  if (errorData && errorData.error === 'ValidationError') {
     return handelValidationError({
       issues: errorData.issues,
       message: errorData.message,
       setErrors: payload?.setErrors,
     });
   } else if (payload?.setErrorMsg) {
-    payload.setErrorMsg(errorData.message);
-    console.log(`${errorData.error}: ${error.message}`);
+    payload.setErrorMsg(errorData?.message || error.message);
+    console.log(`${errorData?.error || 'Error'}: ${error.message}`);
   } else {
-    console.log(`${errorData.error}: ${error.message}`);
-    toast.error(errorData.message);
+    console.log(`${errorData?.error || 'Error'}: ${error.message}`);
+    toast.error(errorData?.message || error.message);
   }
 };

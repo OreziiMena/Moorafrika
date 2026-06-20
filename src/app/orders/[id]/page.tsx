@@ -9,7 +9,6 @@ import { handleClientError } from "@/lib/clientErrorHandler";
 import styles from "./id.module.css";
 import { UserOrderContract } from "@/contracts/order";
 
-// Assuming you have an Order contract. Adjust fields as necessary.
 export default function OrderDetailsPage() {
   const params = useParams();
   const router = useRouter();
@@ -111,6 +110,7 @@ export default function OrderDetailsPage() {
   if (!order) return <div className={styles.loadingWrapper}>Order not found.</div>;
 
   const subtotal = order.orderItems?.reduce((sum, item) => sum + (item.priceAtPurchase * item.quantity), 0) || 0;
+  const tax = subtotal * 0.075;
 
   const getShippingDetails = (method: string) => {
     switch (method?.toLowerCase()) {

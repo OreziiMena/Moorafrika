@@ -187,6 +187,7 @@ describe('OrderService', () => {
       contactName: 'Buyer Name',
       contactPhone: '+2347000000000',
       note: 'Leave at reception',
+      shippingMethod: 'within_port_harcourt',
     });
     mocks.authorizeUserMock.mockResolvedValue({ id: 'user-1' });
     mocks.getUserCartMock.mockResolvedValue({ id: 'cart-1', items: cartItems });
@@ -213,7 +214,8 @@ describe('OrderService', () => {
       contact_name: 'Buyer Name',
       contact_phone: '+2347000000000',
       note: 'Leave at reception',
-      totalAmount: 5000,
+      totalAmount: 10375,
+      shippingMethod: 'WITHIN_PORT_HARCOURT',
       user: { connect: { id: 'user-1' } },
     });
     expect(mocks.createOrderItemsMock).toHaveBeenCalledWith([
@@ -235,7 +237,7 @@ describe('OrderService', () => {
     expect(mocks.paystackCheckoutMock).toHaveBeenCalledWith({
       orderId: 'order-1',
       email: 'buyer@example.com',
-      totalAmount: 5000,
+      totalAmount: 10375,
     });
     expect(mocks.clearCartItemsMock).toHaveBeenCalledWith(cartItems);
   });
@@ -252,11 +254,16 @@ describe('OrderService', () => {
     ];
 
     mocks.createOrderSchemaParseMock.mockReturnValue({
-      deliveryAddress: '12 Market Road',
+      streetAddress: '12 Market Road',
+      city: 'Lagos',
+      state: 'Lagos',
+      zipCode: '100001',
+      country: 'Nigeria',
       contactEmail: 'buyer@example.com',
       contactName: 'Buyer Name',
       contactPhone: '+2347000000000',
       note: undefined,
+      shippingMethod: 'within_port_harcourt',
     });
     mocks.authorizeUserMock.mockResolvedValue({ id: 'user-1' });
     mocks.getUserCartMock.mockResolvedValue({ id: 'cart-1', items: cartItems });
@@ -299,6 +306,7 @@ describe('OrderService', () => {
       userId: 'user-1',
       status: 'PENDING',
       contact_email: 'buyer@example.com',
+      shippingMethod: 'within_port_harcourt',
       orderItems: [
         { quantity: 2, price_at_purchase: 1000, product: { id: 'product-1', price: 1000, category: { name: 'Clothing' } } },
         { quantity: 1, price_at_purchase: 2500, product: { id: 'product-2', price: 2500, category: { name: 'Clothing' } } },
@@ -313,7 +321,7 @@ describe('OrderService', () => {
     expect(mocks.paystackCheckoutMock).toHaveBeenCalledWith({
       orderId: 'order-1',
       email: 'buyer@example.com',
-      totalAmount: 4500,
+      totalAmount: 9837.5,
     });
   });
 

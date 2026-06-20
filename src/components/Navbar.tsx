@@ -198,6 +198,13 @@ export default function Navbar() {
                   <>
                     <Link href="/orders" className={styles.mobileAuthBtn} onClick={() => setIsMobileMenuOpen(false)}>My Order History</Link>
                     {isAdmin && <Link href="/admin" className={styles.mobileAuthBtn} onClick={() => setIsMobileMenuOpen(false)} style={{ color: '#3b82f6' }}>Admin Dashboard</Link>}
+                    <button 
+                      onClick={() => { signOut(); setIsMobileMenuOpen(false); }} 
+                      className={styles.mobileAuthBtn}
+                      style={{ color: 'var(--burnt-umber)' }}
+                    >
+                      Log Out
+                    </button>
                   </>
                 ) : (
                   <>

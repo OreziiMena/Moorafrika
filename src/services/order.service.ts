@@ -170,13 +170,12 @@ class OrderService {
       return product.price * (1 - maxPct / 100);
     };
 
-    let totalAmount = cart.items.reduce(
+    const subtotal = cart.items.reduce(
       (sum, item) => sum + item.quantity * getDiscountedPrice(item.product),
       0,
     );
-
-    // Add shipping fee to total amount
-    totalAmount += OrderService.SHIPPING_FEES[shippingMethod];
+    const tax = subtotal * 0.075;
+    const totalAmount = subtotal + OrderService.SHIPPING_FEES[shippingMethod] + tax;
 
     const orderPayload = {
       street_address: streetAddress,
@@ -277,13 +276,12 @@ class OrderService {
       }
     }
 
-    let totalAmount = order.orderItems.reduce(
+    const subtotal = order.orderItems.reduce(
       (sum, item) => sum + item.quantity * item.price_at_purchase,
       0,
     );
-
-    // Add shipping fee to total amount
-    totalAmount += OrderService.SHIPPING_FEES[order.shippingMethod.toLowerCase() as ShippingMethod];
+    const tax = subtotal * 0.075;
+    const totalAmount = subtotal + OrderService.SHIPPING_FEES[order.shippingMethod.toLowerCase() as ShippingMethod] + tax;
 
     const url = await paystackCheckout({
       orderId: order.id,
@@ -390,8 +388,8 @@ class OrderService {
         newTotalAmount += item.quantity * currentPrice;
       }
 
-      // Add shipping fee to total amount
-      newTotalAmount += OrderService.SHIPPING_FEES[order.shippingMethod.toLowerCase() as ShippingMethod];
+      const tax = newTotalAmount * 0.075;
+      newTotalAmount = newTotalAmount + OrderService.SHIPPING_FEES[order.shippingMethod.toLowerCase() as ShippingMethod] + tax;
 
       if (orderTotalChanged || order.totalAmount !== newTotalAmount) {
         await prisma.order.update({
