@@ -110,7 +110,6 @@ export default function OrderDetailsPage() {
   if (!order) return <div className={styles.loadingWrapper}>Order not found.</div>;
 
   const subtotal = order.orderItems?.reduce((sum, item) => sum + (item.priceAtPurchase * item.quantity), 0) || 0;
-  const tax = subtotal * 0.075;
 
   const getShippingDetails = (method: string) => {
     switch (method?.toLowerCase()) {
@@ -126,6 +125,10 @@ export default function OrderDetailsPage() {
   };
 
   const shippingInfo = getShippingDetails(order.shippingMethod);
+  const shippingFee = order.shippingMethod ? shippingInfo.fee : 0;
+  const hasTax = order.totalAmount > (subtotal + shippingFee) || order.status === 'PENDING';
+  const tax = hasTax ? subtotal * 0.075 : 0;
+  const displayedTotal = hasTax ? (subtotal + shippingFee + tax) : order.totalAmount;
 
   return (
     <main className={styles.pageWrapper}>
@@ -253,9 +256,15 @@ export default function OrderDetailsPage() {
               <span>Shipping ({shippingInfo.name}):</span>
               <span>{formatNaira(shippingInfo.fee)}</span>
             </div>
+            {tax > 0 && (
+              <div className={styles.totalRow}>
+                <span>VAT (7.5%):</span>
+                <span>{formatNaira(tax)}</span>
+              </div>
+            )}
             <div className={`${styles.totalRow} ${styles.grandTotal}`}>
               <span>Total:</span>
-              <span>{formatNaira(order.totalAmount)}</span>
+              <span>{formatNaira(displayedTotal)}</span>
             </div>
           </div>
         </section>
@@ -265,7 +274,7 @@ export default function OrderDetailsPage() {
           <h2 className={styles.cardTitle}>Payment</h2>
           <div className={`${styles.totalRow} ${styles.paymentRow}`}>
             <span>Total Paid:</span>
-            <span>{order.status === 'PENDING' ? formatNaira(0) : formatNaira(order.totalAmount)}</span>
+            <span>{order.status === 'PENDING' ? formatNaira(0) : formatNaira(displayedTotal)}</span>
           </div>
           
           {/* Action Buttons if Pending */}
